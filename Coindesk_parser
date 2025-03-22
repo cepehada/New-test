@@ -1,0 +1,50 @@
+"""
+Базовый модуль для парсеров новостей.
+"""
+from abc import ABC, abstractmethod
+import logging
+from typing import List, Dict, Any, Optional
+from datetime import datetime
+
+class NewsParser(ABC):
+    """Абстрактный базовый класс для парсеров новостей."""
+    
+    def __init__(self, source_name: str, base_url: str):
+        self.source_name = source_name
+        self.base_url = base_url
+        self.logger = logging.getLogger(f"{source_name}Parser")
+    
+    @abstractmethod
+    async def fetch_articles(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:
+        """
+        Получает статьи с новостного источника.
+        
+        Args:
+            limit: Максимальное количество статей для получения
+            
+        Returns:
+            Список словарей со статьями
+        """
+        pass
+    
+    def standardize_article(self, article: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Стандартизирует формат статьи для совместимости со всеми системами.
+        
+        Args:
+            article: Исходная статья
+            
+        Returns:
+            Статья в стандартизированном формате
+        """
+        # Убедимся, что все поля присутствуют и имеют правильные имена
+        standardized = {
+            "source": self.source_name,
+            "title": article.get("title", ""),
+            "link": article.get("url", article.get("link", "")),
+            "content": article.get("content", ""),
+            "timestamp": article.get("timestamp", datetime.now().isoformat()),
+            "hash": article.get("hash", "")
+        }
+        
+        return standardized
