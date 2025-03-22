@@ -1,0 +1,83 @@
+"""
+Базовый модуль ботов.
+Определяет абстрактный класс BaseBot для всех ботов.
+"""
+
+from abc import ABC, abstractmethod
+import asyncio
+import logging
+from typing import Optional, Dict, Any
+
+class BaseBot(ABC):
+    """
+    Абстрактный класс для ботов.
+    Содержит методы запуска и остановки.
+    """
+
+    def __init__(self, name: Optional[str] = None) -> None:
+        """
+        Инициализирует базового бота.
+        
+        Args:
+            name: Имя бота для логирования
+        """
+        self.is_running = False
+        self.task: Optional[asyncio.Task] = None
+        self.name = name or self.__class__.__name__
+        self.logger = logging.getLogger(self.name)
+        self.config: Dict[str, Any] = {}
+
+    @abstractmethod
+    async def run(self) -> None:
+        """
+        Основной цикл работы бота.
+        Должен быть переопределен в подклассах.
+        """
+        pass
+
+    async def start(self) -> None:
+        """
+        Асинхронно запускает бота.
+        """
+        if not self.is_running:
+            self.is_running = True
+            self.logger.info(f"{self.name} starting...")
+            
+            # Создаем и запускаем задачу для выполнения метода run
+            self.task = asyncio.create_task(self._run_wrapper())
+
+    async def stop(self) -> None:
+        """
+        Асинхронно останавливает бота.
+        """
+        if self.is_running:
+            self.is_running = False
+            self.logger.info(f"{self.name} stopping...")
+            
+            # Дожидаемся завершения задачи, если она существует
+            if self.task:
+                try:
+                    await asyncio.wait_for(self.task, timeout=5.0)
+                except asyncio.TimeoutError:
+                    self.logger.warning(f"{self.name} did not stop gracefully, cancelling...")
+                    self.task.cancel()
+                    try:
+                        await self.task
+                    except asyncio.CancelledError:
+                        pass
+                self.task = None
+
+    async def _run_wrapper(self) -> None:
+        """
+        Обертка для run() с обработкой исключений.
+        """
+        try:
+            await self.run()
+        except asyncio.CancelledError:
+            self.logger.info(f"{self.name} was cancelled")
+        except Exception as e:
+            self.logger.error(f"Error in {self.name}: {e}", exc_info=True)
+            self.is_running = False
+        finally:
+            self.logger.info(f"{self.name} stopped")
+            self.is_running = False
