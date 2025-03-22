@@ -1,23 +1,40 @@
 """
-Базовый модуль для парсеров новостей.
+Парсер CoinDesk.
+Парсит новости с сайта CoinDesk.
 """
-from abc import ABC, abstractmethod
+
 import logging
+from bs4 import BeautifulSoup
+from project.utils.http_utils import async_get
 from typing import List, Dict, Any, Optional
 from datetime import datetime
+from project.news.parsers.base_parser import NewsParser  # Новый импорт
 
-class NewsParser(ABC):
-    """Абстрактный базовый класс для парсеров новостей."""
+logger = logging.getLogger("CoinDeskParser")
+
+# Конфигурация для парсера
+COINDESK_CONFIG = {
+    "base_url": "https://www.coindesk.com/",
+    "selectors": {
+        "article": "article.article-default",
+        "title": "h1.heading",
+        "content": ".article-body p",
+        "link": "a",
+        "timestamp": "time"
+    }
+}
+
+
+class CoinDeskParser(NewsParser):
+    """Парсер для новостного сайта CoinDesk"""
     
-    def __init__(self, source_name: str, base_url: str):
-        self.source_name = source_name
-        self.base_url = base_url
-        self.logger = logging.getLogger(f"{source_name}Parser")
+    def __init__(self):
+        super().__init__(source_name="coindesk", base_url=COINDESK_CONFIG["base_url"])
+        self.selectors = COINDESK_CONFIG["selectors"]
     
-    @abstractmethod
-    async def fetch_articles(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:
+    async def fetch_articles(self, limit: Optional[int] = 10) -> List[Dict[str, Any]]:
         """
-        Получает статьи с новостного источника.
+        Получает статьи с CoinDesk.
         
         Args:
             limit: Максимальное количество статей для получения
@@ -25,26 +42,63 @@ class NewsParser(ABC):
         Returns:
             Список словарей со статьями
         """
-        pass
+        articles = []
+        try:
+            html = await async_get(self.base_url)
+            if not html:
+                return articles
+                
+            raw_articles = self._parse_html(html)
+            
+            # Ограничиваем количество статей
+            limited_articles = raw_articles[:limit] if limit else raw_articles
+            
+            # Стандартизируем формат
+            for article in limited_articles:
+                articles.append(self.standardize_article(article))
+                
+        except Exception as e:
+            self.logger.error(f"Ошибка при получении статей с {self.base_url}: {e}")
+        
+        return articles
     
-    def standardize_article(self, article: Dict[str, Any]) -> Dict[str, Any]:
+    def _parse_html(self, html: str) -> List[Dict]:
         """
-        Стандартизирует формат статьи для совместимости со всеми системами.
+        Парсит HTML-контент сайта CoinDesk.
         
         Args:
-            article: Исходная статья
+            html: HTML-контент страницы
             
         Returns:
-            Статья в стандартизированном формате
+            Список словарей со статьями
         """
-        # Убедимся, что все поля присутствуют и имеют правильные имена
-        standardized = {
-            "source": self.source_name,
-            "title": article.get("title", ""),
-            "link": article.get("url", article.get("link", "")),
-            "content": article.get("content", ""),
-            "timestamp": article.get("timestamp", datetime.now().isoformat()),
-            "hash": article.get("hash", "")
-        }
+        soup = BeautifulSoup(html, "html.parser")
+        articles = []
         
-        return standardized
+        for art in soup.select(self.selectors["article"]):
+            try:
+                title = art.select_one(self.selectors["title"]).text.strip()
+                url = art.find(self.selectors["link"])["href"]
+                
+                # Если URL относительный, добавляем базовый URL
+                if url and not url.startswith(('http://', 'https://')):
+                    url = self.base_url.rstrip('/') + '/' + url.lstrip('/')
+                
+                # Собираем текст из всех параграфов
+                content = "\n".join([p.text for p in art.select(self.selectors["content"])])
+                
+                # Получаем временную метку
+                timestamp_elem = art.select_one(self.selectors["timestamp"])
+                ts = timestamp_elem["datetime"] if timestamp_elem else datetime.now().isoformat()
+                
+                articles.append({
+                    "source": self.source_name,
+                    "title": title,
+                    "url": url,
+                    "content": content,
+                    "timestamp": ts,
+                })
+            except Exception as e:
+                self.logger.error(f"Ошибка при парсинге статьи CoinDesk: {e}")
+        
+        return articles
