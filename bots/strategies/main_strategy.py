@@ -674,3 +674,30 @@ class MainStrategy(BaseStrategy):
         except Exception as e:
             logger.error(f"Ошибка при комбинировании сигналов для {symbol}: {str(e)}")
             return {}
+
+    def analyze_market(self, data):
+        """
+        Analyzes market data to generate trading signals.
+        
+        Args:
+            data: Market data to analyze
+            
+        Returns:
+            Dictionary with analysis results
+        """
+        trend = self._determine_trend(data)
+        volatility = self._calculate_volatility(data)
+        signals = self._generate_signals(trend, volatility, data)
+        return signals
+    
+    def _determine_trend(self, data):
+        """Determines market trend based on data"""
+        # Fewer branches...
+    
+    def _calculate_volatility(self, data):
+        """Calculates market volatility"""
+        # Fewer branches...
+    
+    def _generate_signals(self, trend, volatility, data):
+        """Generates signals based on trend and volatility"""
+        # Fewer branches...

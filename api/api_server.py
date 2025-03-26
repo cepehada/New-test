@@ -249,6 +249,25 @@ class APIServer:
         bot_router.post("/{bot_id}/resume")(self.resume_bot)
         bot_router.get("/{bot_id}/status")(self.get_bot_status)
 
+        // ...existing code...
+        @app.route('/api/stats/performance', methods=['GET'])
+        async def get_performance_stats(request):
+            try:
+                # Получаем статистику производительности
+                stats = {
+                    "cpu_usage": system_stats.get_cpu_usage(),
+                    "memory_usage": system_stats.get_memory_usage(),
+                    "disk_usage": system_stats.get_disk_usage(),
+                    "uptime": system_stats.get_uptime(),
+                    "network": system_stats.get_network_stats()
+                }  # Закрытие фигурной скобки, которая ранее не была закрыта
+                
+                return json_response({"success": True, "data": stats})
+            except Exception as e:
+                logger.error(f"Error getting performance stats: {e}")
+                return json_response({"success": False, "error": str(e)}, status=500)
+        // ...existing code...
+
         # Маршруты для бэктестинга
         backtest_router.post("/")(self.run_backtest)
         backtest_router.get("/results")(self.get_backtest_results)

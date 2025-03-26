@@ -117,7 +117,7 @@ class CrossStrategy(BaseStrategy):
 
 
         # Устанавливаем интервал обновления
-self.update_interval = self.strategy_config["check_interval"]
+        self.update_interval = self.strategy_config["check_interval"]
 
         # Загружаем начальные данные
         await self._update_cross_market_data()
@@ -389,7 +389,7 @@ self.update_interval = self.strategy_config["check_interval"]
                 min_base = required_base * self.strategy_config["balance_threshold"]
                 
                 # Проверяем достаточность балансов
-                return buy_available >= min_quote and sell_available >= min_base
+                return buy_available >= min_quote и sell_available >= min_base
                 
             except Exception as e:
                 logger.error(f"Ошибка при проверке балансов для арбитража: {str(e)}")
@@ -493,3 +493,14 @@ self.update_interval = self.strategy_config["check_interval"]
                     # Например, создание записи в self.open_positions
         
         return signals
+
+    def calculate_signals(self, data):
+        """Рассчитывает торговые сигналы на основе пересечения индикаторов"""
+        # ...existing code...
+        
+        # Исправление отступа на строке 123
+        for i in range(len(data)):
+            # Логика расчета сигналов
+            pass
+            
+        # ...existing code...

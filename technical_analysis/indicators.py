@@ -37,7 +37,7 @@ class Indicators:
             Series со значениями SMA
         """
         if len(data) < period:
-            logger.warning(f"Недостаточно данных для расчета SMA с периодом {period}")
+            logger.warning("Недостаточно данных для расчета SMA с периодом %s", period)
             return pd.Series(index=data.index)
 
         return data[column].rolling(window=period).mean()
@@ -59,7 +59,7 @@ class Indicators:
             Series со значениями EMA
         """
         if len(data) < period:
-            logger.warning(f"Недостаточно данных для расчета EMA с периодом {period}")
+            logger.warning("Недостаточно данных для расчета EMA с периодом %s", period)
             return pd.Series(index=data.index)
 
         return data[column].ewm(span=period, adjust=False).mean()
@@ -86,7 +86,7 @@ class Indicators:
         """
         if len(data) < period:
             logger.warning(
-                f"Недостаточно данных для расчета полос Боллинджера с периодом {period}"
+                "Недостаточно данных для расчета полос Боллинджера с периодом %s", period
             )
             return {
                 "upper": pd.Series(index=data.index),
@@ -119,7 +119,7 @@ class Indicators:
             Series со значениями RSI
         """
         if len(data) < period + 1:
-            logger.warning(f"Недостаточно данных для расчета RSI с периодом {period}")
+            logger.warning("Недостаточно данных для расчета RSI с периодом %s", period)
             return pd.Series(index=data.index)
 
         # Рассчитываем изменения цены
@@ -165,7 +165,10 @@ class Indicators:
         """
         if len(data) < slow_period + signal_period:
             logger.warning(
-                f"Недостаточно данных для расчета MACD с периодами {fast_period}, {slow_period}, {signal_period}"
+                "Недостаточно данных для расчета MACD с периодами %s, %s, %s",
+                fast_period,
+                slow_period,
+                signal_period,
             )
             return {
                 "macd": pd.Series(index=data.index),
@@ -206,7 +209,8 @@ class Indicators:
         """
         if len(data) < k_period:
             logger.warning(
-                f"Недостаточно данных для расчета стохастического осциллятора с периодом {k_period}"
+                "Недостаточно данных для расчета стохастического осциллятора с периодом %s",
+                k_period,
             )
             return {"k": pd.Series(index=data.index), "d": pd.Series(index=data.index)}
 
@@ -275,7 +279,10 @@ class Indicators:
         """
         if len(data) < max(tenkan_period, kijun_period, senkou_span_b_period):
             logger.warning(
-                f"Недостаточно данных для расчета Ichimoku Cloud с периодами {tenkan_period}, {kijun_period}, {senkou_span_b_period}"
+                "Недостаточно данных для расчета Ichimoku Cloud с периодами %s, %s, %s",
+                tenkan_period,
+                kijun_period,
+                senkou_span_b_period,
             )
             return {
                 "tenkan_sen": pd.Series(index=data.index),
@@ -421,7 +428,7 @@ class Indicators:
             Словарь с индексом ADX и индикаторами направления
         """
         if len(data) < period + 1:
-            logger.warning(f"Недостаточно данных для расчета ADX с периодом {period}")
+            logger.warning("Недостаточно данных для расчета ADX с периодом %s", period)
             return {
                 "adx": pd.Series(index=data.index),
                 "di_plus": pd.Series(index=data.index),
@@ -539,7 +546,7 @@ class Indicators:
             Series со значениями ROC
         """
         if len(data) < period:
-            logger.warning(f"Недостаточно данных для расчета ROC с периодом {period}")
+            logger.warning("Недостаточно данных для расчета ROC с периодом %s", period)
             return pd.Series(index=data.index)
 
         # Рассчитываем ROC

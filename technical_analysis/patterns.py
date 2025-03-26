@@ -3,10 +3,8 @@
 Предоставляет функции для поиска паттернов в ценовых данных.
 """
 
-import numpy as np
 import pandas as pd
-import logging
-from typing import Dict, List, Any, Optional, Union, Tuple
+from typing import Dict, List
 
 from project.utils.logging_utils import get_logger
 from project.utils.error_handler import handle_error

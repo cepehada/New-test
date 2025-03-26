@@ -41,31 +41,28 @@ class BaseStrategy(ABC):
     Базовый класс для всех торговых стратегий.
     """
 
-    def __init__(
-        self,
-        name: str,
-        exchange_id: str = "binance",
-        symbols: List[str] = None,
-        timeframes: List[str] = None,
-        config: Dict[str, Any] = None,
-    ):
+    def __init__(self, config):
         """
         Инициализирует базовую торговую стратегию.
 
         Args:
-            name: Имя стратегии
-            exchange_id: Идентификатор биржи
-            symbols: Список символов для торговли
-            timeframes: Список таймфреймов для анализа
-            config: Конфигурация стратегии
+            config: Конфигурация стратегии, содержащая:
+                - exchange: Экземпляр биржи
+                - symbol: Торговый символ
+                - timeframe: Таймфрейм для анализа
+                - indicators: Список индикаторов
+                - stop_loss: Процент стоп-лосса
+                - take_profit: Процент тейк-профита
+                - position_size: Размер позиции в процентах от капитала
+                - max_positions: Максимальное количество позиций
         """
         self.config = get_config()
-        self.name = name
+        self.name = config.name
         self.strategy_id = str(uuid.uuid4())
-        self.exchange_id = exchange_id
-        self.symbols = symbols or []
-        self.timeframes = timeframes or ["1h"]
-        self.strategy_config = config or {}
+        self.exchange_id = config.exchange_id
+        self.symbols = config.symbols or []
+        self.timeframes = config.timeframes or ["1h"]
+        self.strategy_config = config.strategy_config or {}
         self.status = StrategyStatus.STOPPED
         self.task = None
         self.start_time = 0

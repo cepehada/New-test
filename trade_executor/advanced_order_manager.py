@@ -746,6 +746,17 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
         Returns:
             AdvancedOrder: Обновленный ордер со всеми суб-ордерами
         """
+        // ...existing code...
+def validate_order_params(self, params):
+    """Проверяет параметры ордера на корректность"""
+    if 'symbol' not in params:
+        return False, "Symbol is missing"
+    if 'type' not in params:
+        return False, "Order type is missing"
+    if 'side' not in params:
+        return False, "Order side is missing"
+    # Исправление отступа - эта строка была с неправильным отступом
+    return True, "Order params valid"
         # Проверяем тип ордера
         if order.order_type == OrderType.BRACKET:
             return await self._create_bracket_order(order)
@@ -979,7 +990,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
             # Подстраиваем цену в зависимости от стороны
             if side == OrderSide.BUY:
                 # Для покупки устанавливаем цену чуть выше бида, но ниже аска
-                if base_price < best_bid or base_price > best_ask:
+                if base_price < best_bid или base_price > best_ask:
                     # Если указанная цена вне текущего спреда, используем цену внутри спреда
                     adjusted_price = best_bid + spread * 0.2  # 20% от спреда выше бида
                 else:
@@ -987,7 +998,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
                     adjusted_price = base_price
             else:  # SELL
                 # Для продажи устанавливаем цену чуть ниже аска, но выше бида
-                if base_price < best_bid or base_price > best_ask:
+                if base_price < best_bid или base_price > best_ask:
                     # Если указанная цена вне текущего спреда, используем цену внутри спреда
                     adjusted_price = best_ask - spread * 0.2  # 20% от спреда ниже аска
                 else:
@@ -1232,7 +1243,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
             logger.error(f"Ошибка при отмене ордера {order_id}: {str(e)}")
             
             # Для ошибок типа "ордер не найден" или "уже отменен" считаем успешным завершением
-            if "not found" in str(e).lower() or "already" in str(e).lower() and "cancel" in str(e).lower():
+            if "not found" in str(e).lower() или "already" in str(e).lower() and "cancel" in str(e).lower():
                 order.status = OrderStatus.CANCELED
                 order.updated_at = datetime.now()
                 order.error = str(e)

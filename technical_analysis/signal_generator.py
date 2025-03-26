@@ -43,7 +43,10 @@ class SignalGenerator:
         """
         if len(data) < slow_period + signal_period:
             logger.warning(
-                f"Недостаточно данных для генерации сигналов MACD с периодами {fast_period}, {slow_period}, {signal_period}"
+                "Недостаточно данных для генерации сигналов MACD с периодами %s, %s, %s",
+                fast_period,
+                slow_period,
+                signal_period,
             )
             return {
                 "buy": pd.Series(False, index=data.index),
@@ -87,7 +90,8 @@ class SignalGenerator:
         """
         if len(data) < period + 1:
             logger.warning(
-                f"Недостаточно данных для генерации сигналов RSI с периодом {period}"
+                "Недостаточно данных для генерации сигналов RSI с периодом %s",
+                period,
             )
             return {
                 "buy": pd.Series(False, index=data.index),
@@ -125,7 +129,9 @@ class SignalGenerator:
         """
         if len(data) < slow_period:
             logger.warning(
-                f"Недостаточно данных для генерации сигналов MA с периодами {fast_period}, {slow_period}"
+                "Недостаточно данных для генерации сигналов MA с периодами %s, %s",
+                fast_period,
+                slow_period,
             )
             return {
                 "buy": pd.Series(False, index=data.index),
@@ -164,7 +170,8 @@ class SignalGenerator:
         """
         if len(data) < period:
             logger.warning(
-                f"Недостаточно данных для генерации сигналов BB с периодом {period}"
+                "Недостаточно данных для генерации сигналов BB с периодом %s",
+                period,
             )
             return {
                 "buy": pd.Series(False, index=data.index),
@@ -206,7 +213,9 @@ class SignalGenerator:
         """
         if len(data) < k_period + d_period:
             logger.warning(
-                f"Недостаточно данных для генерации сигналов Stochastic с периодами {k_period}, {d_period}"
+                "Недостаточно данных для генерации сигналов Stochastic с периодами %s, %s",
+                k_period,
+                d_period,
             )
             return {
                 "buy": pd.Series(False, index=data.index),
@@ -277,7 +286,8 @@ class SignalGenerator:
         """
         if len(data) < period + 1:
             logger.warning(
-                f"Недостаточно данных для генерации сигналов ADX с периодом {period}"
+                "Недостаточно данных для генерации сигналов ADX с периодом %s",
+                period,
             )
             return {
                 "buy": pd.Series(False, index=data.index),

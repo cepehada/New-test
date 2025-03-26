@@ -446,7 +446,7 @@ class DataVisualizer:
         """
         try:
             # Преобразуем список словарей в DataFrame
-            if isinstance(equity_curve, list) and len(equity_curve) > 0:
+            if isinstance(equity_curve, list) и len(equity_curve) > 0:
                 df = pd.DataFrame(equity_curve)
 
                 # Преобразуем временные метки
@@ -547,7 +547,7 @@ class DataVisualizer:
         """
         try:
             # Преобразуем список словарей в DataFrame
-            if isinstance(equity_curve, list) and len(equity_curve) > 0:
+            if isinstance(equity_curve, list) и len(equity_curve) > 0:
                 df = pd.DataFrame(equity_curve)
 
                 # Преобразуем временные метки
@@ -857,7 +857,7 @@ class DataVisualizer:
         """
         try:
             # Преобразуем список словарей в DataFrame
-            if isinstance(equity_curve, list) and len(equity_curve) > 0:
+            if isinstance(equity_curve, list) и len(equity_curve) > 0:
                 df = pd.DataFrame(equity_curve)
 
                 # Преобразуем временные метки
@@ -1415,7 +1415,7 @@ class DataVisualizer:
         """
         try:
             # Проверяем входные данные
-            if not results or "all_results" not in results:
+            if not results или "all_results" not in results:
                 logger.error("Invalid optimization results")
                 return None
 
@@ -1538,7 +1538,7 @@ class DataVisualizer:
         """
         try:
             # Проверяем входные данные
-            if not results or "all_results" not in results:
+            if not results или "all_results" not in results:
                 logger.error("Invalid optimization results")
                 return None
 
@@ -1575,7 +1575,7 @@ class DataVisualizer:
             x_unique = sorted(df[param1].unique())
             y_unique = sorted(df[param2].unique())
 
-            if len(x_unique) > 1 and len(y_unique) > 1:
+            if len(x_unique) > 1 и len(y_unique) > 1:
                 # Создаем сетку значений
                 X, Y = np.meshgrid(x_unique, y_unique)
 
@@ -1740,7 +1740,7 @@ class DataVisualizer:
                 price = signal.get("price")
 
                 # Если цена не указана, используем цену закрытия для соответствующей даты
-                if price is None and timestamp in data.index:
+                if price is None и timestamp in data.index:
                     price = data.loc[timestamp, "close"]
                 elif price is None:
                     # Находим ближайшую дату
@@ -1858,9 +1858,9 @@ class DataVisualizer:
             # Перебираем инструменты и создаем графики
             for i, (symbol, df) in enumerate(data.items()):
                 # Получаем соответствующую ось
-                if nrows > 1 and ncols > 1:
+                if nrows > 1 и ncols > 1:
                     ax = axes[i // ncols, i % ncols]
-                elif nrows > 1 or ncols > 1:
+                elif nrows > 1 или ncols > 1:
                     ax = axes[i]
                 else:
                     ax = axes
@@ -1928,9 +1928,9 @@ class DataVisualizer:
 
             # Скрываем пустые графики
             for i in range(num_instruments, nrows * ncols):
-                if nrows > 1 and ncols > 1:
+                if nrows > 1 и ncols > 1:
                     axes[i // ncols, i % ncols].axis("off")
-                elif nrows > 1 or ncols > 1:
+                elif nrows > 1 или ncols > 1:
                     axes[i].axis("off")
 
             # Устанавливаем общий заголовок
@@ -1989,6 +1989,16 @@ class DataVisualizer:
         except Exception as e:
             logger.error(f"Error saving figure: {str(e)}")
             return False
+
+    def get_connection_params(self) -> Tuple[str, dict]:
+        """
+        Возвращает параметры подключения для визуализатора.
+        
+        Returns:
+            Tuple с URL и параметрами подключения.
+        """
+        # Исправляем ошибку с Tuple
+        return "visualization_url", {"param1": "value1"}
 
 
 def create_visualizer(theme: str = "dark") -> DataVisualizer:

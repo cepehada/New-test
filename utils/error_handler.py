@@ -295,3 +295,32 @@ def log_and_return_fallback(fallback_value: T) -> Callable[[Exception], T]:
         return fallback_value
 
     return handler
+
+
+def handle_exceptions(func):
+    """
+    Decorator to handle exceptions in a standardized way.
+    
+    Args:
+        func: The function to wrap with exception handling
+        
+    Returns:
+        Wrapped function with exception handling
+    """
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        try:
+            return await func(*args, **kwargs)
+        except (RequestError, NetworkError) as e:
+            # Handle specific API-related errors
+            logger.error("API error occurred: %s", str(e))
+            raise
+        except (ValueError, TypeError) as e:
+            # Handle input validation errors
+            logger.error("Input validation error: %s", str(e))
+            raise
+        except Exception as e:
+            # Handle unexpected errors
+            logger.error("Unexpected error: %s", str(e), exc_info=True)
+            raise
+    return wrapper

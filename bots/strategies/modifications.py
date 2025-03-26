@@ -76,8 +76,8 @@ class StrategyModifications:
     def add_partial_exits(
         entry_price: float,
         side: str,
-        take_profit_levels: List[float] = [0.01, 0.02, 0.03],
-        exit_percentages: List[float] = [0.33, 0.33, 0.34],
+        take_profit_levels: List[float] = None,
+        exit_percentages: List[float] = None,
     ) -> List[Tuple[float, float]]:
         """
         Рассчитывает уровни для частичного закрытия позиции.
@@ -91,6 +91,11 @@ class StrategyModifications:
         Returns:
             Список кортежей (цена выхода, процент закрытия)
         """
+        if take_profit_levels is None:
+            take_profit_levels = [0.01, 0.02, 0.03]
+        if exit_percentages is None:
+            exit_percentages = [0.33, 0.33, 0.34]
+
         if len(take_profit_levels) != len(exit_percentages):
             logger.error(
                 "Количество уровней тейк-профита должно совпадать с количеством процентов закрытия"
