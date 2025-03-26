@@ -3,7 +3,7 @@ venv/
 .venv/
 env/
 ENV/
-
+new_venv/
 # Исключаем Python-сборку и байт-код
 __pycache__/
 *.py[cod]
