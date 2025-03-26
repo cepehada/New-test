@@ -1,0 +1,29 @@
+# Конфигурация базы данных
+DATABASE_URI=postgresql://user:password@localhost:5432/trading_db
+
+# API ключи бирж
+BINANCE_API_KEY=your_api_key_here
+BINANCE_API_SECRET=your_api_secret_here
+BYBIT_API_KEY=your_api_key_here
+BYBIT_API_SECRET=your_api_secret_here
+
+# Настройки уведомлений
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
+TELEGRAM_CHAT_ID=your_chat_id_here
+TELEGRAM_ALLOWED_USERS=12345678,87654321
+
+# Настройки логирования
+LOG_LEVEL=INFO
+LOG_FILE_PATH=/var/log/trading_bot/app.log
+
+# Настройки системы
+ENABLE_BACKTESTING=false
+ENABLE_PAPER_TRADING=true
+TRADING_CONCURRENCY=5
+DEFAULT_RISK_PERCENTAGE=1.0
+
+# Настройки брокера сообщений
+MESSAGE_BROKER_URI=amqp://guest:guest@localhost:5672/
+
+# Настройки безопасности
+ENCRYPTION_KEY=your_secure_encryption_key_here

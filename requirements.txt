@@ -1,0 +1,50 @@
+# Базовые пакеты
+python-dotenv==1.0.0
+pydantic==2.0.3
+pydantic-settings==2.0.3
+loguru==0.7.0
+structlog==23.1.0
+
+# Асинхронные библиотеки
+aiohttp==3.8.5
+asyncio==3.4.3
+aio-pika==9.2.2
+asyncpg==0.28.0
+
+# API бирж
+ccxt==3.1.54
+binance-futures-connector==3.3.1
+python-binance==1.0.19
+bybit==0.2.14
+
+# Анализ данных и ML
+numpy==1.24.3
+pandas==2.0.3
+ta-lib==0.4.28
+scikit-learn==1.3.0
+statsmodels==0.14.0
+scipy==1.11.2
+
+# Визуализация и отчеты
+matplotlib==3.7.2
+plotly==5.16.1
+dash==2.13.0
+dash-bootstrap-components==1.4.2
+
+# Инструменты интеграции
+aiogram==2.25.1
+slack-sdk==3.21.3
+redis==4.6.0
+websockets==11.0.3
+
+# Тестирование
+pytest==7.4.0
+pytest-asyncio==0.21.1
+pytest-mock==3.11.1
+pytest-cov==4.1.0
+
+# Инструменты разработки
+black==23.7.0
+isort==5.12.0
+mypy==1.5.1
+flake8==6.1.0
