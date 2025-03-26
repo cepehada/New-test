@@ -1,0 +1,38 @@
+# Исключаем виртуальное окружение
+venv/
+.venv/
+env/
+ENV/
+
+# Исключаем Python-сборку и байт-код
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Исключаем файлы с настройками IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Логи
+logs/
+*.log
+
+# Файлы окружения
+.env
+*.env
+
+# Кэш pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Файлы сборки
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Дополнительные временные файлы
+*.tmp
+*.bak
