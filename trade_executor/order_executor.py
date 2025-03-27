@@ -1,4 +1,644 @@
 """
+Модуль для выполнения торговых ордеров на различных биржах.
+Обеспечивает унифицированный интерфейс для размещения ордеров и контроля их статуса.
+"""
+
+# Стандартные импорты
+import time
+import uuid
+from typing import Dict, List, Any, Optional
+from dataclasses import dataclass
+
+# Внутренние импорты
+from project.config import get_config
+from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
+from project.utils.ccxt_exchanges import (
+    get_exchange, fetch_balance, create_order, cancel_order, fetch_order
+)
+
+logger = get_logger(__name__)
+
+# Константы для типов ордеров и сторон
+ORDER_TYPE_MARKET = "market"
+ORDER_TYPE_LIMIT = "limit"
+SIDE_BUY = "buy"
+SIDE_SELL = "sell"
+
+
+@dataclass
+class OrderResult:
+    """Класс для представления результата выполнения ордера"""
+    success: bool
+    order_id: str = ""
+    status: str = ""
+    filled: float = 0.0
+    cost: float = 0.0
+    price: float = 0.0
+    error: str = ""
+    raw_data: Dict = None
+
+
+class OrderExecutor:
+    """
+    Класс для выполнения торговых ордеров на различных биржах.
+    """
+
+    _instance = None
+
+    def __init__(self, config=None):
+        """
+        Инициализирует исполнитель заказов.
+        
+        Args:
+            config: Конфигурация исполнителя
+        """
+        self.config = config or get_config()
+        self.default_order_type = self.config.get("DEFAULT_ORDER_TYPE", ORDER_TYPE_MARKET)
+        self.default_exchange = self.config.get("DEFAULT_EXCHANGE", "binance")
+        self.default_timeout = self.config.get("DEFAULT_ORDER_TIMEOUT", 60)  # в секундах
+        self.default_retry_attempts = self.config.get("DEFAULT_RETRY_ATTEMPTS", 3)
+        self.default_retry_delay = self.config.get("DEFAULT_RETRY_DELAY", 1)  # в секундах
+        self.enable_logging = self.config.get("ENABLE_ORDER_LOGGING", True)
+        self.paper_trading = self.config.get("ENABLE_PAPER_TRADING", True)
+        
+        logger.info(
+            "Инициализирован исполнитель ордеров. Бумажная торговля: %s", 
+            "Да" if self.paper_trading else "Нет"
+        )
+
+    @classmethod
+    def get_instance(cls, config=None):
+        """
+        Получает экземпляр исполнителя ордеров (singleton).
+        
+        Args:
+            config: Конфигурация для нового экземпляра
+            
+        Returns:
+            Экземпляр OrderExecutor
+        """
+        if cls._instance is None:
+            cls._instance = cls(config)
+        return cls._instance
+
+    @async_handle_error
+    async def execute_order(
+        self,
+        symbol: str,
+        side: str,
+        amount: float,
+        order_type: str = None,
+        price: float = None,
+        exchange_id: str = None,
+        params: Dict = None
+    ) -> OrderResult:
+        """
+        Выполняет торговый ордер.
+        
+        Args:
+            symbol: Торговая пара
+            side: Сторона ордера (buy/sell)
+            amount: Объем
+            order_type: Тип ордера (market/limit)
+            price: Цена (для лимитных ордеров)
+            exchange_id: Идентификатор биржи
+            params: Дополнительные параметры
+        
+        Returns:
+            OrderResult: Результат выполнения ордера
+        """
+        order_type = order_type or self.default_order_type
+        exchange_id = exchange_id or self.default_exchange
+        params = params or {}
+        
+        try:
+            # Валидация параметров
+            if not symbol or not side or amount <= 0:
+                logger.warning(
+                    "Неверные параметры ордера: symbol=%s, side=%s, amount=%f", 
+                    symbol, side, amount
+                )
+                return OrderResult(
+                    success=False,
+                    error="Неверные параметры ордера"
+                )
+                
+            if order_type == ORDER_TYPE_LIMIT and not price:
+                logger.warning(
+                    "Не указана цена для лимитного ордера: %s %s %f", 
+                    symbol, side, amount
+                )
+                return OrderResult(
+                    success=False,
+                    error="Не указана цена для лимитного ордера"
+                )
+                
+            # Логирование начала выполнения ордера
+            logger.info(
+                "Выполнение ордера: %s %s %s %.8f @ %s", 
+                exchange_id, symbol, side, amount, 
+                f"{price:.8f}" if price else "рыночная цена"
+            )
+            
+            # Для бумажной торговли используем эмуляцию
+            if self.paper_trading:
+                return await self._execute_paper_order(
+                    symbol, side, amount, order_type, price, exchange_id
+                )
+                
+            # Выполняем реальный ордер
+            exchange = await get_exchange(exchange_id)
+            if not exchange:
+                return OrderResult(
+                    success=False,
+                    error=f"Не удалось подключиться к бирже {exchange_id}"
+                )
+                
+            # Создаем ордер
+            order = await create_order(
+                exchange_id=exchange_id,
+                symbol=symbol,
+                type_order=order_type,
+                side=side,
+                amount=amount,
+                price=price,
+                params=params
+            )
+            
+            if not order:
+                return OrderResult(
+                    success=False,
+                    error=f"Не удалось создать ордер на {exchange_id}"
+                )
+                
+            # Получаем сведения о выполненном ордере
+            order_id = order.get("id", "")
+            status = order.get("status", "unknown")
+            filled = order.get("filled", 0)
+            cost = order.get("cost", 0)
+            actual_price = order.get("price", price or 0)
+            
+            # Логирование результата
+            logger.info(
+                "Ордер выполнен: %s %s %s, ID: %s, Статус: %s, Цена: %.8f",
+                exchange_id, symbol, side, order_id, status, actual_price
+            )
+            
+            # Возвращаем результат
+            return OrderResult(
+                success=True,
+                order_id=order_id,
+                status=status,
+                filled=filled,
+                cost=cost,
+                price=actual_price,
+                raw_data=order
+            )
+                
+        except Exception as e:
+            logger.error("Ошибка при выполнении ордера: %s", str(e))
+            return OrderResult(
+                success=False,
+                error=f"Ошибка при выполнении ордера: {str(e)}"
+            )
+
+    @async_handle_error
+    async def _execute_paper_order(
+        self, symbol, side, amount, order_type, price, exchange_id
+    ) -> OrderResult:
+        """
+        Эмуляция выполнения ордера в режиме бумажной торговли.
+        
+        Args:
+            symbol: Торговая пара
+            side: Сторона ордера
+            amount: Объем
+            order_type: Тип ордера
+            price: Цена
+            exchange_id: Биржа
+        
+        Returns:
+            OrderResult: Результат эмуляции
+        """
+        try:
+            # Для эмуляции получаем текущие рыночные данные
+            from project.data.market_data import MarketData
+            market_data = MarketData.get_instance()
+            
+            # Получаем тикер для определения цены
+            ticker = await market_data.get_ticker(exchange_id, symbol)
+            if not ticker:
+                return OrderResult(
+                    success=False,
+                    error=f"Не удалось получить рыночные данные для {symbol}"
+                )
+                
+            # Определяем цену исполнения
+            execution_price = price
+            if order_type == ORDER_TYPE_MARKET or not execution_price:
+                if side == SIDE_BUY:
+                    execution_price = ticker.get("ask", ticker.get("last", 0))
+                else:  # SELL
+                    execution_price = ticker.get("bid", ticker.get("last", 0))
+            
+            # Рассчитываем стоимость
+            cost = amount * execution_price
+            
+            # Генерируем фиктивный ID ордера
+            order_id = f"paper_{uuid.uuid4().hex[:16]}"
+            
+            # Логирование результата эмуляции
+            logger.info(
+                "БУМАЖНАЯ ТОРГОВЛЯ: %s %s %s %.8f @ %.8f (ID: %s)",
+                exchange_id, symbol, side, amount, execution_price, order_id
+            )
+            
+            # Сохраняем информацию о бумажной сделке в БД
+            await self._save_paper_trade(
+                exchange_id=exchange_id,
+                symbol=symbol,
+                side=side,
+                amount=amount,
+                price=execution_price,
+                cost=cost,
+                order_id=order_id
+            )
+            
+            # Возвращаем результат
+            return OrderResult(
+                success=True,
+                order_id=order_id,
+                status="FILLED",  # Всегда считаем исполненным
+                filled=amount,
+                cost=cost,
+                price=execution_price,
+                raw_data={
+                    "id": order_id,
+                    "symbol": symbol,
+                    "side": side,
+                    "type": order_type,
+                    "amount": amount,
+                    "price": execution_price,
+                    "cost": cost,
+                    "filled": amount,
+                    "status": "FILLED",
+                    "timestamp": int(time.time() * 1000),
+                    "datetime": time.strftime("%Y-%m-%dT%H:%M:%S.000Z"),
+                    "fee": {"cost": cost * 0.001, "currency": symbol.split("/")[1]},
+                    "trades": [],
+                }
+            )
+                
+        except Exception as e:
+            logger.error("Ошибка при эмуляции ордера: %s", str(e))
+            return OrderResult(
+                success=False,
+                error=f"Ошибка при эмуляции ордера: {str(e)}"
+            )
+
+    @async_handle_error
+    async def market_buy(
+        self,
+        symbol: str,
+        amount: float,
+        exchange_id: str = None,
+        params: Dict = None
+    ) -> OrderResult:
+        """
+        Выполняет рыночный ордер на покупку.
+        
+        Args:
+            symbol: Торговая пара
+            amount: Объем
+            exchange_id: Биржа
+            params: Дополнительные параметры
+            
+        Returns:
+            OrderResult: Результат выполнения ордера
+        """
+        return await self.execute_order(
+            symbol=symbol,
+            side=SIDE_BUY,
+            amount=amount,
+            order_type=ORDER_TYPE_MARKET,
+            exchange_id=exchange_id,
+            params=params
+        )
+
+    @async_handle_error
+    async def market_sell(
+        self,
+        symbol: str,
+        amount: float,
+        exchange_id: str = None,
+        params: Dict = None
+    ) -> OrderResult:
+        """
+        Выполняет рыночный ордер на продажу.
+        
+        Args:
+            symbol: Торговая пара
+            amount: Объем
+            exchange_id: Биржа
+            params: Дополнительные параметры
+            
+        Returns:
+            OrderResult: Результат выполнения ордера
+        """
+        return await self.execute_order(
+            symbol=symbol,
+            side=SIDE_SELL,
+            amount=amount,
+            order_type=ORDER_TYPE_MARKET,
+            exchange_id=exchange_id,
+            params=params
+        )
+
+    @async_handle_error
+    async def limit_buy(
+        self,
+        symbol: str,
+        amount: float,
+        price: float,
+        exchange_id: str = None,
+        params: Dict = None
+    ) -> OrderResult:
+        """
+        Выполняет лимитный ордер на покупку.
+        
+        Args:
+            symbol: Торговая пара
+            amount: Объем
+            price: Цена
+            exchange_id: Биржа
+            params: Дополнительные параметры
+            
+        Returns:
+            OrderResult: Результат выполнения ордера
+        """
+        return await self.execute_order(
+            symbol=symbol,
+            side=SIDE_BUY,
+            amount=amount,
+            order_type=ORDER_TYPE_LIMIT,
+            price=price,
+            exchange_id=exchange_id,
+            params=params
+        )
+
+    @async_handle_error
+    async def limit_sell(
+        self,
+        symbol: str,
+        amount: float,
+        price: float,
+        exchange_id: str = None,
+        params: Dict = None
+    ) -> OrderResult:
+        """
+        Выполняет лимитный ордер на продажу.
+        
+        Args:
+            symbol: Торговая пара
+            amount: Объем
+            price: Цена
+            exchange_id: Биржа
+            params: Дополнительные параметры
+            
+        Returns:
+            OrderResult: Результат выполнения ордера
+        """
+        return await self.execute_order(
+            symbol=symbol,
+            side=SIDE_SELL,
+            amount=amount,
+            order_type=ORDER_TYPE_LIMIT,
+            price=price,
+            exchange_id=exchange_id,
+            params=params
+        )
+
+    @async_handle_error
+    async def get_balance(self, exchange_id: str = None) -> Dict:
+        """
+        Получает баланс аккаунта.
+        
+        Args:
+            exchange_id: Биржа
+            
+        Returns:
+            Dict: Данные о балансе
+        """
+        exchange_id = exchange_id or self.default_exchange
+        
+        try:
+            balance = await fetch_balance(exchange_id)
+            return balance or {}
+        except Exception as e:
+            logger.error("Ошибка при получении баланса: %s", str(e))
+            return {}
+
+    @async_handle_error
+    async def cancel_order(
+        self, order_id: str, symbol: str, exchange_id: str = None
+    ) -> OrderResult:
+        """
+        Отменяет открытый ордер.
+        
+        Args:
+            order_id: Идентификатор ордера
+            symbol: Торговая пара
+            exchange_id: Биржа
+            
+        Returns:
+            OrderResult: Результат отмены ордера
+        """
+        exchange_id = exchange_id or self.default_exchange
+        
+        try:
+            # Для бумажной торговли эмулируем отмену
+            if self.paper_trading and order_id.startswith("paper_"):
+                logger.info(
+                    "БУМАЖНАЯ ТОРГОВЛЯ: Отмена ордера %s для %s на %s",
+                    order_id, symbol, exchange_id
+                )
+                return OrderResult(success=True, order_id=order_id, status="canceled")
+                
+            # Отменяем реальный ордер
+            result = await cancel_order(exchange_id, order_id, symbol)
+            
+            if not result:
+                return OrderResult(
+                    success=False,
+                    error=f"Не удалось отменить ордер {order_id}"
+                )
+                
+            logger.info(
+                "Ордер успешно отменен: %s для %s на %s",
+                order_id, symbol, exchange_id
+            )
+            
+            return OrderResult(
+                success=True,
+                order_id=order_id,
+                status="canceled",
+                raw_data=result
+            )
+                
+        except Exception as e:
+            logger.error("Ошибка при отмене ордера %s: %s", order_id, str(e))
+            return OrderResult(
+                success=False,
+                error=f"Ошибка при отмене ордера: {str(e)}"
+            )
+
+    @async_handle_error
+    async def get_order_status(
+        self, order_id: str, symbol: str, exchange_id: str = None
+    ) -> OrderResult:
+        """
+        Получает статус ордера.
+        
+        Args:
+            order_id: Идентификатор ордера
+            symbol: Торговая пара
+            exchange_id: Биржа
+            
+        Returns:
+            OrderResult: Данные о статусе ордера
+        """
+        exchange_id = exchange_id or self.default_exchange
+        
+        try:
+            # Для бумажной торговли возвращаем фиктивный статус
+            if self.paper_trading and order_id.startswith("paper_"):
+                logger.debug(
+                    "БУМАЖНАЯ ТОРГОВЛЯ: Проверка статуса ордера %s для %s",
+                    order_id, symbol
+                )
+                
+                # В реальном приложении здесь бы загружались данные о бумажном ордере из хранилища
+                return OrderResult(
+                    success=True,
+                    order_id=order_id,
+                    status="FILLED",
+                    filled=1.0,
+                    price=0.0,
+                    cost=0.0
+                )
+                
+            # Получаем статус реального ордера
+            order = await fetch_order(exchange_id, order_id, symbol)
+            
+            if not order:
+                return OrderResult(
+                    success=False,
+                    error=f"Не удалось получить статус ордера {order_id}"
+                )
+                
+            # Извлекаем данные
+            status = order.get("status", "unknown")
+            filled = order.get("filled", 0)
+            price = order.get("price", 0)
+            cost = order.get("cost", 0)
+            
+            logger.debug(
+                "Статус ордера %s: %s, исполнено: %.8f",
+                order_id, status, filled
+            )
+            
+            return OrderResult(
+                success=True,
+                order_id=order_id,
+                status=status,
+                filled=filled,
+                price=price,
+                cost=cost,
+                raw_data=order
+            )
+                
+        except Exception as e:
+            logger.error(
+                "Ошибка при получении статуса ордера %s: %s", 
+                order_id, str(e)
+            )
+            return OrderResult(
+                success=False,
+                error=f"Ошибка при получении статуса ордера: {str(e)}"
+            )
+
+    @async_handle_error
+    async def get_open_orders(
+        self, exchange_id: str = None, symbol: str = None
+    ) -> List[Dict]:
+        """
+        Получает список открытых ордеров.
+        
+        Args:
+            exchange_id: Биржа
+            symbol: Торговая пара (опционально)
+            
+        Returns:
+            List[Dict]: Список открытых ордеров
+        """
+        exchange_id = exchange_id or self.default_exchange
+        
+        try:
+            from project.utils.ccxt_exchanges import fetch_open_orders
+            
+            orders = await fetch_open_orders(exchange_id, symbol)
+            return orders or []
+            
+        except Exception as e:
+            logger.error("Ошибка при получении открытых ордеров: %s", str(e))
+            return []
+
+    @async_handle_error
+    async def _save_paper_trade(
+        self, exchange_id: str, symbol: str, side: str, amount: float, 
+        price: float, cost: float, order_id: str
+    ) -> bool:
+        """
+        Сохраняет информацию о бумажной сделке в базе данных.
+        
+        Args:
+            exchange_id: Биржа
+            symbol: Торговая пара
+            side: Сторона (buy/sell)
+            amount: Объем
+            price: Цена
+            cost: Стоимость
+            order_id: Идентификатор ордера
+            
+        Returns:
+            bool: Успешность сохранения
+        """
+        try:
+            # Импортируем базу данных
+            from project.data.database import Database
+            
+            database = Database.get_instance()
+            
+            # Сохраняем данные о сделке
+            await database.execute(
+                """
+                INSERT INTO paper_trades 
+                (exchange, symbol, side, amount, price, cost, order_id, timestamp)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (exchange_id, symbol, side, amount, price, cost, order_id, time.time())
+            )
+            
+            logger.info(
+                "Бумажная сделка сохранена: %s %s %s %.8f @ %.8f",
+                exchange_id, symbol, side, amount, price
+            )
+            return True
+        except Exception as e:
+            logger.error("Ошибка при сохранении бумажной сделки: %s", str(e))
+            return False
+"""
 Модуль для исполнения торговых ордеров.
 Предоставляет функции для создания и управления ордерами на биржах.
 """

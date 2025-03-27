@@ -33,7 +33,7 @@ order_executor = OrderExecutor.get_instance()
 bot_manager = BotManager.get_instance()
 strategy_manager = StrategyManager.get_instance()
 arbitrage_core = ArbitrageCore.get_instance()
-JWT_ALGORITHM = 'HS256'
+JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION = 86400  # 24 часа
 JWT_SECRET = config.get("JWT_SECRET", "default_secret_key")
 JWT_EXPIRATION = 86400  # 24 часа
@@ -46,11 +46,13 @@ def jwt_required(func):
     async def wrapper(request):
         try:
             # Получаем токен из заголовка Authorization
-            auth_header = request.headers.get('Authorization')
-            if not auth_header or not auth_header.startswith('Bearer '):
-                return web.json_response({"error": "Invalid or missing token"}, status=401)
+            auth_header = request.headers.get("Authorization")
+            if not auth_header or not auth_header.startswith("Bearer "):
+                return web.json_response(
+                    {"error": "Invalid or missing token"}, status=401
+                )
 
-            token = auth_header.split(' ')[1]
+            token = auth_header.split(" ")[1]
 
             try:
                 # Проверяем токен
@@ -72,6 +74,7 @@ def jwt_required(func):
 
     return wrapper
 
+
 # Эндпоинты для аутентификации
 
 
@@ -86,36 +89,35 @@ async def login(request):
         password = data.get("password")
 
         if not username or not password:
-            return web.json_response({"error": "Missing username or password"}, status=400)
+            return web.json_response(
+                {"error": "Missing username or password"}, status=400
+            )
 
         # Проверяем учетные данные
         # В реальном приложении здесь должна быть проверка в базе данных
-        valid_users = {
-            "admin": "adminpassword",
-            "user": "userpassword"
-        }
+        valid_users = {"admin": "adminpassword", "user": "userpassword"}
 
         if username not in valid_users or valid_users[username] != password:
             return web.json_response({"error": "Invalid credentials"}, status=401)
 
         # Создаем JWT токен
-        payload = {
-            "username": username,
-            "exp": time.time() + JWT_EXPIRATION
-        }
+        payload = {"username": username, "exp": time.time() + JWT_EXPIRATION}
 
         token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
         # Отправляем токен
-        return web.json_response({
-            "token": token,
-            "username": username,
-            "expires": time.time() + JWT_EXPIRATION
-        })
+        return web.json_response(
+            {
+                "token": token,
+                "username": username,
+                "expires": time.time() + JWT_EXPIRATION,
+            }
+        )
         logger.error(f"Error in login: {str(e)}")
     except Exception as e:
         logger.error(f"Error in login: {str(e)}")
         return web.json_response({"error": "Login error"}, status=500)
+
 
 # Эндпоинты для рыночных данных
 
@@ -163,13 +165,17 @@ async def get_orderbook(request):
         limit = int(request.query.get("limit", 10))
 
         if not symbol:
-            return web.json_response({"error": "Symbol parameter is required"}, status=400)
+            return web.json_response(
+                {"error": "Symbol parameter is required"}, status=400
+            )
 
         # Получаем ордербук
         orderbook = await market_data.get_orderbook(exchange_id, symbol, limit=limit)
 
         if orderbook is None:
-            return web.json_response({"error": f"Failed to get orderbook for {symbol}"}, status=404)
+            return web.json_response(
+                {"error": f"Failed to get orderbook for {symbol}"}, status=404
+            )
 
         return web.json_response(orderbook)
         logger.error(f"Error in get_orderbook: {str(e)}")
@@ -191,31 +197,38 @@ async def get_ohlcv(request):
         limit = int(request.query.get("limit", 100))
 
         if not symbol:
-            return web.json_response({"error": "Symbol parameter is required"}, status=400)
+            return web.json_response(
+                {"error": "Symbol parameter is required"}, status=400
+            )
 
         # Получаем OHLCV-данные
         ohlcv = await market_data.get_ohlcv(exchange_id, symbol, timeframe, limit=limit)
 
         if ohlcv is None or ohlcv.empty:
-            return web.json_response({"error": f"Failed to get OHLCV data for {symbol}"}, status=404)
+            return web.json_response(
+                {"error": f"Failed to get OHLCV data for {symbol}"}, status=404
+            )
 
         # Преобразуем DataFrame в список
         data = []
         for index, row in ohlcv.iterrows():
-            data.append({
-                "timestamp": index.timestamp() * 1000,  # в миллисекундах для JS
-                "open": row["open"],
-                "high": row["high"],
-                "low": row["low"],
-                "close": row["close"],
-                "volume": row["volume"]
-            })
+            data.append(
+                {
+                    "timestamp": index.timestamp() * 1000,  # в миллисекундах для JS
+                    "open": row["open"],
+                    "high": row["high"],
+                    "low": row["low"],
+                    "close": row["close"],
+                    "volume": row["volume"],
+                }
+            )
 
         return web.json_response(data)
         logger.error(f"Error in get_ohlcv: {str(e)}")
     except Exception as e:
         logger.error(f"Error in get_ohlcv: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
+
 
 # Эндпоинты для торговли
 
@@ -233,7 +246,9 @@ async def execute_order(request):
         required_fields = ["symbol", "side", "amount"]
         for field in required_fields:
             if field not in data:
-                return web.json_response({"error": f"Missing required field: {field}"}, status=400)
+                return web.json_response(
+                    {"error": f"Missing required field: {field}"}, status=400
+                )
 
         # Получаем параметры ордера
         symbol = data["symbol"]
@@ -250,7 +265,7 @@ async def execute_order(request):
             amount=amount,
             order_type=order_type,
             price=price,
-            exchange_id=exchange_id
+            exchange_id=exchange_id,
         )
 
         if not result.success:
@@ -261,18 +276,20 @@ async def execute_order(request):
             f"Ордер выполнен: {side} {amount} {symbol} по цене {price or 'рыночной'}"
         )
 
-        return web.json_response({
-            "success": True,
-            "order_id": result.order_id,
-            "symbol": symbol,
-            "side": side,
-            "amount": amount,
-            "price": price,
-            "order_type": order_type,
-            "exchange": exchange_id,
-            "status": result.status,
-            "timestamp": time.time()
-        })
+        return web.json_response(
+            {
+                "success": True,
+                "order_id": result.order_id,
+                "symbol": symbol,
+                "side": side,
+                "amount": amount,
+                "price": price,
+                "order_type": order_type,
+                "exchange": exchange_id,
+                "status": result.status,
+                "timestamp": time.time(),
+            }
+        )
         logger.error(f"Error in execute_order: {str(e)}")
     except Exception as e:
         logger.error(f"Error in execute_order: {str(e)}")
@@ -312,7 +329,9 @@ async def cancel_order(request):
         required_fields = ["order_id", "symbol"]
         for field in required_fields:
             if field not in data:
-                return web.json_response({"error": f"Missing required field: {field}"}, status=400)
+                return web.json_response(
+                    {"error": f"Missing required field: {field}"}, status=400
+                )
 
         # Получаем параметры
         order_id = data["order_id"]
@@ -321,25 +340,26 @@ async def cancel_order(request):
 
         # Отменяем ордер
         result = await order_executor.cancel_order(
-            order_id=order_id,
-            symbol=symbol,
-            exchange_id=exchange_id
+            order_id=order_id, symbol=symbol, exchange_id=exchange_id
         )
 
         if not result.success:
             return web.json_response({"error": result.error}, status=400)
 
-        return web.json_response({
-            "success": True,
-            "order_id": order_id,
-            "symbol": symbol,
-            "exchange": exchange_id,
-            "timestamp": time.time()
-        })
+        return web.json_response(
+            {
+                "success": True,
+                "order_id": order_id,
+                "symbol": symbol,
+                "exchange": exchange_id,
+                "timestamp": time.time(),
+            }
+        )
         logger.error(f"Error in cancel_order: {str(e)}")
     except Exception as e:
         logger.error(f"Error in cancel_order: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
+
 
 # Эндпоинты для ботов
 
@@ -364,7 +384,7 @@ async def list_bots(request):
                 "exchange": bot.exchange_id,
                 "symbols": bot.symbols,
                 "started_at": bot.start_time,
-                "uptime": time.time() - bot.start_time if bot.start_time > 0 else 0
+                "uptime": time.time() - bot.start_time if bot.start_time > 0 else 0,
             }
             bot_list.append(bot_info)
 
@@ -391,7 +411,9 @@ async def get_bot_state(request):
         state = await bot_manager.get_bot_state(bot_id)
 
         if not state:
-            return web.json_response({"error": f"Bot with ID {bot_id} not found"}, status=404)
+            return web.json_response(
+                {"error": f"Bot with ID {bot_id} not found"}, status=404
+            )
 
         return web.json_response(state)
         logger.error(f"Error in get_bot_state: {str(e)}")
@@ -417,7 +439,9 @@ async def start_bot(request):
         config = data.get("config", {})
 
         if not bot_type or not bot_name:
-            return web.json_response({"error": "Bot type and name are required"}, status=400)
+            return web.json_response(
+                {"error": "Bot type and name are required"}, status=400
+            )
 
         # Запускаем бота
         bot_id = await bot_manager.start_bot(
@@ -425,21 +449,23 @@ async def start_bot(request):
             name=bot_name,
             exchange_id=exchange_id,
             symbols=symbols,
-            config=config
+            config=config,
         )
 
         if not bot_id:
             return web.json_response({"error": "Failed to start bot"}, status=400)
 
-        return web.json_response({
-            "success": True,
-            "bot_id": bot_id,
-            "name": bot_name,
-            "type": bot_type,
-            "exchange": exchange_id,
-            "symbols": symbols,
-            "timestamp": time.time()
-        })
+        return web.json_response(
+            {
+                "success": True,
+                "bot_id": bot_id,
+                "name": bot_name,
+                "type": bot_type,
+                "exchange": exchange_id,
+                "symbols": symbols,
+                "timestamp": time.time(),
+            }
+        )
         logger.error(f"Error in start_bot: {str(e)}")
     except Exception as e:
         logger.error(f"Error in start_bot: {str(e)}")
@@ -462,17 +488,18 @@ async def stop_bot(request):
         success = await bot_manager.stop_bot(bot_id)
 
         if not success:
-            return web.json_response({"error": f"Failed to stop bot with ID {bot_id}"}, status=400)
+            return web.json_response(
+                {"error": f"Failed to stop bot with ID {bot_id}"}, status=400
+            )
 
-        return web.json_response({
-            "success": True,
-            "bot_id": bot_id,
-            "timestamp": time.time()
-        })
+        return web.json_response(
+            {"success": True, "bot_id": bot_id, "timestamp": time.time()}
+        )
         logger.error(f"Error in stop_bot: {str(e)}")
     except Exception as e:
         logger.error(f"Error in stop_bot: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
+
 
 # Эндпоинты для стратегий
 
@@ -487,10 +514,12 @@ async def list_strategies(request):
         available_strategies = strategy_manager.get_available_strategies()
         running_strategies = strategy_manager.get_running_strategies()
 
-        return web.json_response({
-            "available_strategies": available_strategies,
-            "running_strategies": running_strategies
-        })
+        return web.json_response(
+            {
+                "available_strategies": available_strategies,
+                "running_strategies": running_strategies,
+            }
+        )
         logger.error(f"Error in list_strategies: {str(e)}")
     except Exception as e:
         logger.error(f"Error in list_strategies: {str(e)}")
@@ -523,21 +552,25 @@ async def start_strategy(request):
             exchange_id=exchange_id,
             symbols=symbols,
             timeframes=timeframes,
-            config=config
+            config=config,
         )
 
         if not strategy_id:
-            return web.json_response({"error": f"Failed to start strategy {strategy_name}"}, status=400)
+            return web.json_response(
+                {"error": f"Failed to start strategy {strategy_name}"}, status=400
+            )
 
-        return web.json_response({
-            "success": True,
-            "strategy_id": strategy_id,
-            "strategy_name": strategy_name,
-            "exchange": exchange_id,
-            "symbols": symbols,
-            "timeframes": timeframes,
-            "timestamp": time.time()
-        })
+        return web.json_response(
+            {
+                "success": True,
+                "strategy_id": strategy_id,
+                "strategy_name": strategy_name,
+                "exchange": exchange_id,
+                "symbols": symbols,
+                "timeframes": timeframes,
+                "timestamp": time.time(),
+            }
+        )
         logger.error(f"Error in start_strategy: {str(e)}")
     except Exception as e:
         logger.error(f"Error in start_strategy: {str(e)}")
@@ -560,13 +593,13 @@ async def stop_strategy(request):
         success = await strategy_manager.stop_strategy(strategy_id)
 
         if not success:
-            return web.json_response({"error": f"Failed to stop strategy with ID {strategy_id}"}, status=400)
+            return web.json_response(
+                {"error": f"Failed to stop strategy with ID {strategy_id}"}, status=400
+            )
 
-        return web.json_response({
-            "success": True,
-            "strategy_id": strategy_id,
-            "timestamp": time.time()
-        })
+        return web.json_response(
+            {"success": True, "strategy_id": strategy_id, "timestamp": time.time()}
+        )
         logger.error(f"Error in stop_strategy: {str(e)}")
     except Exception as e:
         logger.error(f"Error in stop_strategy: {str(e)}")
@@ -589,13 +622,16 @@ async def get_strategy_state(request):
         state = await strategy_manager.get_strategy_state(strategy_id)
 
         if not state:
-            return web.json_response({"error": f"Strategy with ID {strategy_id} not found"}, status=404)
+            return web.json_response(
+                {"error": f"Strategy with ID {strategy_id} not found"}, status=404
+            )
 
         return web.json_response(state)
         logger.error(f"Error in get_strategy_state: {str(e)}")
     except Exception as e:
         logger.error(f"Error in get_strategy_state: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
+
 
 # Эндпоинты для арбитража
 
@@ -620,19 +656,21 @@ async def scan_arbitrage(request):
         # Преобразуем в JSON-совместимый формат
         opps_list = []
         for opp in opportunities:
-            opps_list.append({
-                "symbol": opp.symbol,
-                "buy_exchange": opp.buy_exchange,
-                "sell_exchange": opp.sell_exchange,
-                "buy_price": opp.buy_price,
-                "sell_price": opp.sell_price,
-                "price_diff": opp.price_diff,
-                "price_diff_pct": opp.price_diff_pct,
-                "profit_margin_pct": opp.profit_margin_pct,
-                "buy_volume": opp.buy_volume,
-                "sell_volume": opp.sell_volume,
-                "timestamp": opp.timestamp
-            })
+            opps_list.append(
+                {
+                    "symbol": opp.symbol,
+                    "buy_exchange": opp.buy_exchange,
+                    "sell_exchange": opp.sell_exchange,
+                    "buy_price": opp.buy_price,
+                    "sell_price": opp.sell_price,
+                    "price_diff": opp.price_diff,
+                    "price_diff_pct": opp.price_diff_pct,
+                    "profit_margin_pct": opp.profit_margin_pct,
+                    "buy_volume": opp.buy_volume,
+                    "sell_volume": opp.sell_volume,
+                    "timestamp": opp.timestamp,
+                }
+            )
 
         return web.json_response(opps_list)
         logger.error(f"Error in scan_arbitrage: {str(e)}")
@@ -654,7 +692,9 @@ async def execute_arbitrage(request):
         required_fields = ["symbol", "buy_exchange", "sell_exchange"]
         for field in required_fields:
             if field not in data:
-                return web.json_response({"error": f"Missing required field: {field}"}, status=400)
+                return web.json_response(
+                    {"error": f"Missing required field: {field}"}, status=400
+                )
 
         # Получаем параметры
         symbol = data["symbol"]
@@ -662,10 +702,14 @@ async def execute_arbitrage(request):
         sell_exchange = data["sell_exchange"]
 
         # Сканируем возможности для указанного символа
-        opportunities = await arbitrage_core.scan_opportunities([symbol], [buy_exchange, sell_exchange])
+        opportunities = await arbitrage_core.scan_opportunities(
+            [symbol], [buy_exchange, sell_exchange]
+        )
 
         if not opportunities:
-            return web.json_response({"error": f"No arbitrage opportunities found for {symbol}"}, status=404)
+            return web.json_response(
+                {"error": f"No arbitrage opportunities found for {symbol}"}, status=404
+            )
 
         # Находим нужную возможность
         target_opp = None
@@ -675,35 +719,45 @@ async def execute_arbitrage(request):
                 break
 
         if not target_opp:
-            return web.json_response({
-                "error": f"No matching arbitrage opportunity found for {symbol} between {buy_exchange} and {sell_exchange}"
-            }, status=404)
+            return web.json_response(
+                {
+                    "error": f"No matching arbitrage opportunity found for {symbol} between {buy_exchange} and {sell_exchange}"
+                },
+                status=404,
+            )
 
         # Проверяем актуальность
         is_valid = await arbitrage_core.verify_opportunity(target_opp)
         if not is_valid:
-            return web.json_response({"error": "Opportunity is no longer valid"}, status=400)
+            return web.json_response(
+                {"error": "Opportunity is no longer valid"}, status=400
+            )
 
         # Выполняем арбитраж
         success = await arbitrage_core.execute_arbitrage(target_opp)
 
         if not success:
-            return web.json_response({"error": "Failed to execute arbitrage"}, status=400)
+            return web.json_response(
+                {"error": "Failed to execute arbitrage"}, status=400
+            )
 
-        return web.json_response({
-            "success": True,
-            "symbol": symbol,
-            "buy_exchange": buy_exchange,
-            "sell_exchange": sell_exchange,
-            "buy_price": target_opp.buy_price,
-            "sell_price": target_opp.sell_price,
-            "profit_margin_pct": target_opp.profit_margin_pct,
-            "timestamp": time.time()
-        })
+        return web.json_response(
+            {
+                "success": True,
+                "symbol": symbol,
+                "buy_exchange": buy_exchange,
+                "sell_exchange": sell_exchange,
+                "buy_price": target_opp.buy_price,
+                "sell_price": target_opp.sell_price,
+                "profit_margin_pct": target_opp.profit_margin_pct,
+                "timestamp": time.time(),
+            }
+        )
         logger.error(f"Error in execute_arbitrage: {str(e)}")
     except Exception as e:
         logger.error(f"Error in execute_arbitrage: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
+
 
 # Создание приложения aiohttp
 
@@ -711,30 +765,35 @@ async def execute_arbitrage(request):
 def create_app():
     """Создает и конфигурирует приложение FastAPI"""
     from fastapi import FastAPI
-    app = FastAPI(title="Trading API", description="API для торгового бота", version="1.0.0")
-    
+
+    app = FastAPI(
+        title="Trading API", description="API для торгового бота", version="1.0.0"
+    )
+
     # Регистрация маршрутов
     app.include_router(router)
     app.include_router(strategy_router)
     app.include_router(market_router)
     app.include_router(user_router)
-    
+
     # Регистрация WebSocket эндпоинтов
     app.include_router(ws_router)
     app.include_router(data_ws_router)
     app.include_router(auth_router)
     app.include_router(order_router)
-    
+
     # Регистрация административных маршрутов
     app.include_router(admin_router)
     app.include_router(stats_router)
-    
+
     return app
+
 
 # Создаем приложение
 app = create_app()
 
 if __name__ == "__main__":
     import uvicorn
+
     logger.info("Запуск API сервера...")
     uvicorn.run("rest_api:app", host="0.0.0.0", port=8000)
