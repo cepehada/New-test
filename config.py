@@ -4,7 +4,7 @@
 """
 
 import logging
-from typing import Dict, Any, Set
+from typing import Dict, Any, Set, Optional
 from pydantic import BaseModel, validator
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
@@ -150,7 +150,7 @@ class Config(BaseSettings):
     POSITION_SIZING_MIN_SIZE: float = 0.01
     POSITION_SIZING_MAX_SIZE: float = 0.1
     POSITION_SIZING_WIN_MULTIPLIER: float = 1.1
-    POSITION_SIZING_LOSS_MULTIPЛИЕР: float = 0.9
+    POSITION_SIZING_LOSS_MULTIPLIER: float = 0.9
     POSITION_SIZING_VOLATILITY: bool = True
     POSITION_SIZING_SIGNAL: bool = True
     POSITION_SIZING_MARTINGALE: bool = False
@@ -214,15 +214,15 @@ class Config(BaseSettings):
         """Возвращает настройки размера позиции"""
         return PositionSizingSettings(
             adaptive_sizing=self.POSITION_SIZING_ADAPTIVE,
-            base_position_size=self.POSITION_SИЗИНГ_BASE_SIZE,
-            min_position_size=self.POSITION_SИЗИНГ_MIN_SIZE,
-            max_position_size=self.POSITION_SИЗИНГ_MAX_SIZE,
-            win_multiplier=self.POSITION_SИЗИНГ_WIN_MULTIPЛИЕР,
-            loss_multiplier=self.POSITION_SИЗИНГ_LOSS_MULTИПЛИЕР,
-            volatility_sizing=self.POSITION_SИЗИНГ_VOLATILITY,
-            signal_sizing=self.POSITION_SИЗИНГ_SIGNAL,
-            martingale=self.POSITION_SИЗИНГ_MАРТИНГАЛЕ,
-            risk_per_trade=self.POSITION_SИЗИНГ_RISK_PER_TRADE,
+            base_position_size=self.POSITION_SIZING_BASE_SIZE,
+            min_position_size=self.POSITION_SIZING_MIN_SIZE,
+            max_position_size=self.POSITION_SIZING_MAX_SIZE,
+            win_multiplier=self.POSITION_SIZING_WIN_MULTIPLIER,
+            loss_multiplier=self.POSITION_SIZING_LOSS_MULTIPLIER,
+            volatility_sizing=self.POSITION_SIZING_VOLATILITY,
+            signal_sizing=self.POSITION_SIZING_SIGNAL,
+            martingale=self.POSITION_SIZING_MARTINGALE,
+            risk_per_trade=self.POSITION_SIZING_RISK_PER_TRADE,
         )
 
 

@@ -22,9 +22,9 @@ class StrategyManager:
             str: Название выбранной стратегии.
         """
         # Пример логики выбора стратегии
-        if market_data["volatility"] > 0.05:
+        if market_data.get("volatility", 0) > 0.05:
             return "scalping"
-        elif market_data["trend"] == "uptrend":
+        elif market_data.get("trend") == "uptrend":
             return "trend_following"
         else:
             return "arbitrage"
