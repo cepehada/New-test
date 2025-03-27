@@ -1,8 +1,9 @@
 """
 Утилиты для арбитражной торговли.
-Предоставляет вспомогательные функции для расчетов арбитражных возможностей.
+Предоставляет вспомогательные функции для работы с данными рынка и расчетов.
 """
 
+import time
 from typing import Any, Dict, List, Set
 
 import pandas as pd
@@ -32,7 +33,7 @@ def calculate_triangular_path(
         return {"path": [], "currencies": [], "rate": 0.0, "profit": 0.0}
 
     if start_currency not in price_matrix.index:
-        logger.warning("Начальная валюта {start_currency} не найдена в матрице цен" %)
+        logger.warning(f"Начальная валюта {start_currency} не найдена в матрице цен")
         return {"path": [], "currencies": [], "rate": 0.0, "profit": 0.0}
 
     # Инициализируем лучший путь
@@ -330,3 +331,81 @@ def calculate_max_trade_size(
             current_amount = max_trade
 
     return max_sizes
+
+
+async def calculate_max_trade_sizes(
+    buy_exchange: str,
+    sell_exchange: str,
+    symbol: str,
+    buy_price: float,
+    sell_price: float,
+    balances: Dict,
+    min_trade_amount: float = 10.0
+) -> Dict[str, float]:
+    """
+    Вычисляет максимально возможные размеры сделок для арбитража.
+    
+    Args:
+        buy_exchange: Биржа для покупки
+        sell_exchange: Биржа для продажи
+        symbol: Символ торговой пары
+        buy_price: Цена покупки
+        sell_price: Цена продажи
+        balances: Словарь с балансами на биржах
+        min_trade_amount: Минимальная сумма сделки в USD
+        
+    Returns:
+        Словарь с размерами сделок
+    """
+    try:
+        # Разбиваем символ на базовую и котируемую валюты
+        base, quote = symbol.split('/')
+        
+        # Получаем балансы
+        buy_balance = balances.get(buy_exchange, {}).get('free', {})
+        sell_balance = balances.get(sell_exchange, {}).get('free', {})
+        
+        # Проверяем доступность валют в балансах
+        if quote not in buy_balance or base not in sell_balance:
+            logger.debug(
+                "Отсутствуют необходимые валюты в балансах: %s/%s", 
+                base, quote
+            )
+            return {}
+        
+        # Расчет максимального размера сделки
+        buy_quote_balance = buy_balance[quote]
+        sell_base_balance = sell_balance[base]
+        
+        max_buy_amount = buy_quote_balance / buy_price
+        max_sell_amount = sell_base_balance
+        
+        # Берем минимальное значение для максимального размера сделки
+        max_amount = min(max_buy_amount, max_sell_amount)
+        
+        # Проверяем минимальную сумму сделки
+        if max_amount * buy_price < min_trade_amount:
+            return {}
+        
+        # Расчет комиссий и прибыли
+        buy_fee = buy_price * max_amount * 0.001  # Примерная комиссия 0.1%
+        sell_fee = sell_price * max_amount * 0.001  # Примерная комиссия 0.1%
+        
+        buy_total = buy_price * max_amount + buy_fee
+        sell_total = sell_price * max_amount - sell_fee
+        
+        profit = sell_total - buy_total
+        profit_percent = (profit / buy_total) * 100
+        
+        return {
+            'buy_amount': max_amount,
+            'sell_amount': max_amount,
+            'buy_cost': buy_total,
+            'sell_proceeds': sell_total,
+            'profit': profit,
+            'profit_percent': profit_percent
+        }
+    
+    except Exception as e:
+        logger.warning("Ошибка при расчете размеров сделок: %s", str(e))
+        return {}
