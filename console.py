@@ -1,11 +1,11 @@
 """
-Консольный интерфейс для управления системой.
+Консольный интерфейс для управления торговой системой.
+Предоставляет команды для мониторинга, управления и настройки торговых ботов.
 """
 
 import asyncio
-import logging
-import os
-import sys
+from datetime import datetime
+from typing import Dict, List, Any, Optional, Union, Tuple
 import json
 import time
 from typing import Dict, List, Any, Optional

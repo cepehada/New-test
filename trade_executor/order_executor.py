@@ -53,18 +53,18 @@ class OrderExecutor:
     def get_instance(cls) -> "OrderExecutor":
         """
         Получает глобальный экземпляр OrderExecutor.
-        
+
         Returns:
             OrderExecutor: Экземпляр класса OrderExecutor
         """
         if cls._instance is None:
             cls._instance = cls()
         return cls._instance
-    
+
     def __init__(self, config=None):
         """
         Инициализирует исполнитель ордеров.
-        
+
         Args:
             config (Dict, optional): Конфигурация. Defaults to None.
         """
@@ -77,7 +77,7 @@ class OrderExecutor:
         self._active_orders = {}
         self._failed_orders = {}
         self._stats = {"created": 0, "filled": 0, "canceled": 0, "failed": 0}
-        
+
     @async_handle_error
     async def execute_order(
         self,
@@ -121,7 +121,8 @@ class OrderExecutor:
                 ticker = await fetch_ticker(exchange_id, symbol)
                 price = ticker.get("last", 0)
                 logger.warning(
-                    "Для лимитного ордера не указана цена, используем текущую цену %s", price
+                    "Для лимитного ордера не указана цена, используем текущую цену %s",
+                    price,
                 )
 
             if price is not None:
@@ -134,8 +135,12 @@ class OrderExecutor:
             # Логируем информацию о создаваемом ордере
             logger.info(
                 "Создаем ордер на %s: %s %s %s %s%s",
-                exchange_id, side, order_type, amount, symbol,
-                f" по цене {price}" if price else ""
+                exchange_id,
+                side,
+                order_type,
+                amount,
+                symbol,
+                f" по цене {price}" if price else "",
             )
 
             # Отправляем уведомление о создании ордера
@@ -283,8 +288,10 @@ class OrderExecutor:
 
             # Логируем информацию о статусе ордера
             logger.debug(
-                "Статус ордера %s на %s: %s", 
-                order_id, exchange_id, order.get('status', 'unknown')
+                "Статус ордера %s на %s: %s",
+                order_id,
+                exchange_id,
+                order.get("status", "unknown"),
             )
 
             return OrderResult(
@@ -302,11 +309,7 @@ class OrderExecutor:
 
         except Exception as e:
             logger.error("Ошибка при проверке статуса ордера %s: %s", order_id, str(e))
-            return OrderResult(
-                success=False,
-                order_id=order_id,
-                error=str(e)
-            )
+            return OrderResult(success=False, order_id=order_id, error=str(e))
 
     @async_handle_error
     async def get_open_orders(
@@ -336,7 +339,9 @@ class OrderExecutor:
             # Логируем информацию об открытых ордерах
             logger.debug(
                 "Получено %d открытых ордеров на %s%s",
-                len(orders), exchange_id, f" для {symbol}" if symbol else ""
+                len(orders),
+                exchange_id,
+                f" для {symbol}" if symbol else "",
             )
 
             return orders
@@ -508,15 +513,17 @@ class OrderExecutor:
         """
         try:
             from project.data.database import Database
-            
+
             if self._db is None:
                 self._db = Database.get_instance()
-            
+
             # Сохраняем информацию об ордере в базе данных
-            logger.debug("Сохраняем ордер в базе данных: %s", order.get("id", "unknown"))
-            
+            logger.debug(
+                "Сохраняем ордер в базе данных: %s", order.get("id", "unknown")
+            )
+
             # Здесь код для сохранения ордера в БД
-            
+
         except Exception as e:
             logger.error("Ошибка при сохранении ордера в БД: %s", str(e))
 
