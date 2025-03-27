@@ -1,410 +1,333 @@
 """
-Базовый класс для всех торговых ботов.
-Предоставляет общую функциональность для всех типов ботов.
+Базовый класс для всех торговых ботов системы.
+Предоставляет основные функции и интерфейс для создания конкретных ботов.
 """
 
+# Стандартные импорты
 import asyncio
-import time
 import uuid
-from enum import Enum
-from typing import Any, Dict, List
+from typing import Dict, List, Any
 
+# Внутренние импорты
 from project.config import get_config
 from project.data.market_data import MarketData
-from project.risk_management.position_sizer import PositionSizer
 from project.trade_executor.order_executor import OrderExecutor
-from project.utils.error_handler import async_handle_error
 from project.utils.logging_utils import get_logger
+from project.utils.error_handler import async_handle_error
 from project.utils.notify import send_trading_signal
 
 logger = get_logger(__name__)
 
 
-class BotStatus(Enum):
-    """
-    Статусы работы бота.
-    """
-
-    STOPPED = "stopped"
-    STARTING = "starting"
-    RUNNING = "running"
-    PAUSED = "paused"
-    STOPPING = "stopping"
-    ERROR = "error"
-
-
 class BaseBot:
     """
     Базовый класс для всех торговых ботов.
+    
+    Предоставляет общую функциональность для мониторинга рынка,
+    выполнения сделок и управления состоянием бота.
     """
 
-    def __init__(
-        self,
-        name: str = "BaseBot",
-        exchange_id: str = "binance",
-        symbols: List[str] = None,
-    ):
+    def __init__(self, config=None, name=None, exchange_id="binance", symbols=None):
         """
-        Инициализирует базовый торговый бот.
-
+        Инициализирует базовый бот.
+        
         Args:
+            config: Конфигурация бота
             name: Имя бота
-            exchange_id: Идентификатор биржи
-            symbols: Список символов для торговли
+            exchange_id: ID биржи для использования
+            symbols: Список символов для мониторинга
         """
-        self.config = get_config()
-        self.name = name
+        # Основные параметры
         self.bot_id = str(uuid.uuid4())
+        self.name = name or f"bot_{self.bot_id[:8]}"
         self.exchange_id = exchange_id
-        self.symbols = symbols or []
-        self.status = BotStatus.STOPPED
-        self.task = None
-        self.start_time = 0
-        self.last_update_time = 0
+        self.symbols = symbols or ["BTC/USDT"]
+        
+        # Загрузка конфигурации
+        self.config = config or get_config()
+        
+        # Инициализация компонентов
         self.market_data = MarketData.get_instance()
         self.order_executor = OrderExecutor.get_instance()
-        self.position_sizer = PositionSizer()
-        self.update_interval = 10.0  # секунды
+        
+        # Состояние
+        self.running = False
+        self.status = "initialized"
+        self.error = None
+        self.last_run_time = 0
         self.stats = {
-            "trades_count": 0,
-            "winning_trades": 0,
-            "losing_trades": 0,
+            "total_trades": 0,
+            "successful_trades": 0,
+            "failed_trades": 0,
             "total_profit": 0.0,
-            "total_loss": 0.0,
-            "max_drawdown": 0.0,
-            "win_rate": 0.0,
-            "average_profit": 0.0,
-            "average_loss": 0.0,
+            "start_time": 0,
         }
-        logger.debug("Создан бот {self.name} (id: {self.bot_id}) для {exchange_id}" %)
+        
+        # Мониторинг задачи
+        self.task = None
+        self.check_interval = 60  # в секундах
+        
+        logger.info("Инициализирован бот %s для %s на %s", 
+                    self.name, self.symbols, self.exchange_id)
 
     @async_handle_error
-    async def start(self) -> bool:
+    async def start(self):
         """
         Запускает бота.
-
+        
         Returns:
-            True в случае успеха, иначе False
+            bool: Успешность запуска
         """
-        if self.status != BotStatus.STOPPED:
-            logger.warning("Бот {self.name} уже запущен или в процессе запуска" %)
-            return False
-
-        logger.info("Запуск бота {self.name} (id: {self.bot_id})" %)
-        self.status = BotStatus.STARTING
-
-        try:
-            # Инициализируем бота
-            await self._initialize()
-
-            # Запускаем основную задачу бота
-            self.task = asyncio.create_task(self._run())
-            self.start_time = time.time()
-            self.status = BotStatus.RUNNING
-
-            logger.info("Бот {self.name} успешно запущен" %)
-            await send_trading_signal(f"Бот {self.name} запущен")
-
+        if self.running:
+            logger.info("Бот %s уже запущен", self.name)
             return True
-
+            
+        try:
+            self.running = True
+            self.status = "running"
+            
+            # Запуск задачи мониторинга
+            self.task = asyncio.create_task(self._run_loop())
+            logger.info("Бот %s запущен", self.name)
+            return True
+            
         except Exception as e:
-            logger.error("Ошибка при запуске бота {self.name}: {str(e)}" %)
-            self.status = BotStatus.ERROR
+            self.running = False
+            self.error = str(e)
+            self.status = "error"
+            logger.error("Ошибка запуска бота %s: %s", self.name, str(e))
             return False
 
-    async def stop(self) -> bool:
+    @async_handle_error
+    async def stop(self):
         """
         Останавливает бота.
-
+        
         Returns:
-            True в случае успеха, иначе False
+            bool: Успешность остановки
         """
-        if self.status == BotStatus.STOPPED:
-            logger.warning("Бот {self.name} уже остановлен" %)
-            return False
-
-        logger.info("Остановка бота {self.name} (id: {self.bot_id})" %)
-        self.status = BotStatus.STOPPING
-
-        if self.task:
+        if not self.running:
+            logger.info("Бот %s уже остановлен", self.name)
+            return True
+            
+        logger.info("Останавливаем бота %s", self.name)
+        self.running = False
+        
+        if self.task and not self.task.done():
             self.task.cancel()
             try:
                 await self.task
             except asyncio.CancelledError:
                 pass
-            self.task = None
-
-        # Вызываем метод очистки
-        try:
-            await self._cleanup()
-        except Exception as e:
-            logger.error("Ошибка при очистке бота {self.name}: {str(e)}" %)
-
-        self.status = BotStatus.STOPPED
-        logger.info("Бот {self.name} успешно остановлен" %)
-        await send_trading_signal(f"Бот {self.name} остановлен")
-
+                
+        self.status = "stopped"
         return True
 
-    async def pause(self) -> bool:
+    @async_handle_error
+    async def restart(self):
         """
-        Приостанавливает работу бота.
-
+        Перезапускает бота.
+        
         Returns:
-            True в случае успеха, иначе False
+            bool: Успешность перезапуска
         """
-        if self.status != BotStatus.RUNNING:
-            logger.warning("Бот {self.name} не запущен, невозможно приостановить" %)
-            return False
+        logger.info("Перезапуск бота %s", self.name)
+        
+        # Останавливаем бота, если запущен
+        if self.running:
+            await self.stop()
+            
+        # Запускаем снова
+        success = await self.start()
+        return success
 
-        logger.info("Приостановка бота {self.name} (id: {self.bot_id})" %)
-        self.status = BotStatus.PAUSED
-
-        await send_trading_signal(f"Бот {self.name} приостановлен")
-
-        return True
-
-    async def resume(self) -> bool:
-        """
-        Возобновляет работу бота после приостановки.
-
-        Returns:
-            True в случае успеха, иначе False
-        """
-        if self.status != BotStatus.PAUSED:
-            logger.warning("Бот {self.name} не приостановлен, невозможно возобновить" %)
-            return False
-
-        logger.info("Возобновление работы бота {self.name} (id: {self.bot_id})" %)
-        self.status = BotStatus.RUNNING
-
-        await send_trading_signal(f"Бот {self.name} возобновил работу")
-
-        return True
-
-    def get_status(self) -> str:
+    @async_handle_error
+    async def get_status(self):
         """
         Получает текущий статус бота.
-
+        
         Returns:
-            Строковое представление статуса
+            str: Статус бота
         """
-        return self.status.value
-
-    def is_running(self) -> bool:
-        """
-        Проверяет, запущен ли бот.
-
-        Returns:
-            True, если бот запущен, иначе False
-        """
-        return self.status == BotStatus.RUNNING
-
-    def get_stats(self) -> Dict[str, Any]:
-        """
-        Получает статистику работы бота.
-
-        Returns:
-            Словарь со статистикой
-        """
-        stats = dict(self.stats)
-
-        # Добавляем дополнительную информацию
-        stats["name"] = self.name
-        stats["bot_id"] = self.bot_id
-        stats["status"] = self.status.value
-        stats["exchange"] = self.exchange_id
-        stats["symbols"] = self.symbols
-        stats["uptime"] = time.time() - self.start_time if self.start_time > 0 else 0
-        stats["last_update"] = self.last_update_time
-
-        # Рассчитываем дополнительные метрики
-        if stats["trades_count"] > 0:
-            stats["win_rate"] = stats["winning_trades"] / stats["trades_count"]
-
-        if stats["winning_trades"] > 0:
-            stats["average_profit"] = stats["total_profit"] / stats["winning_trades"]
-
-        if stats["losing_trades"] > 0:
-            stats["average_loss"] = stats["total_loss"] / stats["losing_trades"]
-
-        # Рассчитываем общую прибыль
-        stats["net_profit"] = stats["total_profit"] - stats["total_loss"]
-
-        # Рассчитываем коэффициент прибыль/риск
-        if stats["total_loss"] > 0:
-            stats["profit_factor"] = stats["total_profit"] / stats["total_loss"]
-        else:
-            stats["profit_factor"] = float("inf") if stats["total_profit"] > 0 else 0.0
-
-        return stats
+        return self.status
 
     @async_handle_error
-    async def update_symbols(self, symbols: List[str]) -> bool:
+    async def get_state(self):
         """
-        Обновляет список символов для торговли.
-
-        Args:
-            symbols: Новый список символов
-
+        Получает полное состояние бота.
+        
         Returns:
-            True в случае успеха, иначе False
+            Dict: Состояние бота
         """
-        try:
-            logger.info("Обновление списка символов для бота {self.name}: {symbols}" %)
-            self.symbols = symbols
-
-            # Если бот запущен, обновляем данные для новых символов
-            if self.is_running():
-                await self._update_market_data()
-
-            return True
-
-        except Exception as e:
-            logger.error(
-                f"Ошибка при обновлении символов для бота {self.name}: {str(e)}"
-            )
-            return False
+        return {
+            "bot_id": self.bot_id,
+            "name": self.name,
+            "exchange": self.exchange_id,
+            "symbols": self.symbols,
+            "status": self.status,
+            "error": self.error,
+            "running": self.running,
+            "stats": self.stats
+        }
 
     @async_handle_error
-    async def update_config(self, config: Dict[str, Any]) -> bool:
-        """
-        Обновляет конфигурацию бота.
-
-        Args:
-            config: Словарь с новыми параметрами конфигурации
-
-        Returns:
-            True в случае успеха, иначе False
-        """
-        try:
-            logger.info("Обновление конфигурации для бота {self.name}" %)
-
-            # Обновляем базовые параметры
-            if "name" in config:
-                self.name = config["name"]
-
-            if "exchange_id" in config:
-                self.exchange_id = config["exchange_id"]
-
-            if "symbols" in config:
-                self.symbols = config["symbols"]
-
-            if "update_interval" in config:
-                self.update_interval = float(config["update_interval"])
-
-            # Обновляем дополнительные параметры (в подклассах)
-            self._update_config(config)
-
-            return True
-
-        except Exception as e:
-            logger.error(
-                f"Ошибка при обновлении конфигурации для бота {self.name}: {str(e)}"
-            )
-            return False
-
-    async def _initialize(self) -> None:
-        """
-        Инициализирует бота перед запуском.
-        Должен быть переопределен в подклассах.
-        """
-        # Загружаем рыночные данные для всех символов
-        await self._update_market_data()
-
-    async def _cleanup(self) -> None:
-        """
-        Выполняет очистку ресурсов при остановке бота.
-        Должен быть переопределен в подклассах.
-        """
-
-    def _update_config(self, config: Dict[str, Any]) -> None:
-        """
-        Обновляет дополнительные параметры конфигурации.
-        Должен быть переопределен в подклассах.
-
-        Args:
-            config: Словарь с новыми параметрами конфигурации
-        """
-
-    @async_handle_error
-    async def _update_market_data(self) -> None:
-        """
-        Обновляет рыночные данные для всех символов.
-        """
-        for symbol in self.symbols:
-            try:
-                await self.market_data.get_ticker(self.exchange_id, symbol)
-                await self.market_data.get_ohlcv(
-                    self.exchange_id, symbol, "1h", limit=100
-                )
-            except Exception as e:
-                logger.warning("Ошибка при обновлении данных для {symbol}: {str(e)}" %)
-
-    async def _run(self) -> None:
+    async def _run_loop(self):
         """
         Основной цикл работы бота.
         """
         try:
-            logger.info("Основной цикл бота {self.name} запущен" %)
-
-            while True:
-                if self.status == BotStatus.RUNNING:
-                    try:
-                        # Обновляем данные
-                        await self._update_market_data()
-
-                        # Выполняем основной шаг бота
-                        await self._execute_bot_step()
-
-                        # Обновляем время последнего обновления
-                        self.last_update_time = time.time()
-                    except Exception as e:
-                        logger.error(
-                            f"Ошибка в основном цикле бота {self.name}: {str(e)}"
-                        )
-
-                # Ждем до следующего обновления
-                await asyncio.sleep(self.update_interval)
-
+            logger.info("Начало мониторинга рынка ботом %s", self.name)
+            self.stats["start_time"] = asyncio.get_event_loop().time()
+            
+            while self.running:
+                start_time = asyncio.get_event_loop().time()
+                
+                # Запускаем основную логику
+                await self._process_market_data()
+                
+                # Вычисляем время ожидания до следующего цикла
+                elapsed = asyncio.get_event_loop().time() - start_time
+                wait_time = max(0, self.check_interval - elapsed)
+                
+                # Ждем следующий цикл
+                await asyncio.sleep(wait_time)
+                
         except asyncio.CancelledError:
-            logger.info("Основной цикл бота {self.name} отменен" %)
-            raise
+            logger.info("Задача бота %s отменена", self.name)
+            
         except Exception as e:
-            logger.error("Критическая ошибка в боте {self.name}: {str(e)}" %)
-            self.status = BotStatus.ERROR
+            self.error = str(e)
+            self.status = "error"
+            logger.error("Ошибка в основном цикле бота %s: %s", self.name, str(e))
+            
+        finally:
+            self.running = False
+            logger.info("Основной цикл бота %s завершен", self.name)
 
-    async def _execute_bot_step(self) -> None:
+    async def _process_market_data(self):
         """
-        Выполняет один шаг работы бота.
-        Должен быть переопределен в подклассах.
+        Обрабатывает рыночные данные (метод для переопределения).
         """
-
-    def _update_stats(self, trade_result: float, is_win: bool) -> None:
+        # Реализация в наследниках
+        
+    async def _process_signals(self, signals):
         """
-        Обновляет статистику торговли.
-
+        Обрабатывает сигналы (метод для переопределения).
+        """
+        # Реализация в наследниках
+        
+    @async_handle_error
+    async def execute_order(self, symbol, side, amount, order_type="market", price=None):
+        """
+        Выполняет ордер на бирже.
+        
         Args:
-            trade_result: Результат сделки (прибыль/убыток)
-            is_win: True, если сделка прибыльная, иначе False
+            symbol: Торговая пара
+            side: Сторона (buy или sell)
+            amount: Объем
+            order_type: Тип ордера (market или limit)
+            price: Цена (для limit ордеров)
+            
+        Returns:
+            Dict: Результат выполнения ордера
         """
-        self.stats["trades_count"] += 1
-
-        if is_win:
-            self.stats["winning_trades"] += 1
-            self.stats["total_profit"] += trade_result
-        else:
-            self.stats["losing_trades"] += 1
-            self.stats["total_loss"] += abs(trade_result)
-
-        # Обновляем максимальную просадку
-        current_drawdown = self.stats["total_loss"] / (
-            self.stats["total_profit"] + 0.0001
-        )
-        self.stats["max_drawdown"] = max(self.stats["max_drawdown"], current_drawdown)
-
-        # Обновляем винрейт
-        if self.stats["trades_count"] > 0:
-            self.stats["win_rate"] = (
-                self.stats["winning_trades"] / self.stats["trades_count"]
+        try:
+            logger.info(
+                "Выполнение ордера: %s %s %s, объем: %.8f, цена: %s",
+                self.exchange_id, symbol, side, amount,
+                str(price) if price else "рыночная"
             )
+            
+            # Выполняем ордер через исполнитель
+            result = await self.order_executor.execute_order(
+                exchange_id=self.exchange_id,
+                symbol=symbol,
+                side=side,
+                amount=amount,
+                order_type=order_type,
+                price=price
+            )
+            
+            # Обновляем статистику
+            self.stats["total_trades"] += 1
+            if result.success:
+                self.stats["successful_trades"] += 1
+                
+                # Отправляем уведомление
+                await send_trading_signal(
+                    f"Ордер выполнен: {side.upper()} {symbol} на {self.exchange_id}, "
+                    f"объем: {amount}, стоимость: {result.cost:.2f} USD"
+                )
+            else:
+                self.stats["failed_trades"] += 1
+                logger.error(
+                    "Ошибка выполнения ордера: %s", 
+                    result.error
+                )
+                
+            return result
+            
+        except Exception as e:
+            logger.error("Ошибка при выполнении ордера: %s", str(e))
+            self.stats["failed_trades"] += 1
+            return None
+
+    @async_handle_error
+    async def get_balance(self, currency=None):
+        """
+        Получает баланс на бирже.
+        
+        Args:
+            currency: Валюта для получения баланса
+            
+        Returns:
+            Dict или float: Баланс для указанной валюты или для всех валют
+        """
+        try:
+            # Получаем баланс через исполнитель
+            balance = await self.order_executor.get_balance(self.exchange_id)
+            
+            if currency:
+                return balance.get("free", {}).get(currency, 0.0)
+            return balance.get("free", {})
+            
+        except Exception as e:
+            logger.error("Ошибка при получении баланса: %s", str(e))
+            return {} if currency is None else 0.0
+
+    @async_handle_error
+    async def get_market_data(self, symbol):
+        """
+        Получает рыночные данные для символа.
+        
+        Args:
+            symbol: Торговая пара
+            
+        Returns:
+            Dict: Рыночные данные
+        """
+        try:
+            # Получаем данные через MarketData
+            ticker = await self.market_data.get_ticker(self.exchange_id, symbol)
+            orderbook = await self.market_data.get_orderbook(self.exchange_id, symbol)
+            
+            return {
+                "ticker": ticker,
+                "orderbook": orderbook
+            }
+            
+        except Exception as e:
+            logger.error(
+                "Ошибка при получении рыночных данных для %s: %s", 
+                symbol, str(e)
+            )
+            return {}
+
+    async def send_notification(self, message):
+        """
+        Отправляет уведомление.
+        
+        Args:
+            message: Сообщение для отправки
+        """
+        await send_trading_signal(message)

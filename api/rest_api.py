@@ -1,36 +1,41 @@
 """
-Модуль для RESTful API.
-Предоставляет REST эндпоинты для взаимодействия с системой.
+REST API для управления торговой системой.
+Предоставляет конечные точки для мониторинга рынка, управления ботами и выполнения операций.
 """
 
+# Стандартные импорты
 import os
 import time
+from typing import Dict, Any, Optional
 from functools import wraps
 
+# Сторонние импорты
+import aiohttp
 import jwt
 from aiohttp import web
-from project.bots.arbitrage.core import ArbitrageCore
-from project.bots.bot_manager import BotManager
-from project.bots.strategies.strategy_manager import StrategyManager
+
+# Внутренние импорты
 from project.config import get_config
 from project.data.market_data import MarketData
 from project.trade_executor.order_executor import OrderExecutor
+from project.bots.bot_manager import BotManager
+from project.bots.strategies.strategy_manager import StrategyManager
+from project.bots.arbitrage.core import ArbitrageCore
 from project.utils.logging_utils import get_logger
 from project.utils.notify import send_trading_signal
 
+# Инициализация логгера
 logger = get_logger(__name__)
 
-# Глобальные объекты
+config = get_config()
 market_data = MarketData.get_instance()
 order_executor = OrderExecutor.get_instance()
 bot_manager = BotManager.get_instance()
 strategy_manager = StrategyManager.get_instance()
 arbitrage_core = ArbitrageCore.get_instance()
-config = get_config()
-
-# Настройки JWT
-JWT_SECRET = config.JWT_SECRET or os.environ.get("JWT_SECRET", "super-secret-key-change-this")
 JWT_ALGORITHM = 'HS256'
+JWT_EXPIRATION = 86400  # 24 часа
+JWT_SECRET = config.get("JWT_SECRET", "default_secret_key")
 JWT_EXPIRATION = 86400  # 24 часа
 
 # Защита эндпоинтов с помощью JWT
@@ -60,9 +65,9 @@ def jwt_required(func):
 
             # Вызываем исходную функцию
             return await func(request)
-
+            logger.error(f"Error in JWT middleware: {str(e)}")
         except Exception as e:
-            logger.error("Error in JWT middleware: {str(e)}" %)
+            logger.error(f"Error in JWT middleware: {str(e)}")
             return web.json_response({"error": "Authentication error"}, status=500)
 
     return wrapper
@@ -107,9 +112,9 @@ async def login(request):
             "username": username,
             "expires": time.time() + JWT_EXPIRATION
         })
-
+        logger.error(f"Error in login: {str(e)}")
     except Exception as e:
-        logger.error("Error in login: {str(e)}" %)
+        logger.error(f"Error in login: {str(e)}")
         return web.json_response({"error": "Login error"}, status=500)
 
 # Эндпоинты для рыночных данных
@@ -140,9 +145,9 @@ async def get_tickers(request):
                 results[symbol] = ticker
 
         return web.json_response(results)
-
+        logger.error(f"Error in get_tickers: {str(e)}")
     except Exception as e:
-        logger.error("Error in get_tickers: {str(e)}" %)
+        logger.error(f"Error in get_tickers: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
 
 
@@ -167,9 +172,9 @@ async def get_orderbook(request):
             return web.json_response({"error": f"Failed to get orderbook for {symbol}"}, status=404)
 
         return web.json_response(orderbook)
-
+        logger.error(f"Error in get_orderbook: {str(e)}")
     except Exception as e:
-        logger.error("Error in get_orderbook: {str(e)}" %)
+        logger.error(f"Error in get_orderbook: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
 
 
@@ -207,9 +212,9 @@ async def get_ohlcv(request):
             })
 
         return web.json_response(data)
-
+        logger.error(f"Error in get_ohlcv: {str(e)}")
     except Exception as e:
-        logger.error("Error in get_ohlcv: {str(e)}" %)
+        logger.error(f"Error in get_ohlcv: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
 
 # Эндпоинты для торговли
@@ -268,9 +273,9 @@ async def execute_order(request):
             "status": result.status,
             "timestamp": time.time()
         })
-
+        logger.error(f"Error in execute_order: {str(e)}")
     except Exception as e:
-        logger.error("Error in execute_order: {str(e)}" %)
+        logger.error(f"Error in execute_order: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
 
 
@@ -288,9 +293,9 @@ async def get_open_orders(request):
         orders = await order_executor.get_open_orders(exchange_id, symbol)
 
         return web.json_response(orders)
-
+        logger.error(f"Error in get_open_orders: {str(e)}")
     except Exception as e:
-        logger.error("Error in get_open_orders: {str(e)}" %)
+        logger.error(f"Error in get_open_orders: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
 
 
@@ -331,9 +336,9 @@ async def cancel_order(request):
             "exchange": exchange_id,
             "timestamp": time.time()
         })
-
+        logger.error(f"Error in cancel_order: {str(e)}")
     except Exception as e:
-        logger.error("Error in cancel_order: {str(e)}" %)
+        logger.error(f"Error in cancel_order: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
 
 # Эндпоинты для ботов
@@ -364,9 +369,9 @@ async def list_bots(request):
             bot_list.append(bot_info)
 
         return web.json_response(bot_list)
-
+        logger.error(f"Error in list_bots: {str(e)}")
     except Exception as e:
-        logger.error("Error in list_bots: {str(e)}" %)
+        logger.error(f"Error in list_bots: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
 
 
@@ -389,9 +394,9 @@ async def get_bot_state(request):
             return web.json_response({"error": f"Bot with ID {bot_id} not found"}, status=404)
 
         return web.json_response(state)
-
+        logger.error(f"Error in get_bot_state: {str(e)}")
     except Exception as e:
-        logger.error("Error in get_bot_state: {str(e)}" %)
+        logger.error(f"Error in get_bot_state: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
 
 
@@ -435,9 +440,9 @@ async def start_bot(request):
             "symbols": symbols,
             "timestamp": time.time()
         })
-
+        logger.error(f"Error in start_bot: {str(e)}")
     except Exception as e:
-        logger.error("Error in start_bot: {str(e)}" %)
+        logger.error(f"Error in start_bot: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
 
 
@@ -464,9 +469,9 @@ async def stop_bot(request):
             "bot_id": bot_id,
             "timestamp": time.time()
         })
-
+        logger.error(f"Error in stop_bot: {str(e)}")
     except Exception as e:
-        logger.error("Error in stop_bot: {str(e)}" %)
+        logger.error(f"Error in stop_bot: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
 
 # Эндпоинты для стратегий
@@ -486,9 +491,9 @@ async def list_strategies(request):
             "available_strategies": available_strategies,
             "running_strategies": running_strategies
         })
-
+        logger.error(f"Error in list_strategies: {str(e)}")
     except Exception as e:
-        logger.error("Error in list_strategies: {str(e)}" %)
+        logger.error(f"Error in list_strategies: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
 
 
@@ -533,9 +538,9 @@ async def start_strategy(request):
             "timeframes": timeframes,
             "timestamp": time.time()
         })
-
+        logger.error(f"Error in start_strategy: {str(e)}")
     except Exception as e:
-        logger.error("Error in start_strategy: {str(e)}" %)
+        logger.error(f"Error in start_strategy: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
 
 
@@ -562,9 +567,9 @@ async def stop_strategy(request):
             "strategy_id": strategy_id,
             "timestamp": time.time()
         })
-
+        logger.error(f"Error in stop_strategy: {str(e)}")
     except Exception as e:
-        logger.error("Error in stop_strategy: {str(e)}" %)
+        logger.error(f"Error in stop_strategy: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
 
 
@@ -587,9 +592,9 @@ async def get_strategy_state(request):
             return web.json_response({"error": f"Strategy with ID {strategy_id} not found"}, status=404)
 
         return web.json_response(state)
-
+        logger.error(f"Error in get_strategy_state: {str(e)}")
     except Exception as e:
-        logger.error("Error in get_strategy_state: {str(e)}" %)
+        logger.error(f"Error in get_strategy_state: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
 
 # Эндпоинты для арбитража
@@ -630,9 +635,9 @@ async def scan_arbitrage(request):
             })
 
         return web.json_response(opps_list)
-
+        logger.error(f"Error in scan_arbitrage: {str(e)}")
     except Exception as e:
-        logger.error("Error in scan_arbitrage: {str(e)}" %)
+        logger.error(f"Error in scan_arbitrage: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
 
 
@@ -695,9 +700,9 @@ async def execute_arbitrage(request):
             "profit_margin_pct": target_opp.profit_margin_pct,
             "timestamp": time.time()
         })
-
+        logger.error(f"Error in execute_arbitrage: {str(e)}")
     except Exception as e:
-        logger.error("Error in execute_arbitrage: {str(e)}" %)
+        logger.error(f"Error in execute_arbitrage: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
 
 # Создание приложения aiohttp
