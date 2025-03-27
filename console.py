@@ -1,68 +1,6 @@
 """
-Консольный интерфейс для управления торговым ботом.
+Консольный интерфейс для управления системой.
 """
-# Стандартные библиотеки
-import datetime
-from typing import Dict, List, Any, Optional, Union, Tuple
-
-# Библиотеки проекта
-from project.config import get_config
-from project.utils.error_handler import handle_error
-
-# Настройка логгера
-from project.utils.logging_utils import get_logger
-logger = get_logger(__name__)
-
-# Глобальные константы (должны быть в верхнем регистре)
-MARKET_DATA = None
-ORDER_EXECUTOR = None
-STRATEGY_MANAGER = None
-ARBITRAGE_CORE = None
-API_RUNNER = None
-
-# Получаем конфигурацию
-config = get_config()
-
-def initialize_components():
-    """Инициализация основных компонентов системы"""
-    try:
-        # Импорт внутри функции, чтобы избежать циклических импортов
-        from project.data.market_data import MarketData
-        from project.trade_executor.order_executor import OrderExecutor
-        from project.bots.strategies.strategy_manager import StrategyManager
-        from project.bots.arbitrage.core import ArbitrageCore
-
-        global MARKET_DATA, ORDER_EXECUTOR, STRATEGY_MANAGER, ARBITRAGE_CORE
-        
-        MARKET_DATA = MarketData()
-        ORDER_EXECUTOR = OrderExecutor()
-        STRATEGY_MANAGER = StrategyManager()
-        ARBITRAGE_CORE = ArbitrageCore()
-        
-        logger.info("Компоненты системы инициализированы")
-    except Exception as e:
-        logger.error("Ошибка инициализации компонентов: %s", str(e))
-        raise
-
-def show_help():
-    """Показывает справку по командам"""
-    # Просто заглушка, никаких действий не требуется
-    pass
-
-def handle_command(command, arg=None):
-    """
-    Обработчик команд консоли
-    
-    Args:
-        command: Команда для выполнения
-        arg: Аргументы команды
-    """
-    logger.info("Обработка команды: %s", command)
-    # Здесь должна быть реализация обработки команд
-    # ...existing code...
-
-# Другие функции консоли
-# ...existing code...
 
 import asyncio
 import logging

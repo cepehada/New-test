@@ -1,8 +1,8 @@
 """
 Модуль для анализа и извлечения ключевых слов из новостного контента.
 """
-import re
 import logging
+import re
 from typing import Any, Dict, List, Optional, Tuple
 
 from project.utils.error_handler import handle_error
