@@ -4,22 +4,18 @@
 """
 
 import asyncio
-import logging
 import time
-import re
-import json
-from typing import Dict, List, Any, Optional, Union, Tuple, Set
 from datetime import datetime, timedelta
+from typing import Any, Dict, List
 
-from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import async_handle_error, async_with_retry
-from project.utils.notify import send_trading_signal
-from project.data.market_data import MarketData
-from project.utils.ccxt_exchanges import fetch_ticker
 from project.bots.base_bot import BaseBot, BotStatus
-from project.bots.news.parsers.coindesk_parser import CoindeskParser
 from project.bots.news.parsers.bitcoinmag_parser import BitcoinMagParser
+from project.bots.news.parsers.coindesk_parser import CoindeskParser
+from project.config import get_config
+from project.utils.ccxt_exchanges import fetch_ticker
+from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
+from project.utils.notify import send_trading_signal
 
 logger = get_logger(__name__)
 
@@ -172,7 +168,7 @@ class NewsBot(BaseBot):
         # Добавляем необходимый атрибут
         self.open_positions = {}
 
-        logger.debug(f"Создан новостной бот {self.name}")
+        logger.debug("Создан новостной бот {self.name}" %)
 
     def _initialize_parsers(self) -> None:
         """
@@ -200,7 +196,7 @@ class NewsBot(BaseBot):
         await super()._initialize()
 
         # Дополнительная инициализация для новостного бота
-        logger.info(f"Инициализация новостного бота {self.name}")
+        logger.info("Инициализация новостного бота {self.name}" %)
 
         # Запускаем отдельную задачу для проверки новостей
         self.news_task = asyncio.create_task(self._check_news_periodically())
@@ -226,7 +222,7 @@ class NewsBot(BaseBot):
         Периодически проверяет новости из различных источников.
         """
         try:
-            logger.info(f"Запущена задача проверки новостей для {self.name}")
+            logger.info("Запущена задача проверки новостей для {self.name}" %)
 
             while True:
                 if self.status == BotStatus.RUNNING:
@@ -236,10 +232,10 @@ class NewsBot(BaseBot):
                 await asyncio.sleep(self.news_check_interval)
 
         except asyncio.CancelledError:
-            logger.info(f"Задача проверки новостей для {self.name} отменена")
+            logger.info("Задача проверки новостей для {self.name} отменена" %)
             raise
         except Exception as e:
-            logger.error(f"Ошибка в задаче проверки новостей для {self.name}: {str(e)}")
+            logger.error("Ошибка в задаче проверки новостей для {self.name}: {str(e)}" %)
 
     @async_handle_error
     async def _fetch_and_process_news(self) -> None:
@@ -248,23 +244,23 @@ class NewsBot(BaseBot):
         """
         for source, parser in self.parsers.items():
             try:
-                logger.debug(f"Получение новостей из {source}")
+                logger.debug("Получение новостей из {source}" %)
 
                 # Получаем последние новости
                 news = await parser.fetch_latest_news()
 
                 if not news:
-                    logger.debug(f"Нет новых новостей из {source}")
+                    logger.debug("Нет новых новостей из {source}" %)
                     continue
 
-                logger.debug(f"Получено {len(news)} новостей из {source}")
+                logger.debug("Получено {len(news)} новостей из {source}" %)
 
                 # Обрабатываем каждую новость
                 for article in news:
                     await self._process_news_article(article, source)
 
             except Exception as e:
-                logger.error(f"Ошибка при получении новостей из {source}: {str(e)}")
+                logger.error("Ошибка при получении новостей из {source}: {str(e)}" %)
 
     @async_handle_error
     async def _process_news_article(self, article: Dict[str, Any], source: str) -> None:
@@ -298,10 +294,10 @@ class NewsBot(BaseBot):
                 if datetime.now(published_at.tzinfo) - published_at > timedelta(
                     hours=self.news_relevance_time
                 ):
-                    logger.debug(f"Пропуск устаревшей новости: {title}")
+                    logger.debug("Пропуск устаревшей новости: {title}" %)
                     return
             except Exception as e:
-                logger.warning(f"Ошибка при проверке даты публикации: {str(e)}")
+                logger.warning("Ошибка при проверке даты публикации: {str(e)}" %)
 
         # Анализируем новость для каждого символа
         affected_symbols = []
@@ -348,8 +344,8 @@ class NewsBot(BaseBot):
 
         # Если новость затрагивает какие-либо символы, сохраняем ее
         if affected_symbols:
-            logger.info(f"Обнаружена значимая новость: {title}")
-            logger.info(f"Затронутые символы: {affected_symbols}")
+            logger.info("Обнаружена значимая новость: {title}" %)
+            logger.info("Затронутые символы: {affected_symbols}" %)
 
             # Сохраняем новость
             self.processed_news[url] = {
@@ -509,12 +505,12 @@ class NewsBot(BaseBot):
             # Получаем текущую цену
             ticker = await fetch_ticker(self.exchange_id, symbol)
             if not ticker:
-                logger.warning(f"Не удалось получить тикер для {symbol}")
+                logger.warning("Не удалось получить тикер для {symbol}" %)
                 return False
 
             current_price = ticker.get("last", 0)
             if current_price <= 0:
-                logger.warning(f"Некорректная цена для {symbol}: {current_price}")
+                logger.warning("Некорректная цена для {symbol}: {current_price}" %)
                 return False
 
             # Определяем сторону ордера
@@ -648,7 +644,7 @@ class NewsBot(BaseBot):
 
             # Если есть причина для выхода, закрываем позицию
             if exit_reason:
-                logger.info(f"Закрытие позиции по {symbol} (причина: {exit_reason})")
+                logger.info("Закрытие позиции по {symbol} (причина: {exit_reason})" %)
 
                 # Определяем сторону для закрытия (противоположную открытию)
                 close_side = "sell" if side == "long" else "buy"

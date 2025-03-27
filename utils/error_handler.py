@@ -3,12 +3,11 @@
 Обеспечивает единообразную обработку исключений во всем приложении.
 """
 
-import sys
-import traceback
+import asyncio
 import functools
 import logging
-import asyncio
-from typing import Any, Callable, TypeVar, cast, Optional, Dict, Type, Union
+import sys
+from typing import Any, Callable, Dict, Optional, Type, TypeVar, cast
 
 from project.utils.logging_utils import get_logger
 
@@ -33,7 +32,7 @@ def register_error_handler(
         handler: Функция-обработчик ошибки
     """
     _error_handlers[exception_type] = handler
-    logger.debug(f"Зарегистрирован обработчик для {exception_type.__name__}")
+    logger.debug("Зарегистрирован обработчик для {exception_type.__name__}" %)
 
 
 def handle_exception(exc: Exception) -> Any:
@@ -61,7 +60,7 @@ def handle_exception(exc: Exception) -> Any:
     )
 
     # Логируем исключение
-    logger.error(f"Необработанное исключение: {str(exc)}", exc_info=exc)
+    logger.error("Необработанное исключение: {str(exc)}" %, exc_info=exc)
 
     # Для асинхронных отмен не выполняем дополнительных действий
     if isinstance(exc, asyncio.CancelledError):
@@ -70,7 +69,7 @@ def handle_exception(exc: Exception) -> Any:
 
     # Для критических исключений завершаем программу
     if isinstance(exc, (SystemExit, KeyboardInterrupt)):
-        logger.critical(f"Критическое исключение: {type(exc).__name__}")
+        logger.critical("Критическое исключение: {type(exc).__name__}" %)
         raise exc
 
     return None
@@ -158,7 +157,7 @@ def with_retry(
 
                         time.sleep(retry_delay)
                     else:
-                        _logger.error(f"All {max_retries} attempts failed.")
+                        _logger.error("All {max_retries} attempts failed." %)
                         raise last_exception
 
             # Этот код не должен выполниться, но на всякий случай
@@ -209,7 +208,7 @@ def async_with_retry(
                         )
                         await asyncio.sleep(retry_delay)
                     else:
-                        _logger.error(f"All {max_retries} attempts failed.")
+                        _logger.error("All {max_retries} attempts failed." %)
                         raise last_exception
 
             # Этот код не должен выполниться, но на всякий случай
@@ -229,15 +228,15 @@ def setup_error_handlers() -> None:
     """
     # Регистрируем стандартные обработчики ошибок
     register_error_handler(
-        ConnectionError, lambda e: logger.error(f"Ошибка соединения: {str(e)}")
+        ConnectionError, lambda e: logger.error("Ошибка соединения: {str(e)}" %)
     )
     register_error_handler(
-        TimeoutError, lambda e: logger.error(f"Таймаут операции: {str(e)}")
+        TimeoutError, lambda e: logger.error("Таймаут операции: {str(e)}" %)
     )
     register_error_handler(
-        ValueError, lambda e: logger.error(f"Ошибка значения: {str(e)}")
+        ValueError, lambda e: logger.error("Ошибка значения: {str(e)}" %)
     )
-    register_error_handler(KeyError, lambda e: logger.error(f"Ошибка ключа: {str(e)}"))
+    register_error_handler(KeyError, lambda e: logger.error("Ошибка ключа: {str(e)}" %))
 
     # Настраиваем обработчик неперехваченных исключений
     def handle_uncaught_exception(exc_type, exc_value, exc_traceback):
@@ -264,7 +263,7 @@ def log_and_ignore_error(e: Exception) -> None:
     Args:
         e: Исключение для логирования
     """
-    logger.warning(f"Игнорируемая ошибка: {str(e)}")
+    logger.warning("Игнорируемая ошибка: {str(e)}" %)
     return None
 
 
@@ -275,7 +274,7 @@ def log_and_raise_error(e: Exception) -> None:
     Args:
         e: Исключение для логирования и пробрасывания
     """
-    logger.error(f"Ошибка требует дальнейшей обработки: {str(e)}")
+    logger.error("Ошибка требует дальнейшей обработки: {str(e)}" %)
     raise e
 
 
@@ -291,7 +290,7 @@ def log_and_return_fallback(fallback_value: T) -> Callable[[Exception], T]:
     """
 
     def handler(e: Exception) -> T:
-        logger.warning(f"Ошибка, возвращаем запасное значение: {str(e)}")
+        logger.warning("Ошибка, возвращаем запасное значение: {str(e)}" %)
         return fallback_value
 
     return handler
@@ -340,7 +339,6 @@ async def async_retry(func, max_retries=3, delay=1, *args, **kwargs):
         try:
             return await func(*args, **kwargs)
         except Exception as e:
-            import time
             last_exception = e
             logger.warning("Попытка %d из %d не удалась: %s", 
                           attempt + 1, max_retries, str(e))

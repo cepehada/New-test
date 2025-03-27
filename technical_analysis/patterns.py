@@ -5,7 +5,7 @@
 
 # Standard imports
 import logging
-from typing import Dict, List, Any, Optional, Union, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 # Third-party imports
 try:
@@ -20,8 +20,8 @@ except ImportError:
 
 # Local imports
 from project.technical_analysis.indicators import Indicators
-from project.utils.logging_utils import get_logger
 from project.utils.error_handler import handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 

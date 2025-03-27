@@ -1,11 +1,13 @@
 import asyncio
 import logging
+
 import pandas as pd
-from config import get_config
 
 # Импорт новых модулей: генетического оптимизатора и визуализатора
 from project.optimizers.genetic_optimizer import GeneticOptimizer
 from project.visualizers.data_visualizer import DataVisualizer
+
+from config import get_config
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +56,7 @@ async def run_optimization():
 
     # Запуск оптимизации
     results = await genetic_optimizer.optimize(strategy_class, parameter_ranges, data)
-    logger.info(f"Результаты оптимизации: {results}")
+    logger.info("Результаты оптимизации: {results}" %)
 
 
 def run_visualization():
@@ -92,6 +94,6 @@ if __name__ == "__main__":
         # Запуск оптимизации в event loop
         asyncio.run(run_optimization())
     except Exception as e:
-        logger.error(f"Ошибка в оптимизации: {e}")
+        logger.error("Ошибка в оптимизации: {e}" %)
 
     run_visualization()

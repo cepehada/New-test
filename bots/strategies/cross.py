@@ -6,15 +6,15 @@
 import asyncio
 import logging
 import time
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Any, Optional, Union, Tuple, Set
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
-from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import async_handle_error
-from project.data.market_data import MarketData
+import numpy as np
+import pandas as pd
 from project.bots.strategies.base_strategy import BaseStrategy, StrategyStatus
+from project.config import get_config
+from project.data.market_data import MarketData
+from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -71,7 +71,7 @@ class CrossStrategy(BaseStrategy):
         self.arbitrage_opportunities: List[Dict[str, Any]] = []  # список возможностей для арбитража
         self.last_check_time = 0  # время последней проверки
 
-        logger.debug(f"Создана стратегия кросс-торговли {self.name}")
+        logger.debug("Создана стратегия кросс-торговли {self.name}" %)
 
     def _update_config(self, config: Dict[str, Any]) -> None:
         """
@@ -127,7 +127,6 @@ class CrossStrategy(BaseStrategy):
         Выполняет дополнительную очистку ресурсов стратегии.
         """
         # Нет специфических ресурсов для очистки
-        pass
     
     @async_handle_error
     async def _update_cross_market_data(self) -> None:
@@ -154,7 +153,7 @@ class CrossStrategy(BaseStrategy):
                             self.exchange_volumes[exchange][symbol] = volume
                 
                 except Exception as e:
-                    logger.warning(f"Ошибка при получении данных для {symbol} на {exchange}: {str(e)}")
+                    logger.warning("Ошибка при получении данных для {symbol} на {exchange}: {str(e)}" %)
         
         self.last_check_time = time.time()
     
@@ -214,7 +213,7 @@ class CrossStrategy(BaseStrategy):
                     
                     self.arbitrage_opportunities.append(opportunity)
                     
-                    logger.debug(f"Найдена возможность арбитража для {symbol}: "
+                    logger.debug("Найдена возможность арбитража для {symbol}: " %
                                 f"купить на {min_exchange} по {min_price:.8f}, "
                                 f"продать на {max_exchange} по {max_price:.8f}, "
                                 f"прибыль: {net_profit_pct:.2%}")
@@ -287,7 +286,7 @@ class CrossStrategy(BaseStrategy):
                                         
                                         self.arbitrage_opportunities.append(opportunity)
                                         
-                                        logger.debug(f"Найдена возможность треугольного арбитража на {exchange}: "
+                                        logger.debug("Найдена возможность треугольного арбитража на {exchange}: " %
                                                     f"{base} -> {coin_a} -> {coin_b} -> {base}, "
                                                     f"прибыль: {profit_pct:.2%}")
                                 
@@ -315,12 +314,12 @@ class CrossStrategy(BaseStrategy):
                                         
                                         self.arbitrage_opportunities.append(opportunity)
                                         
-                                        logger.debug(f"Найдена возможность треугольного арбитража на {exchange}: "
+                                        logger.debug("Найдена возможность треугольного арбитража на {exchange}: " %
                                                     f"{base} -> {coin_a} -> {coin_b} -> {base}, "
                                                     f"прибыль: {profit_pct:.2%}")
             
             except Exception as e:
-                logger.error(f"Ошибка при поиске треугольного арбитража на {exchange}: {str(e)}")
+                logger.error("Ошибка при поиске треугольного арбитража на {exchange}: {str(e)}" %)
     
     @async_handle_error
     async def _check_balances(self, opportunity: Dict[str, Any]) -> bool:
@@ -354,7 +353,7 @@ class CrossStrategy(BaseStrategy):
                 return available >= minimum
                 
             except Exception as e:
-                logger.error(f"Ошибка при проверке баланса для треугольного арбитража: {str(e)}")
+                logger.error("Ошибка при проверке баланса для треугольного арбитража: {str(e)}" %)
                 return False
         
         else:
@@ -392,7 +391,7 @@ class CrossStrategy(BaseStrategy):
                 return buy_available >= min_quote и sell_available >= min_base
                 
             except Exception as e:
-                logger.error(f"Ошибка при проверке балансов для арбитража: {str(e)}")
+                logger.error("Ошибка при проверке балансов для арбитража: {str(e)}" %)
                 return False
     
     @async_handle_error
@@ -412,12 +411,12 @@ class CrossStrategy(BaseStrategy):
         
         if "type" в opportunity и opportunity["type"] == "triangular":
             # Треугольный арбитраж
-            logger.info(f"Выполняем треугольный арбитраж на {opportunity['exchange']}: "
+            logger.info("Выполняем треугольный арбитраж на {opportunity['exchange']}: " %
                        f"{opportunity['step1']}, {opportunity['step2']}, {opportunity['step3']}, "
                        f"ожидаемая прибыль: {opportunity['profit_pct']:.2%}")
         else:
             # Обычный арбитраж между биржами
-            logger.info(f"Выполняем арбитраж для {opportunity['symbol']}: "
+            logger.info("Выполняем арбитраж для {opportunity['symbol']}: " %
                        f"покупка на {opportunity['buy_exchange']} по {opportunity['buy_price']:.8f}, "
                        f"продажа на {opportunity['sell_exchange']} по {opportunity['sell_price']:.8f}, "
                        f"ожидаемая прибыль: {opportunity['net_profit_pct']:.2%}")

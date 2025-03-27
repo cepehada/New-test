@@ -3,20 +3,14 @@
 Предоставляет HTTP-интерфейс для управления стратегиями и мониторинга.
 """
 
-import asyncio
 import json
-import logging
 import time
-from typing import Dict, List, Any, Optional
 
-from aiohttp import web
 import jwt
-
+from aiohttp import web
 from project.config import get_config
-from project.utils.logging_utils import get_logger
 from project.utils.error_handler import async_handle_error
-from project.bots.strategies.strategy_manager import StrategyManager
-from project.infrastructure.database import Database
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -45,7 +39,7 @@ class RestAPI:
 
         # Настраиваем маршруты
         self._setup_routes()
-        logger.debug(f"REST API настроен на {host}:{port}")
+        logger.debug("REST API настроен на {host}:{port}" %)
 
     def _setup_routes(self) -> None:
         """
@@ -153,7 +147,7 @@ class RestAPI:
         self.site = web.TCPSite(self.runner, self.host, self.port)
         await self.site.start()
 
-        logger.info(f"REST API запущен на http://{self.host}:{self.port}")
+        logger.info("REST API запущен на http://{self.host}:{self.port}" %)
 
     async def stop(self) -> None:
         """
@@ -277,7 +271,7 @@ class RestAPI:
                 {"error": "Bad request", "message": "Invalid JSON"}, status=400
             )
         except Exception as e:
-            logger.error(f"Error creating strategy: {str(e)}")
+            logger.error("Error creating strategy: {str(e)}" %)
             return web.json_response(
                 {"error": "Internal server error", "message": str(e)}, status=500
             )
@@ -310,7 +304,7 @@ class RestAPI:
             )
 
         except Exception as e:
-            logger.error(f"Error stopping strategy {strategy_id}: {str(e)}")
+            logger.error("Error stopping strategy {strategy_id}: {str(e)}" %)
             return web.json_response(
                 {"error": "Internal server error", "message": str(e)}, status=500
             )
@@ -326,8 +320,8 @@ class RestAPI:
             # Импортируем модуль для работы с биржами
             from project.utils.ccxt_exchanges import (
                 connect_exchange,
-                fetch_open_orders,
                 fetch_closed_orders,
+                fetch_open_orders,
             )
 
             exchange = await connect_exchange(exchange_id)
@@ -344,7 +338,7 @@ class RestAPI:
             return web.json_response({"orders": orders})
 
         except Exception as e:
-            logger.error(f"Error getting orders: {str(e)}")
+            logger.error("Error getting orders: {str(e)}" %)
             return web.json_response(
                 {"error": "Internal server error", "message": str(e)}, status=500
             )
@@ -411,7 +405,7 @@ class RestAPI:
                 {"error": "Bad request", "message": "Invalid JSON"}, status=400
             )
         except Exception as e:
-            logger.error(f"Error creating order: {str(e)}")
+            logger.error("Error creating order: {str(e)}" %)
             return web.json_response(
                 {"error": "Internal server error", "message": str(e)}, status=500
             )
@@ -430,7 +424,7 @@ class RestAPI:
                 )
 
             # Отменяем ордер через CCXT
-            from project.utils.ccxt_exchanges import connect_exchange, cancel_order
+            from project.utils.ccxt_exchanges import cancel_order
 
             result = await cancel_order(exchange_id, order_id, symbol)
 
@@ -439,7 +433,7 @@ class RestAPI:
             )
 
         except Exception as e:
-            logger.error(f"Error cancelling order: {str(e)}")
+            logger.error("Error cancelling order: {str(e)}" %)
             return web.json_response(
                 {"error": "Internal server error", "message": str(e)}, status=500
             )
@@ -458,7 +452,7 @@ class RestAPI:
             return web.json_response(ticker)
 
         except Exception as e:
-            logger.error(f"Error getting ticker: {str(e)}")
+            logger.error("Error getting ticker: {str(e)}" %)
             return web.json_response(
                 {"error": "Internal server error", "message": str(e)}, status=500
             )
@@ -493,7 +487,7 @@ class RestAPI:
             return web.json_response({"ohlcv": formatted_ohlcv})
 
         except Exception as e:
-            logger.error(f"Error getting OHLCV data: {str(e)}")
+            logger.error("Error getting OHLCV data: {str(e)}" %)
             return web.json_response(
                 {"error": "Internal server error", "message": str(e)}, status=500
             )

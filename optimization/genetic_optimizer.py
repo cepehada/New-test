@@ -1,21 +1,18 @@
 import asyncio
-import logging
-import time
 import random
-import json
-from typing import Dict, List, Optional, Tuple, Union, Any, Set, Callable
-from datetime import datetime
-import numpy as np
-import pandas as pd
+import time
+import traceback
 import uuid
 from copy import deepcopy
-import traceback
-import os
+from datetime import datetime
+from typing import Any, Callable, Dict, List
 
-from project.utils.logging_utils import setup_logger
+import numpy as np
+import pandas as pd
 from project.backtesting.backtester import Backtester, BacktestResult
-from project.trading.strategy_base import Strategy, StrategyRegistry
 from project.data.database import Database
+from project.trading.strategy_base import Strategy
+from project.utils.logging_utils import setup_logger
 
 logger = setup_logger("genetic_optimizer")
 
@@ -320,7 +317,7 @@ class GeneticOptimizer:
             self.backtester.progress_callback = self._backtest_progress_callback
 
         try:
-            logger.info(f"Starting optimization for {strategy_class.__name__}")
+            logger.info("Starting optimization for {strategy_class.__name__}" %)
 
             # Проверяем входные данные
             if not issubclass(strategy_class, Strategy):
@@ -378,7 +375,7 @@ class GeneticOptimizer:
                 # Вызываем коллбэк прогресса
                 await self._update_progress(generation + 1, self.generations)
 
-                logger.info(f"Generation {generation + 1}/{self.generations} completed")
+                logger.info("Generation {generation + 1}/{self.generations} completed" %)
 
             # Сортируем финальную популяцию
             population.sort(
@@ -416,7 +413,7 @@ class GeneticOptimizer:
             return results
 
         except Exception as e:
-            logger.error(f"Error during optimization: {str(e)}")
+            logger.error("Error during optimization: {str(e)}" %)
             logger.error(traceback.format_exc())
 
             # Завершаем сбор статистики
@@ -471,7 +468,7 @@ class GeneticOptimizer:
             individual = Individual(params)
             population.append(individual)
 
-        logger.info(f"Initialized population with {len(population)} individuals")
+        logger.info("Initialized population with {len(population)} individuals" %)
 
         return population
 
@@ -655,7 +652,7 @@ class GeneticOptimizer:
             individual.metrics = result.metrics
 
         except Exception as e:
-            logger.error(f"Error evaluating individual: {str(e)}")
+            logger.error("Error evaluating individual: {str(e)}" %)
             individual.fitness = float("-inf")
             individual.metrics = {}
 
@@ -919,10 +916,10 @@ class GeneticOptimizer:
             # Сохраняем результаты
             await self.database.save_optimization_result(optimization_record)
 
-            logger.info(f"Saved optimization results with ID: {optimization_id}")
+            logger.info("Saved optimization results with ID: {optimization_id}" %)
 
         except Exception as e:
-            logger.error(f"Error saving optimization results: {str(e)}")
+            logger.error("Error saving optimization results: {str(e)}" %)
 
     async def _update_progress(self, current: int, total: int):
         """
@@ -945,7 +942,7 @@ class GeneticOptimizer:
                     progress, self.optimization_stats.get_stats()
                 )
             except Exception as e:
-                logger.error(f"Error in progress callback: {str(e)}")
+                logger.error("Error in progress callback: {str(e)}" %)
 
     async def _backtest_progress_callback(self, progress: float, info: Dict):
         """
@@ -976,7 +973,7 @@ class GeneticOptimizer:
                     total_progress, self.optimization_stats.get_stats()
                 )
             except Exception as e:
-                logger.error(f"Error in progress callback: {str(e)}")
+                logger.error("Error in progress callback: {str(e)}" %)
 
     async def cancel(self):
         """Отменяет выполнение оптимизации"""

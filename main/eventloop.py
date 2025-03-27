@@ -4,13 +4,11 @@
 """
 
 import asyncio
-import logging
-import time
-import os
 import signal
 import sys
+import time
 from functools import wraps
-from typing import Any, Callable, Coroutine, TypeVar, cast
+from typing import Any, Callable, Coroutine, TypeVar
 
 from project.utils.logging_utils import get_logger
 
@@ -55,7 +53,7 @@ def setup_event_loop(
         soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
         resource.setrlimit(resource.RLIMIT_NOFILE, (min(4096, hard), hard))
 
-    logger.debug(f"Цикл событий настроен: {loop}")
+    logger.debug("Цикл событий настроен: {loop}" %)
     return loop
 
 
@@ -69,12 +67,12 @@ def exception_handler(loop: asyncio.AbstractEventLoop, context: dict) -> None:
     """
     exception = context.get("exception")
     if exception is None:
-        logger.error(f"Ошибка в цикле событий: {context['message']}")
+        logger.error("Ошибка в цикле событий: {context['message']}" %)
         return
 
     if isinstance(exception, asyncio.CancelledError):
         # Нормальное отменение задачи, логируем с debug-уровнем
-        logger.debug(f"Задача отменена: {context.get('message')}")
+        logger.debug("Задача отменена: {context.get('message')}" %)
         return
 
     # Получаем информацию о задаче
@@ -154,7 +152,7 @@ async def periodic(
                 await asyncio.sleep(sleep_time)
         except asyncio.CancelledError:
             # Нормальное отменение задачи
-            logger.debug(f"Периодическая задача {func.__name__} отменена")
+            logger.debug("Периодическая задача {func.__name__} отменена" %)
             break
         except Exception as e:
             logger.error(

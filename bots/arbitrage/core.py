@@ -4,19 +4,16 @@
 """
 
 import asyncio
-import logging
 import time
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Any, Optional, Union, Tuple, Set
 from dataclasses import dataclass
+from typing import Any, Dict, List
 
 from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import async_handle_error, async_with_retry
-from project.utils.notify import send_trading_signal
 from project.data.market_data import MarketData
-from project.utils.ccxt_exchanges import fetch_ticker, fetch_balance, create_order
+from project.utils.ccxt_exchanges import create_order, fetch_balance, fetch_ticker
+from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
+from project.utils.notify import send_trading_signal
 
 logger = get_logger(__name__)
 
@@ -392,7 +389,7 @@ class ArbitrageCore:
             # Получаем символы базовой и котируемой валюты
             symbol_parts = opportunity.symbol.split("/")
             if len(symbol_parts) != 2:
-                logger.warning(f"Некорректный формат символа: {opportunity.symbol}")
+                logger.warning("Некорректный формат символа: {opportunity.symbol}" %)
                 return {}
 
             base_currency, quote_currency = symbol_parts
@@ -483,14 +480,14 @@ class ArbitrageCore:
         # Проверяем актуальность возможности
         is_valid = await self.verify_opportunity(opportunity)
         if not is_valid:
-            logger.warning(f"Возможность больше не актуальна: {opportunity.symbol}")
+            logger.warning("Возможность больше не актуальна: {opportunity.symbol}" %)
             opportunity.status = "expired"
             return False
 
         # Проверяем балансы и рассчитываем объемы
         trade_sizes = await self.check_balances(opportunity)
         if not trade_sizes:
-            logger.warning(f"Недостаточно балансов для арбитража {opportunity.symbol}")
+            logger.warning("Недостаточно балансов для арбитража {opportunity.symbol}" %)
             opportunity.status = "failed"
             return False
 
@@ -604,7 +601,7 @@ class ArbitrageCore:
             Список возможностей треугольного арбитража
         """
         if exchange_id not in self.supported_exchanges:
-            logger.warning(f"Биржа {exchange_id} не поддерживается")
+            logger.warning("Биржа {exchange_id} не поддерживается" %)
             return []
 
         if base_currencies is None:
@@ -618,7 +615,7 @@ class ArbitrageCore:
             all_tickers = await self.market_data.get_all_tickers(exchange_id)
 
             if not all_tickers:
-                logger.warning(f"Не удалось получить тикеры для {exchange_id}")
+                logger.warning("Не удалось получить тикеры для {exchange_id}" %)
                 return []
 
             opportunities = []
@@ -735,11 +732,11 @@ class ArbitrageCore:
         # В реальной реализации здесь был бы код для выполнения трех сделок
         # Для простоты только логируем выполнение
 
-        logger.info(f"Выполнение треугольного арбитража на {opportunity['exchange']}:")
-        logger.info(f"  Шаг 1: {opportunity['step1']}")
-        logger.info(f"  Шаг 2: {opportunity['step2']}")
-        logger.info(f"  Шаг 3: {opportunity['step3']}")
-        logger.info(f"  Ожидаемая прибыль: {opportunity['profit_pct']:.2%}")
+        logger.info("Выполнение треугольного арбитража на {opportunity['exchange']}:" %)
+        logger.info("  Шаг 1: {opportunity['step1']}" %)
+        logger.info("  Шаг 2: {opportunity['step2']}" %)
+        logger.info("  Шаг 3: {opportunity['step3']}" %)
+        logger.info("  Ожидаемая прибыль: {opportunity['profit_pct']:.2%}" %)
 
         # Отправляем уведомление
         await send_trading_signal(

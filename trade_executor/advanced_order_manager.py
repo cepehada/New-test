@@ -1,25 +1,25 @@
 import asyncio
-import logging
-import time
-from typing import Dict, List, Optional, Tuple, Union, Any, Set, Callable
-from datetime import datetime, timedelta
-from enum import Enum
-from decimal import Decimal, ROUND_DOWN, ROUND_UP
-import uuid
 import json
+import logging
 import math
 import random
+import time
+import uuid
+from datetime import datetime, timedelta
+from decimal import ROUND_DOWN, ROUND_UP, Decimal
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
-from project.utils.logging_utils import setup_logger
-from project.utils.error_handler import handle_exchange_errors, ExchangeErrorHandler
-from project.utils.ccxt_exchanges import get_exchange_instance
+from project.data.database import Database
 from project.data.market_data import MarketDataProvider
+from project.exchange.exchange_manager import ExchangeManager
+from project.risk_management.position_sizer import PositionSizer
 from project.trade_executor.order_executor import OrderExecutor
 from project.trade_executor.order_tracker import OrderTracker
-from project.risk_management.position_sizer import PositionSizer
-from project.data.database import Database
+from project.utils.ccxt_exchanges import get_exchange_instance
+from project.utils.error_handler import ExchangeErrorHandler, handle_exchange_errors
+from project.utils.logging_utils import setup_logger
 from project.utils.notify import send_notification
-from project.exchange.exchange_manager import ExchangeManager
 
 logger = setup_logger("advanced_order_manager")
 
@@ -284,7 +284,7 @@ class AdvancedOrderManager:
                             for hedge_order in order.hedge_orders:
                                 await self._check_order_status(hedge_order)
                     except Exception as e:
-                        logger.error(f"Ошибка при отслеживании ордера {order.order_id}: {str(e)}")
+                        logger.error("Ошибка при отслеживании ордера {order.order_id}: {str(e)}" %)
                         
                 # Пауза между обновлениями
                 await asyncio.sleep(2)
@@ -293,7 +293,7 @@ class AdvancedOrderManager:
                 logger.info("Задача отслеживания ордеров отменена")
                 break
             except Exception as e:
-                logger.error(f"Ошибка в цикле отслеживания ордеров: {str(e)}")
+                logger.error("Ошибка в цикле отслеживания ордеров: {str(e)}" %)
                 await asyncio.sleep(5)
                 
     async def _check_order_status(self, order: AdvancedOrder):
@@ -343,7 +343,7 @@ class AdvancedOrderManager:
             await exchange.close()
             
         except Exception as e:
-            logger.error(f"Ошибка при проверке статуса ордера {order.order_id}: {str(e)}")
+            logger.error("Ошибка при проверке статуса ордера {order.order_id}: {str(e)}" %)
             
             # Если ошибка указывает на то, что ордер не найден, отмечаем как ошибку
             if "not found" in str(e).lower() or "does not exist" in str(e).lower():
@@ -709,7 +709,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
                 if should_hedge и order.status in [OrderStatus.OPEN, OrderStatus.PARTIALLY_FILLED, OrderStatus.FILLED]:
                     await self._hedge_order(order)
                     
-                logger.info(f"Создан ордер {order.order_id} ({order.order_type.value}) для {order.symbol} на {order.exchange_id}")
+                logger.info("Создан ордер {order.order_id} ({order.order_type.value}) для {order.symbol} на {order.exchange_id}" %)
                 
                 return order
                 
@@ -748,11 +748,11 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
         """
         # Проверяем, что все условия выполнены
         if all_conditions_met:
-            self.logger.info(f"Все условия для ордера {order_id} выполнены, выполняем действие")
+            self.logger.info("Все условия для ордера {order_id} выполнены, выполняем действие" %)
             # Выполняем действие
             await self._execute_order_action(order_id, order_data)
         else:
-            self.logger.debug(f"Не все условия для ордера {order_id} выполнены")
+            self.logger.debug("Не все условия для ордера {order_id} выполнены" %)
         # Проверяем тип ордера
         if order.order_type == OrderType.BRACKET:
             return await self._create_bracket_order(order)
@@ -808,7 +808,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
                     await self.db.save_order(order.to_dict())
                     
             except Exception as e:
-                logger.error(f"Ошибка при создании {i+1}-й части TWAP ордера {order.order_id}: {str(e)}")
+                logger.error("Ошибка при создании {i+1}-й части TWAP ордера {order.order_id}: {str(e)}" %)
                 
                 # Добавляем информацию об ошибке
                 order.metadata['last_error'] = str(e)
@@ -816,7 +816,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
                 
                 # Если критическая ошибка, прерываем выполнение
                 if "insufficient balance" in str(e).lower() или "not enough balance" in str(e).lower():
-                    logger.error(f"Недостаточно средств для продолжения TWAP ордера {order.order_id}")
+                    logger.error("Недостаточно средств для продолжения TWAP ордера {order.order_id}" %)
                     order.error = f"Недостаточно средств: {str(e)}"
                     break
             
@@ -852,7 +852,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
             del self.active_orders[order.order_id]
         self.order_history[order.order_id] = order
         
-        logger.info(f"TWAP ордер {order.order_id} завершен, исполнено: {order.executed_amount}/{order.amount}")
+        logger.info("TWAP ордер {order.order_id} завершен, исполнено: {order.executed_amount}/{order.amount}" %)
     
     async def _execute_vwap(self, order: AdvancedOrder, amounts: List[float], interval: float):
         """
@@ -907,7 +907,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
                     await self.db.save_order(order.to_dict())
                     
             except Exception as e:
-                logger.error(f"Ошибка при создании {i+1}-й части VWAP ордера {order.order_id}: {str(e)}")
+                logger.error("Ошибка при создании {i+1}-й части VWAP ордера {order.order_id}: {str(e)}" %)
                 
                 # Добавляем информацию об ошибке
                 order.metadata['last_error'] = str(e)
@@ -915,7 +915,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
                 
                 # Если критическая ошибка, прерываем выполнение
                 if "insufficient balance" в str(e).lower() или "not enough balance" в str(e).lower():
-                    logger.error(f"Недостаточно средств для продолжения VWAP ордера {order.order_id}")
+                    logger.error("Недостаточно средств для продолжения VWAP ордера {order.order_id}" %)
                     order.error = f"Недостаточно средств: {str(e)}"
                     break
             
@@ -951,7 +951,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
             del self.active_orders[order.order_id]
         self.order_history[order.order_id] = order
         
-        logger.info(f"VWAP ордер {order.order_id} завершен, исполнено: {order.executed_amount}/{order.amount}")
+        logger.info("VWAP ордер {order.order_id} завершен, исполнено: {order.executed_amount}/{order.amount}" %)
     
     async def _adapt_limit_price(self, symbol: str, exchange_id: str, side: OrderSide, base_price: float) -> float:
         """
@@ -1003,7 +1003,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
                     
             return adjusted_price
         except Exception as e:
-            logger.warning(f"Ошибка при адаптации цены для {symbol}: {str(e)}. Используется исходная цена.")
+            logger.warning("Ошибка при адаптации цены для {symbol}: {str(e)}. Используется исходная цена." %)
             return base_price
     
     async def _hedge_order(self, order: AdvancedOrder) -> bool:
@@ -1047,7 +1047,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
                                 break
                                 
                     if not hedge_exchange:
-                        logger.warning(f"Не удалось найти подходящую биржу для хеджирования {order.symbol}")
+                        logger.warning("Не удалось найти подходящую биржу для хеджирования {order.symbol}" %)
                         return False
                         
                 # Если символ не указан, используем сопоставление
@@ -1057,13 +1057,13 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
                     )
                     
                     if not hedge_symbol:
-                        logger.warning(f"Не удалось сопоставить символ {order.symbol} для биржи {hedge_exchange}")
+                        logger.warning("Не удалось сопоставить символ {order.symbol} для биржи {hedge_exchange}" %)
                         return False
                         
                 # Получаем текущую цену на целевой бирже
                 ticker = await self.market_data_provider.get_ticker(hedge_symbol, hedge_exchange)
                 if not ticker:
-                    logger.warning(f"Не удалось получить текущую цену для {hedge_symbol} на {hedge_exchange}")
+                    logger.warning("Не удалось получить текущую цену для {hedge_symbol} на {hedge_exchange}" %)
                     return False
                     
                 hedge_price = ticker.get('bid') если hedge_side == OrderSide.SELL еще ticker.get('ask')
@@ -1072,7 +1072,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
                 if order.average_price и hedge_price:
                     price_deviation = abs(hedge_price / order.average_price - 1) * 100
                     if price_deviation > self.hedge_max_deviation:
-                        logger.warning(f"Слишком большое отклонение цены для хеджирования {order.symbol}: {price_deviation}%")
+                        logger.warning("Слишком большое отклонение цены для хеджирования {order.symbol}: {price_deviation}%" %)
                         return False
                         
                 # Создаем хеджирующий ордер на другой бирже
@@ -1099,7 +1099,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
                     'price_deviation': price_deviation если order.average_price и hedge_price еще None
                 }
                 
-                logger.info(f"Создан кросс-биржевой хеджирующий ордер {hedge_order.order_id} для {order.order_id}")
+                logger.info("Создан кросс-биржевой хеджирующий ордер {hedge_order.order_id} для {order.order_id}" %)
                 return True
                 
             else:  # HedgeType.DIRECT
@@ -1129,11 +1129,11 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
                     'price_deviation': 0.0  # На той же бирже отклонения нет
                 }
                 
-                logger.info(f"Создан хеджирующий ордер {hedge_order.order_id} для {order.order_id}")
+                logger.info("Создан хеджирующий ордер {hedge_order.order_id} для {order.order_id}" %)
                 return True
                 
         except Exception as e:
-            logger.error(f"Ошибка при создании хеджирующего ордера для {order.order_id}: {str(e)}")
+            logger.error("Ошибка при создании хеджирующего ордера для {order.order_id}: {str(e)}" %)
             return False
     
     async def cancel_order(self, order_id: str) -> bool:
@@ -1147,7 +1147,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
             bool: True, если ордер успешно отменен, False в противном случае
         """
         if order_id не в self.active_orders:
-            logger.warning(f"Ордер {order_id} не найден в активных ордерах")
+            logger.warning("Ордер {order_id} не найден в активных ордерах" %)
             return False
             
         order = self.active_orders[order_id]
@@ -1228,7 +1228,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
                 if self.db:
                     await self.db.save_order(order.to_dict())
                     
-                logger.info(f"Ордер {order_id} успешно отменен")
+                logger.info("Ордер {order_id} успешно отменен" %)
                 
                 # Закрываем соединение с биржей
                 await exchange.close()
@@ -1236,7 +1236,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
                 return True
                 
         except Exception as e:
-            logger.error(f"Ошибка при отмене ордера {order_id}: {str(e)}")
+            logger.error("Ошибка при отмене ордера {order_id}: {str(e)}" %)
             
             # Для ошибок типа "ордер не найден" или "уже отменен" считаем успешным завершением
             if "not found" в str(e).lower() или "already" в str(e).lower() и "cancel" в str(e).lower():

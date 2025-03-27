@@ -3,10 +3,8 @@
 Предоставляет единый интерфейс для выполнения операций с базой данных.
 """
 
-import asyncio
-import logging
-from typing import Dict, List, Any, Optional, Union, Tuple
 from contextlib import asynccontextmanager
+from typing import Any, Dict, List, Optional, Union
 
 try:
     import asyncpg
@@ -17,8 +15,8 @@ except ImportError:
     import asyncpg
 
 from project.config import get_config
-from project.utils.logging_utils import get_logger
 from project.utils.error_handler import async_handle_error, async_with_retry
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -73,7 +71,7 @@ class Database:
                 )
                 logger.info("Пул соединений с базой данных успешно создан")
             except Exception as e:
-                logger.error(f"Ошибка при инициализации пула соединений: {str(e)}")
+                logger.error("Ошибка при инициализации пула соединений: {str(e)}" %)
                 raise
 
     @asynccontextmanager
@@ -91,7 +89,7 @@ class Database:
             try:
                 yield conn
             except Exception as e:
-                logger.error(f"Ошибка при работе с соединением: {str(e)}")
+                logger.error("Ошибка при работе с соединением: {str(e)}" %)
                 raise
 
     @async_handle_error
@@ -111,7 +109,7 @@ class Database:
 
         async with self.connection() as conn:
             result = await conn.execute(query, *args)
-            logger.debug(f"Выполнен запрос: {query[:100]}...")
+            logger.debug("Выполнен запрос: {query[:100]}..." %)
             return result
 
     @async_handle_error
@@ -132,7 +130,7 @@ class Database:
         async with self.connection() as conn:
             rows = await conn.fetch(query, *args)
             result = [dict(row) for row in rows]
-            logger.debug(f"Запрос вернул {len(result)} строк: {query[:100]}...")
+            logger.debug("Запрос вернул {len(result)} строк: {query[:100]}..." %)
             return result
 
     @async_handle_error
@@ -175,7 +173,7 @@ class Database:
 
         async with self.connection() as conn:
             result = await conn.fetchval(query, *args)
-            logger.debug(f"Запрос вернул одно значение: {query[:100]}...")
+            logger.debug("Запрос вернул одно значение: {query[:100]}..." %)
             return result
 
     @async_handle_error
@@ -225,7 +223,7 @@ class Database:
             Словарь с вставленными данными или None при ошибке
         """
         if not data:
-            logger.warning(f"Попытка вставки пустых данных в таблицу {table}")
+            logger.warning("Попытка вставки пустых данных в таблицу {table}" %)
             return None
 
         columns = list(data.keys())
@@ -258,7 +256,7 @@ class Database:
             Словарь с обновленными данными или None при ошибке
         """
         if not data:
-            logger.warning(f"Попытка обновления пустыми данными в таблице {table}")
+            logger.warning("Попытка обновления пустыми данными в таблице {table}" %)
             return None
 
         set_parts = []

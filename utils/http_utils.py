@@ -1,15 +1,12 @@
 import asyncio
-import httpx
-import logging
-import time
-import json
 import hashlib
-from typing import Dict, Any, Optional, Callable, Tuple, List, Union
-from functools import wraps
-from datetime import datetime, timedelta
+import json
 import os
 import tempfile
+import time
+from typing import Any, Dict, Optional
 
+import httpx
 from project.utils.logging_utils import setup_logger
 
 logger = setup_logger("http_utils")
@@ -92,7 +89,7 @@ class HttpCache:
         self._cache_metadata = {}
         self._load_metadata()
 
-        logger.info(f"HTTP cache initialized in {self.cache_dir}")
+        logger.info("HTTP cache initialized in {self.cache_dir}" %)
 
     def _create_cache_dir(self):
         """Создает директорию для кеша, если она не существует"""
@@ -107,7 +104,7 @@ class HttpCache:
                 with open(metadata_path, "r") as f:
                     self._cache_metadata = json.load(f)
             except Exception as e:
-                logger.error(f"Error loading cache metadata: {str(e)}")
+                logger.error("Error loading cache metadata: {str(e)}" %)
                 self._cache_metadata = {}
 
     def _save_metadata(self):
@@ -117,7 +114,7 @@ class HttpCache:
             with open(metadata_path, "w") as f:
                 json.dump(self._cache_metadata, f)
         except Exception as e:
-            logger.error(f"Error saving cache metadata: {str(e)}")
+            logger.error("Error saving cache metadata: {str(e)}" %)
 
     def _get_cache_key(
         self, url: str, params: Dict = None, headers: Dict = None
@@ -245,7 +242,7 @@ class HttpCache:
                     cache_data = json.load(f)
                     return cache_data.get("response")
         except Exception as e:
-            logger.error(f"Error reading cache file: {str(e)}")
+            logger.error("Error reading cache file: {str(e)}" %)
 
         return None
 
@@ -300,7 +297,7 @@ class HttpCache:
             # Сохраняем обновленные метаданные
             self._save_metadata()
         except Exception as e:
-            logger.error(f"Error writing cache file: {str(e)}")
+            logger.error("Error writing cache file: {str(e)}" %)
 
     async def clear(self, url: str = None, older_than: int = None) -> None:
         """
@@ -463,7 +460,7 @@ class HttpClient:
         if self.cache_enabled and use_cache:
             cached_response = await self.cache.get(url, params, headers)
             if cached_response:
-                logger.debug(f"Cache hit for {url}")
+                logger.debug("Cache hit for {url}" %)
                 return cached_response
 
         # Добавляем заголовки по умолчанию

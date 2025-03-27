@@ -4,21 +4,19 @@
 """
 
 import asyncio
-import logging
 import time
 import uuid
-from typing import Dict, List, Any, Optional, Union, Tuple, Set
-from enum import Enum
 from abc import ABC, abstractmethod
+from enum import Enum
+from typing import Any, Dict, Optional
 
 from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import async_handle_error, async_with_retry
-from project.utils.notify import send_trading_signal
 from project.data.market_data import MarketData
-from project.technicals.indicators import Indicators
-from project.trade_executor.order_executor import OrderExecutor
 from project.risk_management.position_sizer import PositionSizer
+from project.trade_executor.order_executor import OrderExecutor
+from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
+from project.utils.notify import send_trading_signal
 
 logger = get_logger(__name__)
 
@@ -125,10 +123,10 @@ class BaseStrategy(ABC):
             True в случае успеха, иначе False
         """
         if self.status != StrategyStatus.STOPPED:
-            logger.warning(f"Стратегия {self.name} уже запущена или в процессе запуска")
+            logger.warning("Стратегия {self.name} уже запущена или в процессе запуска" %)
             return False
 
-        logger.info(f"Запуск стратегии {self.name} (id: {self.strategy_id})")
+        logger.info("Запуск стратегии {self.name} (id: {self.strategy_id})" %)
         self.status = StrategyStatus.STARTING
 
         try:
@@ -140,13 +138,13 @@ class BaseStrategy(ABC):
             self.start_time = time.time()
             self.status = StrategyStatus.RUNNING
 
-            logger.info(f"Стратегия {self.name} успешно запущена")
+            logger.info("Стратегия {self.name} успешно запущена" %)
             await send_trading_signal(f"Стратегия {self.name} запущена")
 
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка при запуске стратегии {self.name}: {str(e)}")
+            logger.error("Ошибка при запуске стратегии {self.name}: {str(e)}" %)
             self.status = StrategyStatus.ERROR
             return False
 
@@ -158,10 +156,10 @@ class BaseStrategy(ABC):
             True в случае успеха, иначе False
         """
         if self.status == StrategyStatus.STOPPED:
-            logger.warning(f"Стратегия {self.name} уже остановлена")
+            logger.warning("Стратегия {self.name} уже остановлена" %)
             return False
 
-        logger.info(f"Остановка стратегии {self.name} (id: {self.strategy_id})")
+        logger.info("Остановка стратегии {self.name} (id: {self.strategy_id})" %)
         self.status = StrategyStatus.STOPPING
 
         if self.task:
@@ -176,10 +174,10 @@ class BaseStrategy(ABC):
         try:
             await self._cleanup()
         except Exception as e:
-            logger.error(f"Ошибка при очистке стратегии {self.name}: {str(e)}")
+            logger.error("Ошибка при очистке стратегии {self.name}: {str(e)}" %)
 
         self.status = StrategyStatus.STOPPED
-        logger.info(f"Стратегия {self.name} успешно остановлена")
+        logger.info("Стратегия {self.name} успешно остановлена" %)
         await send_trading_signal(f"Стратегия {self.name} остановлена")
 
         return True
@@ -197,7 +195,7 @@ class BaseStrategy(ABC):
             )
             return False
 
-        logger.info(f"Приостановка стратегии {self.name} (id: {self.strategy_id})")
+        logger.info("Приостановка стратегии {self.name} (id: {self.strategy_id})" %)
         self.status = StrategyStatus.PAUSED
 
         await send_trading_signal(f"Стратегия {self.name} приостановлена")
@@ -296,7 +294,7 @@ class BaseStrategy(ABC):
             True в случае успеха, иначе False
         """
         try:
-            logger.info(f"Обновление конфигурации для стратегии {self.name}")
+            logger.info("Обновление конфигурации для стратегии {self.name}" %)
 
             # Обновляем базовые параметры
             if "name" in config:
@@ -368,7 +366,7 @@ class BaseStrategy(ABC):
         """
         try:
             if "symbol" not in signal or "action" not in signal:
-                logger.warning(f"Некорректный формат сигнала: {signal}")
+                logger.warning("Некорректный формат сигнала: {signal}" %)
                 return False
 
             symbol = signal["symbol"]
@@ -405,7 +403,7 @@ class BaseStrategy(ABC):
                 # Закрываем позицию
                 return await self._close_position(symbol)
             else:
-                logger.warning(f"Неизвестное действие в сигнале: {action}")
+                logger.warning("Неизвестное действие в сигнале: {action}" %)
                 return False
 
         except Exception as e:
@@ -434,7 +432,7 @@ class BaseStrategy(ABC):
                 try:
                     await self._close_position(symbol)
                 except Exception as e:
-                    logger.error(f"Ошибка при закрытии позиции {symbol}: {str(e)}")
+                    logger.error("Ошибка при закрытии позиции {symbol}: {str(e)}" %)
 
         # Отменяем все активные ордера
         for order_id in list(self.active_orders.keys()):
@@ -446,7 +444,7 @@ class BaseStrategy(ABC):
                     exchange_id=self.exchange_id,
                 )
             except Exception as e:
-                logger.error(f"Ошибка при отмене ордера {order_id}: {str(e)}")
+                logger.error("Ошибка при отмене ордера {order_id}: {str(e)}" %)
 
         # Выполняем дополнительную очистку в подклассах
         await self._strategy_cleanup()
@@ -459,7 +457,6 @@ class BaseStrategy(ABC):
         Args:
             config: Словарь с новыми параметрами конфигурации
         """
-        pass
 
     @abstractmethod
     async def _strategy_initialize(self) -> None:
@@ -467,7 +464,6 @@ class BaseStrategy(ABC):
         Выполняет дополнительную инициализацию стратегии.
         Должен быть переопределен в подклассах.
         """
-        pass
 
     @abstractmethod
     async def _strategy_cleanup(self) -> None:
@@ -475,7 +471,6 @@ class BaseStrategy(ABC):
         Выполняет дополнительную очистку ресурсов стратегии.
         Должен быть переопределен в подклассах.
         """
-        pass
 
     @abstractmethod
     async def _generate_trading_signals(self) -> Dict[str, Dict[str, Any]]:
@@ -486,7 +481,6 @@ class BaseStrategy(ABC):
         Returns:
             Словарь с сигналами для каждого символа
         """
-        pass
 
     @async_handle_error
     async def _update_market_data(self) -> None:
@@ -504,14 +498,14 @@ class BaseStrategy(ABC):
                         self.exchange_id, symbol, timeframe, limit=100
                     )
             except Exception as e:
-                logger.warning(f"Ошибка при обновлении данных для {symbol}: {str(e)}")
+                logger.warning("Ошибка при обновлении данных для {symbol}: {str(e)}" %)
 
     async def _run(self) -> None:
         """
         Основной цикл работы стратегии.
         """
         try:
-            logger.info(f"Основной цикл стратегии {self.name} запущен")
+            logger.info("Основной цикл стратегии {self.name} запущен" %)
 
             while True:
                 if self.status == StrategyStatus.RUNNING:
@@ -542,10 +536,10 @@ class BaseStrategy(ABC):
                 await asyncio.sleep(self.update_interval)
 
         except asyncio.CancelledError:
-            logger.info(f"Основной цикл стратегии {self.name} отменен")
+            logger.info("Основной цикл стратегии {self.name} отменен" %)
             raise
         except Exception as e:
-            logger.error(f"Критическая ошибка в стратегии {self.name}: {str(e)}")
+            logger.error("Критическая ошибка в стратегии {self.name}: {str(e)}" %)
             self.status = StrategyStatus.ERROR
 
     @async_handle_error
@@ -603,7 +597,7 @@ class BaseStrategy(ABC):
                     continue
 
             except Exception as e:
-                logger.error(f"Ошибка при проверке позиции {symbol}: {str(e)}")
+                logger.error("Ошибка при проверке позиции {symbol}: {str(e)}" %)
 
     @async_handle_error
     async def _check_orders(self) -> None:
@@ -720,10 +714,10 @@ class BaseStrategy(ABC):
                 # Если ордер отменен, удаляем его из списка активных
                 elif result.status in ["canceled", "expired", "rejected"]:
                     del self.active_orders[order_id]
-                    logger.info(f"Ордер {order_id} для {order['symbol']} отменен")
+                    logger.info("Ордер {order_id} для {order['symbol']} отменен" %)
 
             except Exception as e:
-                logger.error(f"Ошибка при проверке ордера {order_id}: {str(e)}")
+                logger.error("Ошибка при проверке ордера {order_id}: {str(e)}" %)
 
     @async_handle_error
     async def _process_signals(self, signals: Dict[str, Dict[str, Any]]) -> None:
@@ -771,7 +765,7 @@ class BaseStrategy(ABC):
                     pass
 
             except Exception as e:
-                logger.error(f"Ошибка при обработке сигнала для {symbol}: {str(e)}")
+                logger.error("Ошибка при обработке сигнала для {symbol}: {str(e)}" %)
 
     @async_handle_error
     async def _open_position(
@@ -791,7 +785,7 @@ class BaseStrategy(ABC):
         try:
             # Проверяем, есть ли уже открытая позиция по этому символу
             if symbol in self.open_positions:
-                logger.warning(f"Уже есть открытая позиция по {symbol}")
+                logger.warning("Уже есть открытая позиция по {symbol}" %)
                 return False
 
             # Проверяем лимит открытых позиций
@@ -805,12 +799,12 @@ class BaseStrategy(ABC):
             if price is None:
                 ticker = await self.market_data.get_ticker(self.exchange_id, symbol)
                 if not ticker:
-                    logger.error(f"Не удалось получить тикер для {symbol}")
+                    logger.error("Не удалось получить тикер для {symbol}" %)
                     return False
 
                 price = ticker.get("last", 0)
                 if price <= 0:
-                    logger.error(f"Некорректная цена для {symbol}: {price}")
+                    logger.error("Некорректная цена для {symbol}: {price}" %)
                     return False
 
             # Рассчитываем размер позиции
@@ -826,7 +820,7 @@ class BaseStrategy(ABC):
             quantity = self._normalize_quantity(symbol, quantity)
 
             if quantity <= 0:
-                logger.error(f"Некорректное количество для {symbol}: {quantity}")
+                logger.error("Некорректное количество для {symbol}: {quantity}" %)
                 return False
 
             # Определяем тип и сторону ордера
@@ -892,12 +886,12 @@ class BaseStrategy(ABC):
                     take_profit = self._calculate_take_profit(symbol, side, entry_price)
                     self.open_positions[symbol]["take_profit"] = take_profit
 
-                logger.info(f"Открыта позиция {side} по {symbol} по цене {entry_price}")
+                logger.info("Открыта позиция {side} по {symbol} по цене {entry_price}" %)
 
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка при открытии позиции {side} по {symbol}: {str(e)}")
+            logger.error("Ошибка при открытии позиции {side} по {symbol}: {str(e)}" %)
             return False
 
     @async_handle_error
@@ -915,7 +909,7 @@ class BaseStrategy(ABC):
         try:
             # Проверяем, есть ли открытая позиция по этому символу
             if symbol not in self.open_positions:
-                logger.warning(f"Нет открытой позиции по {symbol}")
+                logger.warning("Нет открытой позиции по {symbol}" %)
                 return False
 
             # Получаем информацию о позиции
@@ -1006,7 +1000,7 @@ class BaseStrategy(ABC):
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка при закрытии позиции по {symbol}: {str(e)}")
+            logger.error("Ошибка при закрытии позиции по {symbol}: {str(e)}" %)
             return False
 
     def _calculate_stop_loss(self, symbol: str, side: str, entry_price: float) -> float:

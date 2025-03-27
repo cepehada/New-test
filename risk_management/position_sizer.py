@@ -1,10 +1,7 @@
-import logging
-import time
-import math
-from typing import Dict, List, Optional, Tuple, Union, Any
-from datetime import datetime, timedelta
-import numpy as np
+from datetime import datetime
+from typing import Dict, Tuple
 
+import numpy as np
 from project.utils.logging_utils import setup_logger
 
 logger = setup_logger("position_sizer")
@@ -225,7 +222,7 @@ class PositionSizer:
         # Ограничиваем историю
         if len(self.volatility_history) > self.volatility_lookback:
             self.volatility_history = self.volatility_history[
-                -self.volatility_lookback:
+                -self.volatility_lookback :
             ]
 
         # Рассчитываем среднюю волатильность

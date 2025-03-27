@@ -1,22 +1,16 @@
 import asyncio
-import logging
 import time
-import json
-import uuid
-from typing import Dict, List, Optional, Tuple, Union, Any, Callable
-from datetime import datetime, timedelta
-from enum import Enum
 import traceback
-import inspect
-import os
-import signal
+import uuid
+from datetime import datetime
+from enum import Enum
+from typing import Dict, Optional
 
-from project.utils.logging_utils import setup_logger
-from project.utils.notify import NotificationManager, NotificationLevel
-from project.exchange.exchange_manager import get_exchange_manager
-from project.trading.strategy_base import Strategy, Signal, Position
 from project.data.database import Database
-from project.config.configuration import get_config
+from project.exchange.exchange_manager import get_exchange_manager
+from project.trading.strategy_base import Position, Signal, Strategy
+from project.utils.logging_utils import setup_logger
+from project.utils.notify import NotificationLevel, NotificationManager
 
 logger = setup_logger("trading_bot")
 
@@ -165,9 +159,9 @@ class TradingBot:
             # Получаем инстанс биржи
             self.exchange = await self.exchange_manager.get_exchange(self.exchange_id)
 
-            logger.info(f"Connected to exchange: {self.exchange_id}")
+            logger.info("Connected to exchange: {self.exchange_id}" %)
         except Exception as e:
-            logger.error(f"Error connecting to exchange {self.exchange_id}: {str(e)}")
+            logger.error("Error connecting to exchange {self.exchange_id}: {str(e)}" %)
             self.state = BotState.ERROR
             raise
 
@@ -184,10 +178,10 @@ class TradingBot:
     async def start(self):
         """Запускает торгового бота"""
         if self.state == BotState.RUNNING:
-            logger.warning(f"Bot {self.bot_id} is already running")
+            logger.warning("Bot {self.bot_id} is already running" %)
             return
 
-        logger.info(f"Starting bot: {self.bot_id}")
+        logger.info("Starting bot: {self.bot_id}" %)
 
         # Инициализируем бота
         self.state = BotState.INITIALIZING
@@ -236,9 +230,9 @@ class TradingBot:
                 NotificationLevel.INFO,
             )
 
-            logger.info(f"Bot {self.bot_id} started successfully")
+            logger.info("Bot {self.bot_id} started successfully" %)
         except Exception as e:
-            logger.error(f"Error starting bot {self.bot_id}: {str(e)}")
+            logger.error("Error starting bot {self.bot_id}: {str(e)}" %)
             logger.error(traceback.format_exc())
             self.state = BotState.ERROR
             self.error_count += 1
@@ -255,10 +249,10 @@ class TradingBot:
     async def stop(self):
         """Останавливает торгового бота"""
         if self.state == BotState.STOPPED:
-            logger.warning(f"Bot {self.bot_id} is already stopped")
+            logger.warning("Bot {self.bot_id} is already stopped" %)
             return
 
-        logger.info(f"Stopping bot: {self.bot_id}")
+        logger.info("Stopping bot: {self.bot_id}" %)
 
         # Устанавливаем флаг для остановки
         self._force_stop = True
@@ -289,15 +283,15 @@ class TradingBot:
             NotificationLevel.INFO,
         )
 
-        logger.info(f"Bot {self.bot_id} stopped successfully")
+        logger.info("Bot {self.bot_id} stopped successfully" %)
 
     async def pause(self):
         """Приостанавливает торгового бота"""
         if self.state != BotState.RUNNING:
-            logger.warning(f"Bot {self.bot_id} is not running, cannot pause")
+            logger.warning("Bot {self.bot_id} is not running, cannot pause" %)
             return
 
-        logger.info(f"Pausing bot: {self.bot_id}")
+        logger.info("Pausing bot: {self.bot_id}" %)
 
         # Обновляем состояние
         self.state = BotState.PAUSED
@@ -312,15 +306,15 @@ class TradingBot:
             NotificationLevel.INFO,
         )
 
-        logger.info(f"Bot {self.bot_id} paused successfully")
+        logger.info("Bot {self.bot_id} paused successfully" %)
 
     async def resume(self):
         """Возобновляет работу торгового бота"""
         if self.state != BotState.PAUSED:
-            logger.warning(f"Bot {self.bot_id} is not paused, cannot resume")
+            logger.warning("Bot {self.bot_id} is not paused, cannot resume" %)
             return
 
-        logger.info(f"Resuming bot: {self.bot_id}")
+        logger.info("Resuming bot: {self.bot_id}" %)
 
         # Обновляем состояние
         self.state = BotState.RUNNING
@@ -335,7 +329,7 @@ class TradingBot:
             NotificationLevel.INFO,
         )
 
-        logger.info(f"Bot {self.bot_id} resumed successfully")
+        logger.info("Bot {self.bot_id} resumed successfully" %)
 
     async def _update_loop(self):
         """Основной цикл обновления бота"""
@@ -378,10 +372,10 @@ class TradingBot:
                 await asyncio.sleep(self.update_interval)
 
             except asyncio.CancelledError:
-                logger.info(f"Update loop cancelled for bot {self.bot_id}")
+                logger.info("Update loop cancelled for bot {self.bot_id}" %)
                 break
             except Exception as e:
-                logger.error(f"Error in update loop for bot {self.bot_id}: {str(e)}")
+                logger.error("Error in update loop for bot {self.bot_id}: {str(e)}" %)
                 logger.error(traceback.format_exc())
 
                 # Увеличиваем счетчики ошибок
@@ -399,7 +393,7 @@ class TradingBot:
                         NotificationLevel.ERROR,
                     )
 
-                    logger.error(f"Bot {self.bot_id} stopped due to consecutive errors")
+                    logger.error("Bot {self.bot_id} stopped due to consecutive errors" %)
                     break
 
                 # Ждем перед повторной попыткой
@@ -451,9 +445,9 @@ class TradingBot:
             # Сохраняем данные
             self.data = df
 
-            logger.info(f"Loaded {len(df)} historical bars for {self.symbol}")
+            logger.info("Loaded {len(df)} historical bars for {self.symbol}" %)
         except Exception as e:
-            logger.error(f"Error loading historical data: {str(e)}")
+            logger.error("Error loading historical data: {str(e)}" %)
             raise
 
     async def _update_market_data(self):
@@ -510,9 +504,9 @@ class TradingBot:
             self.data.attrs["exchange"] = self.exchange_id
             self.data.attrs["timeframe"] = self.timeframe
 
-            logger.debug(f"Updated market data with {len(new_df)} new bars")
+            logger.debug("Updated market data with {len(new_df)} new bars" %)
         except Exception as e:
-            logger.error(f"Error updating market data: {str(e)}")
+            logger.error("Error updating market data: {str(e)}" %)
             raise
 
     async def _init_strategy(self):
@@ -544,7 +538,7 @@ class TradingBot:
                 f"Strategy {self.strategy_id} initialized with parameters: {parameters}"
             )
         except Exception as e:
-            logger.error(f"Error initializing strategy: {str(e)}")
+            logger.error("Error initializing strategy: {str(e)}" %)
             raise
 
     async def _load_state(self):
@@ -603,12 +597,12 @@ class TradingBot:
                     if "error_count" in state_data:
                         self.error_count = state_data["error_count"]
 
-                    logger.info(f"Loaded saved state for bot {self.bot_id}")
+                    logger.info("Loaded saved state for bot {self.bot_id}" %)
                     return
 
-            logger.info(f"No saved state found for bot {self.bot_id}")
+            logger.info("No saved state found for bot {self.bot_id}" %)
         except Exception as e:
-            logger.error(f"Error loading bot state: {str(e)}")
+            logger.error("Error loading bot state: {str(e)}" %)
 
     async def _save_state(self):
         """Сохраняет состояние бота в базу данных"""
@@ -661,9 +655,9 @@ class TradingBot:
             # Сохраняем состояние
             await self.database.save_bot_state(bot_state)
 
-            logger.debug(f"Saved state for bot {self.bot_id}")
+            logger.debug("Saved state for bot {self.bot_id}" %)
         except Exception as e:
-            logger.error(f"Error saving bot state: {str(e)}")
+            logger.error("Error saving bot state: {str(e)}" %)
 
     async def _check_existing_positions(self):
         """Проверяет существующие позиции на бирже"""
@@ -711,9 +705,9 @@ class TradingBot:
                             # Добавляем в словарь позиций
                             self.positions[pos.id] = pos
 
-                            logger.info(f"Found existing position: {pos}")
+                            logger.info("Found existing position: {pos}" %)
         except Exception as e:
-            logger.error(f"Error checking existing positions: {str(e)}")
+            logger.error("Error checking existing positions: {str(e)}" %)
 
     async def _check_existing_orders(self):
         """Проверяет существующие ордера на бирже"""
@@ -737,7 +731,7 @@ class TradingBot:
                             f"Found existing order: {order.get('id')} | {order.get('type')} | {order.get('side')} | {order.get('price')}"
                         )
         except Exception as e:
-            logger.error(f"Error checking existing orders: {str(e)}")
+            logger.error("Error checking existing orders: {str(e)}" %)
 
     async def _update_positions(self):
         """Обновляет информацию о позициях"""
@@ -809,7 +803,7 @@ class TradingBot:
                                 # Добавляем в словарь позиций
                                 self.positions[position_id] = pos
 
-                                logger.info(f"New position detected: {pos}")
+                                logger.info("New position detected: {pos}" %)
 
                             # Добавляем в текущие позиции
                             current_positions[position_id] = pos
@@ -820,12 +814,12 @@ class TradingBot:
                     # Позиция закрылась
                     pos.close(self.data.iloc[-1]["close"], datetime.now())
 
-                    logger.info(f"Position closed: {pos}")
+                    logger.info("Position closed: {pos}" %)
 
                     # Обновляем статистику
                     await self._update_stats_after_trade(pos)
         except Exception as e:
-            logger.error(f"Error updating positions: {str(e)}")
+            logger.error("Error updating positions: {str(e)}" %)
 
     async def _update_orders(self):
         """Обновляет информацию об ордерах"""
@@ -879,15 +873,15 @@ class TradingBot:
                             # Удаляем из открытых ордеров
                             del self.open_orders[order_id]
                         elif status == "canceled":
-                            logger.info(f"Order canceled: {order_id}")
+                            logger.info("Order canceled: {order_id}" %)
                             # Удаляем из открытых ордеров
                             del self.open_orders[order_id]
                     else:
                         # Если не удалось получить информацию, удаляем ордер
-                        logger.warning(f"Order not found: {order_id}")
+                        logger.warning("Order not found: {order_id}" %)
                         del self.open_orders[order_id]
         except Exception as e:
-            logger.error(f"Error updating orders: {str(e)}")
+            logger.error("Error updating orders: {str(e)}" %)
 
     async def _process_signal(self, signal: Signal):
         """
@@ -897,7 +891,7 @@ class TradingBot:
             signal: Торговый сигнал
         """
         if not signal.is_valid():
-            logger.debug(f"Signal is not valid: {signal}")
+            logger.debug("Signal is not valid: {signal}" %)
             return
 
         # Обновляем временную метку последнего сигнала
@@ -910,11 +904,11 @@ class TradingBot:
         if self.database:
             await self.database.save_signal(signal.to_dict())
 
-        logger.info(f"Processing signal: {signal}")
+        logger.info("Processing signal: {signal}" %)
 
         # Проверяем, активен ли бот
         if self.state != BotState.RUNNING:
-            logger.warning(f"Bot is not running, ignoring signal: {signal}")
+            logger.warning("Bot is not running, ignoring signal: {signal}" %)
             return
 
         # Проверяем тип сигнала
@@ -926,12 +920,12 @@ class TradingBot:
             if self.allow_shorts:
                 await self._open_position("short", signal)
             else:
-                logger.debug(f"Short positions not allowed, ignoring signal: {signal}")
+                logger.debug("Short positions not allowed, ignoring signal: {signal}" %)
         elif signal.direction == "close":
             # Закрываем все позиции
             await self._close_all_positions()
         else:
-            logger.warning(f"Unknown signal direction: {signal.direction}")
+            logger.warning("Unknown signal direction: {signal.direction}" %)
 
     async def _open_position(self, direction: str, signal: Signal):
         """
@@ -992,7 +986,7 @@ class TradingBot:
                 if self.strategy:
                     await self.strategy.on_position_update(position)
 
-                logger.info(f"Opened {direction} position: {amount} @ {current_price}")
+                logger.info("Opened {direction} position: {amount} @ {current_price}" %)
 
                 # Отправляем уведомление
                 await self._send_notification(
@@ -1040,9 +1034,9 @@ class TradingBot:
                     self.notification_levels.get("trade", NotificationLevel.INFO),
                 )
             else:
-                logger.error(f"Failed to create {direction} order")
+                logger.error("Failed to create {direction} order" %)
         except Exception as e:
-            logger.error(f"Error opening {direction} position: {str(e)}")
+            logger.error("Error opening {direction} position: {str(e)}" %)
 
             # Отправляем уведомление об ошибке
             await self._send_notification(
@@ -1061,14 +1055,14 @@ class TradingBot:
         try:
             # Проверяем, существует ли позиция
             if position_id not in self.positions:
-                logger.warning(f"Position not found: {position_id}")
+                logger.warning("Position not found: {position_id}" %)
                 return
 
             position = self.positions[position_id]
 
             # Проверяем, открыта ли позиция
             if not position.is_open():
-                logger.warning(f"Position already closed: {position_id}")
+                logger.warning("Position already closed: {position_id}" %)
                 return
 
             # Получаем текущую цену
@@ -1086,7 +1080,7 @@ class TradingBot:
                 # Обновляем статистику
                 await self._update_stats_after_trade(position)
 
-                logger.info(f"Closed position: {position}")
+                logger.info("Closed position: {position}" %)
 
                 # Отправляем уведомление
                 await self._send_notification(
@@ -1138,7 +1132,7 @@ class TradingBot:
                     f"Failed to create closing order for position {position_id}"
                 )
         except Exception as e:
-            logger.error(f"Error closing position {position_id}: {str(e)}")
+            logger.error("Error closing position {position_id}: {str(e)}" %)
 
             # Отправляем уведомление об ошибке
             await self._send_notification(
@@ -1192,7 +1186,7 @@ class TradingBot:
                 logger.warning("Failed to fetch balance")
                 return 0.0
         except Exception as e:
-            logger.error(f"Error getting balance: {str(e)}")
+            logger.error("Error getting balance: {str(e)}" %)
             return 0.0
 
     def _calculate_stop_loss(
@@ -1293,7 +1287,7 @@ class TradingBot:
 
             return atr
         except Exception as e:
-            logger.error(f"Error calculating ATR: {str(e)}")
+            logger.error("Error calculating ATR: {str(e)}" %)
             return None
 
     async def _update_stats_after_trade(self, position: Position):
@@ -1425,7 +1419,7 @@ class TradingBot:
         Args:
             position: Открытая позиция
         """
-        logger.info(f"Position opened: {position}")
+        logger.info("Position opened: {position}" %)
 
         # Сохраняем позицию
         self.positions[position.id] = position
@@ -1441,7 +1435,7 @@ class TradingBot:
         Args:
             position: Закрытая позиция
         """
-        logger.info(f"Position closed: {position}")
+        logger.info("Position closed: {position}" %)
 
         # Обновляем статистику
         await self._update_stats_after_trade(position)
@@ -1464,7 +1458,7 @@ class TradingBot:
             try:
                 await self.notification_manager.send_notification(title, message, level)
             except Exception as e:
-                logger.error(f"Error sending notification: {str(e)}")
+                logger.error("Error sending notification: {str(e)}" %)
 
     def get_info(self) -> Dict:
         """

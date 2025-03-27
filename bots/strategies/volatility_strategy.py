@@ -3,21 +3,15 @@
 Торгует на основе индикаторов волатильности и технических уровней.
 """
 
-import asyncio
-import logging
 import time
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Any, Optional, Union, Tuple, Set
+from typing import Any, Dict, List, Optional
 
-from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import async_handle_error
-from project.data.market_data import MarketData
-from project.technicals.indicators import Indicators
-from project.technicals.patterns import Patterns
-from project.bots.strategies.base_strategy import BaseStrategy, StrategyStatus
+import pandas as pd
+from project.bots.strategies.base_strategy import BaseStrategy
 from project.bots.strategies.modifications import StrategyModifications
+from project.technicals.indicators import Indicators
+from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -86,7 +80,7 @@ class VolatilityStrategy(BaseStrategy):
             {}
         )  # symbol -> минимальная цена для трейлинг-стопа
 
-        logger.debug(f"Создана стратегия волатильности {self.name}")
+        logger.debug("Создана стратегия волатильности {self.name}" %)
 
     def _update_config(self, config: Dict[str, Any]) -> None:
         """
@@ -178,7 +172,6 @@ class VolatilityStrategy(BaseStrategy):
         Выполняет дополнительную очистку ресурсов стратегии.
         """
         # Нет специфических ресурсов для очистки
-        pass
 
     @async_handle_error
     async def _calculate_volatility(self) -> None:
@@ -291,7 +284,7 @@ class VolatilityStrategy(BaseStrategy):
                         )
 
             except Exception as e:
-                logger.error(f"Ошибка при расчете волатильности для {symbol}: {str(e)}")
+                logger.error("Ошибка при расчете волатильности для {symbol}: {str(e)}" %)
 
     def _rank_symbols_by_volatility(self) -> None:
         """
@@ -318,7 +311,7 @@ class VolatilityStrategy(BaseStrategy):
             )
 
         except Exception as e:
-            logger.error(f"Ошибка при ранжировании символов по волатильности: {str(e)}")
+            logger.error("Ошибка при ранжировании символов по волатильности: {str(e)}" %)
 
     @async_handle_error
     async def _generate_trading_signals(self) -> Dict[str, Dict[str, Any]]:
@@ -412,7 +405,7 @@ class VolatilityStrategy(BaseStrategy):
                     await self._update_trailing_stops(symbol, current_price)
 
             except Exception as e:
-                logger.error(f"Ошибка при генерации сигналов для {symbol}: {str(e)}")
+                logger.error("Ошибка при генерации сигналов для {symbol}: {str(e)}" %)
 
         return signals
 

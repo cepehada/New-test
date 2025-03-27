@@ -3,14 +3,11 @@
 Предоставляет вспомогательные функции для расчетов арбитражных возможностей.
 """
 
-import logging
-import time
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Any, Optional, Union, Tuple, Set
+from typing import Any, Dict, List, Set
 
-from project.utils.logging_utils import get_logger
+import pandas as pd
 from project.utils.error_handler import handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -35,7 +32,7 @@ def calculate_triangular_path(
         return {"path": [], "currencies": [], "rate": 0.0, "profit": 0.0}
 
     if start_currency not in price_matrix.index:
-        logger.warning(f"Начальная валюта {start_currency} не найдена в матрице цен")
+        logger.warning("Начальная валюта {start_currency} не найдена в матрице цен" %)
         return {"path": [], "currencies": [], "rate": 0.0, "profit": 0.0}
 
     # Инициализируем лучший путь

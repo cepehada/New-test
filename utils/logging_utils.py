@@ -4,12 +4,10 @@
 """
 
 import logging
-import sys
 import os
+import sys
 import time
 from logging.handlers import RotatingFileHandler
-from pathlib import Path
-from typing import Optional, Dict, Any
 
 from project.config import get_config
 
@@ -74,7 +72,7 @@ def setup_logging() -> None:
         for logger_name in ["asyncio", "matplotlib", "urllib3", "websockets"]:
             logging.getLogger(logger_name).setLevel(logging.WARNING)
 
-        root_logger.info(f"Logging initialized at level {config.LOG_LEVEL}")
+        root_logger.info("Logging initialized at level {config.LOG_LEVEL}" %)
 
     except Exception as e:
         # Запасной вариант при ошибке конфигурации

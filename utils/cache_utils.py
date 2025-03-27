@@ -3,11 +3,10 @@
 Предоставляет функции для временного хранения часто используемых данных.
 """
 
-import time
 import asyncio
 import functools
-from typing import Dict, Any, Optional, Callable, TypeVar, Tuple, cast
-import logging
+import time
+from typing import Any, Callable, Dict, Optional, Tuple, TypeVar, cast
 
 from project.utils.logging_utils import get_logger
 
@@ -42,13 +41,13 @@ def cache(ttl: float = 60.0) -> Callable[[Callable[..., T]], Callable[..., T]]:
             if cache_key in _cache:
                 value, timestamp, _ttl = _cache[cache_key]
                 if time.time() - timestamp < _ttl:
-                    logger.debug(f"Cache hit for {func.__name__}")
+                    logger.debug("Cache hit for {func.__name__}" %)
                     return value
 
             # Выполняем функцию и кэшируем результат
             result = func(*args, **kwargs)
             _cache[cache_key] = (result, time.time(), ttl)
-            logger.debug(f"Cache miss for {func.__name__}, stored result")
+            logger.debug("Cache miss for {func.__name__}, stored result" %)
 
             return result
 
@@ -78,13 +77,13 @@ def async_cache(ttl: float = 60.0) -> Callable[[Callable[..., T]], Callable[...,
             if cache_key in _cache:
                 value, timestamp, _ttl = _cache[cache_key]
                 if time.time() - timestamp < _ttl:
-                    logger.debug(f"Cache hit for {func.__name__}")
+                    logger.debug("Cache hit for {func.__name__}" %)
                     return value
 
             # Выполняем функцию и кэшируем результат
             result = await func(*args, **kwargs)
             _cache[cache_key] = (result, time.time(), ttl)
-            logger.debug(f"Cache miss for {func.__name__}, stored result")
+            logger.debug("Cache miss for {func.__name__}, stored result" %)
 
             return result
 
@@ -106,7 +105,7 @@ def invalidate_cache(key_pattern: Optional[str] = None) -> None:
         # Инвалидируем весь кэш
         count = len(_cache)
         _cache.clear()
-        logger.info(f"Invalidated entire cache ({count} entries)")
+        logger.info("Invalidated entire cache ({count} entries)" %)
     else:
         # Инвалидируем кэш по шаблону
         keys_to_remove = [k for k in _cache.keys() if key_pattern in k]
@@ -167,7 +166,7 @@ def cleanup_expired_cache() -> int:
     for k in expired_keys:
         del _cache[k]
 
-    logger.debug(f"Cleaned up {len(expired_keys)} expired cache entries")
+    logger.debug("Cleaned up {len(expired_keys)} expired cache entries" %)
     return len(expired_keys)
 
 
@@ -178,19 +177,19 @@ async def start_cache_cleanup(interval: float = 300.0) -> None:
     Args:
         interval: Интервал очистки в секундах
     """
-    logger.info(f"Starting cache cleanup task with interval {interval} seconds")
+    logger.info("Starting cache cleanup task with interval {interval} seconds" %)
 
     while True:
         try:
             await asyncio.sleep(interval)
             count = cleanup_expired_cache()
             if count > 0:
-                logger.info(f"Cache cleanup removed {count} expired entries")
+                logger.info("Cache cleanup removed {count} expired entries" %)
         except asyncio.CancelledError:
             logger.info("Cache cleanup task cancelled")
             break
         except Exception as e:
-            logger.error(f"Error in cache cleanup: {str(e)}")
+            logger.error("Error in cache cleanup: {str(e)}" %)
             await asyncio.sleep(interval)
 
 

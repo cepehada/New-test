@@ -4,15 +4,14 @@
 """
 
 import re
-import logging
-from typing import Dict, List, Any, Tuple, Optional
+from typing import Any, Dict, List, Optional
+
 import nltk
+from nltk.corpus import stopwords
 from nltk.sentiment import SentimentIntensityAnalyzer
 from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-
-from project.utils.logging_utils import get_logger
 from project.utils.error_handler import handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 

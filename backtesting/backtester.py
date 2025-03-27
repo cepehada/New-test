@@ -1,19 +1,15 @@
-import asyncio
-import logging
 import time
-from typing import Dict, List, Optional, Tuple, Union, Any, Callable
-from datetime import datetime, timedelta
-import pandas as pd
-import numpy as np
-from dataclasses import dataclass
-import uuid
-import json
 import traceback
+import uuid
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Callable, Dict, List, Optional, Union
 
+import pandas as pd
+from project.backtesting.portfolio import Portfolio
+from project.trading.strategy_base import Signal, Strategy
 from project.utils.logging_utils import setup_logger
 from project.utils.math_utils import calculate_statistics
-from project.backtesting.portfolio import Portfolio
-from project.trading.strategy_base import Strategy, Signal, Position
 
 logger = setup_logger("backtester")
 
@@ -277,7 +273,7 @@ class Backtester:
             self.backtest_count += 1
             self.total_execution_time += result.execution_time
 
-            logger.info(f"Backtest completed in {result.execution_time:.2f} seconds")
+            logger.info("Backtest completed in {result.execution_time:.2f} seconds" %)
 
             return result.to_dict()
 
@@ -285,7 +281,7 @@ class Backtester:
             # Логируем ошибку
             error_msg = f"Error during backtest: {str(e)}"
             error_traceback = traceback.format_exc()
-            logger.error(f"{error_msg}\n{error_traceback}")
+            logger.error("{error_msg}\n{error_traceback}" %)
 
             # Добавляем ошибку в результат
             result.errors.append(error_msg)
@@ -434,7 +430,7 @@ class Backtester:
                         },
                     )
                 except Exception as e:
-                    logger.error(f"Error in progress callback: {str(e)}")
+                    logger.error("Error in progress callback: {str(e)}" %)
 
             # Увеличиваем индекс текущего бара
             current_bar += 1
@@ -499,7 +495,7 @@ class Backtester:
 
                 # Логируем сделку, если включено
                 if settings.log_trades:
-                    logger.debug(f"Opened LONG position at {price} ({timestamp})")
+                    logger.debug("Opened LONG position at {price} ({timestamp})" %)
 
         elif signal.direction == "sell":
             if settings.enable_shorting:
@@ -529,7 +525,7 @@ class Backtester:
 
                     # Логируем сделку, если включено
                     if settings.log_trades:
-                        logger.debug(f"Opened SHORT position at {price} ({timestamp})")
+                        logger.debug("Opened SHORT position at {price} ({timestamp})" %)
 
         elif signal.direction == "close":
             # Закрываем все позиции
@@ -790,7 +786,7 @@ class Backtester:
             return results
 
         except Exception as e:
-            logger.error(f"Error during optimization: {str(e)}")
+            logger.error("Error during optimization: {str(e)}" %)
             traceback_str = traceback.format_exc()
             logger.error(traceback_str)
 
@@ -885,7 +881,7 @@ class Backtester:
                         },
                     )
                 except Exception as e:
-                    logger.error(f"Error in progress callback: {str(e)}")
+                    logger.error("Error in progress callback: {str(e)}" %)
 
         # Сохраняем лучший результат
         results["best_parameters"] = best_parameters
@@ -977,7 +973,7 @@ class Backtester:
                         },
                     )
                 except Exception as e:
-                    logger.error(f"Error in progress callback: {str(e)}")
+                    logger.error("Error in progress callback: {str(e)}" %)
 
         # Сохраняем лучший результат
         results["best_parameters"] = best_parameters

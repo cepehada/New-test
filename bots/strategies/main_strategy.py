@@ -3,20 +3,15 @@
 Реализует комбинированную стратегию на основе нескольких индикаторов.
 """
 
-import asyncio
-import logging
 import time
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Any, Optional, Union, Tuple, Set
+from typing import Any, Dict, List
 
-from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import async_handle_error
-from project.data.market_data import MarketData
+import pandas as pd
+from project.bots.strategies.base_strategy import BaseStrategy
 from project.technicals.indicators import Indicators
 from project.technicals.patterns import Patterns
-from project.bots.strategies.base_strategy import BaseStrategy, StrategyStatus
+from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -85,7 +80,7 @@ class MainStrategy(BaseStrategy):
         )  # symbol -> timeframe -> timestamp
         self.trend_direction: Dict[str, str] = {}  # symbol -> trend
 
-        logger.debug(f"Создана основная стратегия {self.name}")
+        logger.debug("Создана основная стратегия {self.name}" %)
 
     def _update_config(self, config: Dict[str, Any]) -> None:
         """
@@ -176,7 +171,6 @@ class MainStrategy(BaseStrategy):
         Выполняет дополнительную очистку ресурсов стратегии.
         """
         # Нет специфических ресурсов для очистки
-        pass
 
     @async_handle_error
     async def _calculate_indicators(self) -> None:
@@ -391,7 +385,7 @@ class MainStrategy(BaseStrategy):
                     signals[symbol] = combined_signal
 
             except Exception as e:
-                logger.error(f"Ошибка при генерации сигналов для {symbol}: {str(e)}")
+                logger.error("Ошибка при генерации сигналов для {symbol}: {str(e)}" %)
 
         return signals
 
@@ -672,7 +666,7 @@ class MainStrategy(BaseStrategy):
             return combined_signal
 
         except Exception as e:
-            logger.error(f"Ошибка при комбинировании сигналов для {symbol}: {str(e)}")
+            logger.error("Ошибка при комбинировании сигналов для {symbol}: {str(e)}" %)
             return {}
 
     def analyze_market(self, data):

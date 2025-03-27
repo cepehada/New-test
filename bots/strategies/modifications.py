@@ -3,15 +3,12 @@
 Предоставляет функции для настройки и оптимизации стратегий.
 """
 
-import numpy as np
-import pandas as pd
-import logging
-from typing import Dict, List, Any, Optional, Union, Tuple, Callable
+from typing import Any, Callable, Dict, List, Tuple
 
-from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import handle_error
+import pandas as pd
 from project.technicals.indicators import Indicators
+from project.utils.error_handler import handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -68,7 +65,7 @@ class StrategyModifications:
             return min(initial_stop, trailing_stop)
 
         else:
-            logger.error(f"Неизвестная сторона позиции: {side}")
+            logger.error("Неизвестная сторона позиции: {side}" %)
             return entry_price
 
     @staticmethod
@@ -123,7 +120,7 @@ class StrategyModifications:
                 result.append((exit_price, pct))
 
         else:
-            logger.error(f"Неизвестная сторона позиции: {side}")
+            logger.error("Неизвестная сторона позиции: {side}" %)
 
         return result
 
@@ -257,7 +254,7 @@ class StrategyModifications:
             Оптимальное соотношение риск/прибыль
         """
         if win_rate <= 0 or win_rate >= 1:
-            logger.warning(f"Некорректный винрейт: {win_rate}")
+            logger.warning("Некорректный винрейт: {win_rate}" %)
             return risk_reward_ratio
 
         # Оптимальное соотношение риск/прибыль = (1 - win_rate) / win_rate
@@ -287,7 +284,7 @@ class StrategyModifications:
             Словарь с порогами для разных индикаторов
         """
         if data.empty:
-            logger.warning(f"Пустой DataFrame для {symbol}")
+            logger.warning("Пустой DataFrame для {symbol}" %)
             return {
                 "rsi_oversold": 30.0,
                 "rsi_overbought": 70.0,

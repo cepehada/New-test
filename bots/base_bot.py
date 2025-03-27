@@ -4,19 +4,18 @@
 """
 
 import asyncio
-import logging
 import time
 import uuid
-from typing import Dict, List, Any, Optional, Union, Tuple
 from enum import Enum
+from typing import Any, Dict, List
 
 from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import async_handle_error, async_with_retry
-from project.utils.notify import send_trading_signal
 from project.data.market_data import MarketData
-from project.trade_executor.order_executor import OrderExecutor
 from project.risk_management.position_sizer import PositionSizer
+from project.trade_executor.order_executor import OrderExecutor
+from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
+from project.utils.notify import send_trading_signal
 
 logger = get_logger(__name__)
 
@@ -77,7 +76,7 @@ class BaseBot:
             "average_profit": 0.0,
             "average_loss": 0.0,
         }
-        logger.debug(f"Создан бот {self.name} (id: {self.bot_id}) для {exchange_id}")
+        logger.debug("Создан бот {self.name} (id: {self.bot_id}) для {exchange_id}" %)
 
     @async_handle_error
     async def start(self) -> bool:
@@ -88,10 +87,10 @@ class BaseBot:
             True в случае успеха, иначе False
         """
         if self.status != BotStatus.STOPPED:
-            logger.warning(f"Бот {self.name} уже запущен или в процессе запуска")
+            logger.warning("Бот {self.name} уже запущен или в процессе запуска" %)
             return False
 
-        logger.info(f"Запуск бота {self.name} (id: {self.bot_id})")
+        logger.info("Запуск бота {self.name} (id: {self.bot_id})" %)
         self.status = BotStatus.STARTING
 
         try:
@@ -103,13 +102,13 @@ class BaseBot:
             self.start_time = time.time()
             self.status = BotStatus.RUNNING
 
-            logger.info(f"Бот {self.name} успешно запущен")
+            logger.info("Бот {self.name} успешно запущен" %)
             await send_trading_signal(f"Бот {self.name} запущен")
 
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка при запуске бота {self.name}: {str(e)}")
+            logger.error("Ошибка при запуске бота {self.name}: {str(e)}" %)
             self.status = BotStatus.ERROR
             return False
 
@@ -121,10 +120,10 @@ class BaseBot:
             True в случае успеха, иначе False
         """
         if self.status == BotStatus.STOPPED:
-            logger.warning(f"Бот {self.name} уже остановлен")
+            logger.warning("Бот {self.name} уже остановлен" %)
             return False
 
-        logger.info(f"Остановка бота {self.name} (id: {self.bot_id})")
+        logger.info("Остановка бота {self.name} (id: {self.bot_id})" %)
         self.status = BotStatus.STOPPING
 
         if self.task:
@@ -139,10 +138,10 @@ class BaseBot:
         try:
             await self._cleanup()
         except Exception as e:
-            logger.error(f"Ошибка при очистке бота {self.name}: {str(e)}")
+            logger.error("Ошибка при очистке бота {self.name}: {str(e)}" %)
 
         self.status = BotStatus.STOPPED
-        logger.info(f"Бот {self.name} успешно остановлен")
+        logger.info("Бот {self.name} успешно остановлен" %)
         await send_trading_signal(f"Бот {self.name} остановлен")
 
         return True
@@ -155,10 +154,10 @@ class BaseBot:
             True в случае успеха, иначе False
         """
         if self.status != BotStatus.RUNNING:
-            logger.warning(f"Бот {self.name} не запущен, невозможно приостановить")
+            logger.warning("Бот {self.name} не запущен, невозможно приостановить" %)
             return False
 
-        logger.info(f"Приостановка бота {self.name} (id: {self.bot_id})")
+        logger.info("Приостановка бота {self.name} (id: {self.bot_id})" %)
         self.status = BotStatus.PAUSED
 
         await send_trading_signal(f"Бот {self.name} приостановлен")
@@ -173,10 +172,10 @@ class BaseBot:
             True в случае успеха, иначе False
         """
         if self.status != BotStatus.PAUSED:
-            logger.warning(f"Бот {self.name} не приостановлен, невозможно возобновить")
+            logger.warning("Бот {self.name} не приостановлен, невозможно возобновить" %)
             return False
 
-        logger.info(f"Возобновление работы бота {self.name} (id: {self.bot_id})")
+        logger.info("Возобновление работы бота {self.name} (id: {self.bot_id})" %)
         self.status = BotStatus.RUNNING
 
         await send_trading_signal(f"Бот {self.name} возобновил работу")
@@ -252,7 +251,7 @@ class BaseBot:
             True в случае успеха, иначе False
         """
         try:
-            logger.info(f"Обновление списка символов для бота {self.name}: {symbols}")
+            logger.info("Обновление списка символов для бота {self.name}: {symbols}" %)
             self.symbols = symbols
 
             # Если бот запущен, обновляем данные для новых символов
@@ -279,7 +278,7 @@ class BaseBot:
             True в случае успеха, иначе False
         """
         try:
-            logger.info(f"Обновление конфигурации для бота {self.name}")
+            logger.info("Обновление конфигурации для бота {self.name}" %)
 
             # Обновляем базовые параметры
             if "name" in config:
@@ -318,7 +317,6 @@ class BaseBot:
         Выполняет очистку ресурсов при остановке бота.
         Должен быть переопределен в подклассах.
         """
-        pass
 
     def _update_config(self, config: Dict[str, Any]) -> None:
         """
@@ -328,7 +326,6 @@ class BaseBot:
         Args:
             config: Словарь с новыми параметрами конфигурации
         """
-        pass
 
     @async_handle_error
     async def _update_market_data(self) -> None:
@@ -342,14 +339,14 @@ class BaseBot:
                     self.exchange_id, symbol, "1h", limit=100
                 )
             except Exception as e:
-                logger.warning(f"Ошибка при обновлении данных для {symbol}: {str(e)}")
+                logger.warning("Ошибка при обновлении данных для {symbol}: {str(e)}" %)
 
     async def _run(self) -> None:
         """
         Основной цикл работы бота.
         """
         try:
-            logger.info(f"Основной цикл бота {self.name} запущен")
+            logger.info("Основной цикл бота {self.name} запущен" %)
 
             while True:
                 if self.status == BotStatus.RUNNING:
@@ -371,10 +368,10 @@ class BaseBot:
                 await asyncio.sleep(self.update_interval)
 
         except asyncio.CancelledError:
-            logger.info(f"Основной цикл бота {self.name} отменен")
+            logger.info("Основной цикл бота {self.name} отменен" %)
             raise
         except Exception as e:
-            logger.error(f"Критическая ошибка в боте {self.name}: {str(e)}")
+            logger.error("Критическая ошибка в боте {self.name}: {str(e)}" %)
             self.status = BotStatus.ERROR
 
     async def _execute_bot_step(self) -> None:
@@ -382,7 +379,6 @@ class BaseBot:
         Выполняет один шаг работы бота.
         Должен быть переопределен в подклассах.
         """
-        pass
 
     def _update_stats(self, trade_result: float, is_win: bool) -> None:
         """

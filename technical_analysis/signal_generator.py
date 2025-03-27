@@ -4,24 +4,22 @@
 """
 
 # Standard imports
-import logging
-from typing import Dict, List, Any, Union, Tuple
+from typing import Dict, List
 
 # Third-party imports
 try:
-    import numpy as np
     import pandas as pd
 except ImportError:
     import subprocess
     import sys
+
     subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy", "pandas"])
-    import numpy as np
     import pandas as pd
 
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import handle_error
 from project.technical_analysis.indicators import Indicators
 from project.technical_analysis.patterns import Patterns
+from project.utils.error_handler import handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 

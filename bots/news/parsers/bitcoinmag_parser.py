@@ -3,18 +3,15 @@
 Извлекает новости из RSS-ленты и страниц Bitcoin Magazine.
 """
 
-import aiohttp
-import logging
 import time
-import feedparser
-import re
-from typing import Dict, List, Any, Optional
 from datetime import datetime
-from bs4 import BeautifulSoup
+from typing import Any, Dict, List
 
-from project.utils.logging_utils import get_logger
+import feedparser
+from bs4 import BeautifulSoup
 from project.utils.error_handler import async_handle_error
 from project.utils.http_utils import aiohttp_session
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -112,11 +109,11 @@ class BitcoinMagParser:
             # Обновляем время последнего запроса
             self.last_fetch_time = current_time
 
-            logger.debug(f"Получено {len(articles)} статей из Bitcoin Magazine")
+            logger.debug("Получено {len(articles)} статей из Bitcoin Magazine" %)
             return articles
 
         except Exception as e:
-            logger.error(f"Ошибка при получении новостей из Bitcoin Magazine: {str(e)}")
+            logger.error("Ошибка при получении новостей из Bitcoin Magazine: {str(e)}" %)
             return []
 
     @async_handle_error
@@ -156,10 +153,10 @@ class BitcoinMagParser:
                 # Обновляем кэшированную статью
                 if url in self.articles_cache:
                     self.articles_cache[url]["content"] = content
-                    logger.debug(f"Обновлено содержимое статьи: {url}")
+                    logger.debug("Обновлено содержимое статьи: {url}" %)
 
         except Exception as e:
-            logger.error(f"Ошибка при получении содержимого статьи {url}: {str(e)}")
+            logger.error("Ошибка при получении содержимого статьи {url}: {str(e)}" %)
 
     @async_handle_error
     async def search_news(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
@@ -234,5 +231,5 @@ class BitcoinMagParser:
             return articles
 
         except Exception as e:
-            logger.error(f"Ошибка при поиске новостей на Bitcoin Magazine: {str(e)}")
+            logger.error("Ошибка при поиске новостей на Bitcoin Magazine: {str(e)}" %)
             return []

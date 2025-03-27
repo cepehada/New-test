@@ -3,19 +3,15 @@
 Торгует на отклонениях цены от среднего значения, ожидая возврата.
 """
 
-import asyncio
-import logging
 import time
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Any, Optional, Union, Tuple, Set
+from typing import Any, Dict, List, Optional
 
-from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import async_handle_error
-from project.data.market_data import MarketData
+import numpy as np
+import pandas as pd
+from project.bots.strategies.base_strategy import BaseStrategy
 from project.technicals.indicators import Indicators
-from project.bots.strategies.base_strategy import BaseStrategy, StrategyStatus
+from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -93,7 +89,7 @@ class MeanReversionStrategy(BaseStrategy):
         self.recent_lows: Dict[str, float] = {}  # symbol -> недавний минимум
         self.volume_data: Dict[str, List[float]] = {}  # symbol -> история объемов
 
-        logger.debug(f"Создана стратегия возврата к среднему {self.name}")
+        logger.debug("Создана стратегия возврата к среднему {self.name}" %)
 
     def _update_config(self, config: Dict[str, Any]) -> None:
         """
@@ -161,7 +157,6 @@ class MeanReversionStrategy(BaseStrategy):
         Выполняет дополнительную очистку ресурсов стратегии.
         """
         # Нет специфических ресурсов для очистки
-        pass
 
     @async_handle_error
     async def _load_historical_data(self) -> None:
@@ -385,7 +380,7 @@ class MeanReversionStrategy(BaseStrategy):
                 # Проверяем объем
                 volume_ok = await self._analyze_volume(symbol)
                 if not volume_ok:
-                    logger.debug(f"Недостаточный объем для {symbol}")
+                    logger.debug("Недостаточный объем для {symbol}" %)
                     continue
 
                 # Проверяем корреляцию
@@ -451,7 +446,7 @@ class MeanReversionStrategy(BaseStrategy):
                     signals[symbol] = signal
 
             except Exception as e:
-                logger.error(f"Ошибка при генерации сигналов для {symbol}: {str(e)}")
+                logger.error("Ошибка при генерации сигналов для {symbol}: {str(e)}" %)
 
         return signals
 

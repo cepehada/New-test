@@ -3,19 +3,14 @@
 Фокусируется на выявлении и торговле монетами с высокой волатильностью и объемом.
 """
 
-import asyncio
-import logging
 import time
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Any, Optional, Union, Tuple, Set
+from typing import Any, Dict, List, Optional
 
-from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import async_handle_error
-from project.data.market_data import MarketData
+import numpy as np
+from project.bots.strategies.base_strategy import BaseStrategy
 from project.technicals.indicators import Indicators
-from project.bots.strategies.base_strategy import BaseStrategy, StrategyStatus
+from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -84,7 +79,7 @@ class MemcoinStrategy(BaseStrategy):
             []
         )  # список потенциальных монет для торговли
 
-        logger.debug(f"Создана стратегия для мемкоинов {self.name}")
+        logger.debug("Создана стратегия для мемкоинов {self.name}" %)
 
     def _update_config(self, config: Dict[str, Any]) -> None:
         """
@@ -147,7 +142,6 @@ class MemcoinStrategy(BaseStrategy):
         Выполняет дополнительную очистку ресурсов стратегии.
         """
         # Нет специфических ресурсов для очистки
-        pass
 
     @async_handle_error
     async def _load_historical_data(self) -> None:
@@ -168,10 +162,10 @@ class MemcoinStrategy(BaseStrategy):
                     # Сохраняем историю объемов
                     self.volume_data[symbol] = ohlcv["volume"].tolist()
 
-                    logger.debug(f"Загружена история для {symbol}: {len(ohlcv)} свечей")
+                    logger.debug("Загружена история для {symbol}: {len(ohlcv)} свечей" %)
 
             except Exception as e:
-                logger.error(f"Ошибка при загрузке истории для {symbol}: {str(e)}")
+                logger.error("Ошибка при загрузке истории для {symbol}: {str(e)}" %)
 
     @async_handle_error
     async def _scan_for_new_coins(self) -> None:
@@ -284,10 +278,10 @@ class MemcoinStrategy(BaseStrategy):
                             "social_score": 0,
                         }
 
-                        logger.info(f"Добавлена новая монета для отслеживания: {coin}")
+                        logger.info("Добавлена новая монета для отслеживания: {coin}" %)
 
         except Exception as e:
-            logger.error(f"Ошибка при сканировании новых монет: {str(e)}")
+            logger.error("Ошибка при сканировании новых монет: {str(e)}" %)
 
     @async_handle_error
     async def _check_social_media(self, symbol: str) -> None:
@@ -332,7 +326,7 @@ class MemcoinStrategy(BaseStrategy):
             )
 
         except Exception as e:
-            logger.error(f"Ошибка при проверке социальных медиа для {symbol}: {str(e)}")
+            logger.error("Ошибка при проверке социальных медиа для {symbol}: {str(e)}" %)
 
     @async_handle_error
     async def _generate_trading_signals(self) -> Dict[str, Dict[str, Any]]:
@@ -437,7 +431,7 @@ class MemcoinStrategy(BaseStrategy):
                     await self._check_memcoin_position(symbol, current_price)
 
             except Exception as e:
-                logger.error(f"Ошибка при генерации сигналов для {symbol}: {str(e)}")
+                logger.error("Ошибка при генерации сигналов для {symbol}: {str(e)}" %)
 
         return signals
 

@@ -3,15 +3,12 @@
 Предоставляет общий интерфейс для взаимодействия с различными криптовалютными биржами.
 """
 
-import ccxt.async_support as ccxt
-import asyncio
-import logging
-import time
-from typing import Dict, List, Any, Optional, Union, Tuple
+from typing import Any, Dict, List, Optional
 
+import ccxt.async_support as ccxt
 from project.config import get_config
-from project.utils.logging_utils import get_logger
 from project.utils.error_handler import async_handle_error, async_with_retry
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -41,7 +38,7 @@ async def connect_exchange(exchange_id: str) -> ccxt.Exchange:
         exchange_id in _exchange_instances
         and not _exchange_instances[exchange_id].closed
     ):
-        logger.debug(f"Использование существующего соединения с {exchange_id}")
+        logger.debug("Использование существующего соединения с {exchange_id}" %)
         return _exchange_instances[exchange_id]
 
     # Получаем настройки для указанной биржи
@@ -49,13 +46,13 @@ async def connect_exchange(exchange_id: str) -> ccxt.Exchange:
     try:
         exchange_settings = config.get_exchange_settings(exchange_id)
     except ValueError as e:
-        logger.error(f"Ошибка при получении настроек биржи {exchange_id}: {str(e)}")
+        logger.error("Ошибка при получении настроек биржи {exchange_id}: {str(e)}" %)
         raise
 
     # Проверяем наличие класса биржи в CCXT
     exchange_class = getattr(ccxt, exchange_id, None)
     if exchange_class is None:
-        logger.error(f"Биржа {exchange_id} не поддерживается CCXT")
+        logger.error("Биржа {exchange_id} не поддерживается CCXT" %)
         raise ValueError(f"Биржа {exchange_id} не поддерживается")
 
     # Создаем экземпляр биржи с настройками
@@ -82,24 +79,24 @@ async def connect_exchange(exchange_id: str) -> ccxt.Exchange:
 
     try:
         exchange = exchange_class(exchange_options)
-        logger.info(f"Соединение с биржей {exchange_id} создано")
+        logger.info("Соединение с биржей {exchange_id} создано" %)
 
         # Загружаем рынки для валидации символов и получения лимитов
         await exchange.load_markets()
-        logger.debug(f"Рынки для {exchange_id} загружены")
+        logger.debug("Рынки для {exchange_id} загружены" %)
 
         # Сохраняем в кэш
         _exchange_instances[exchange_id] = exchange
         return exchange
 
     except ccxt.AuthenticationError as e:
-        logger.error(f"Ошибка аутентификации на бирже {exchange_id}: {str(e)}")
+        logger.error("Ошибка аутентификации на бирже {exchange_id}: {str(e)}" %)
         raise
     except ccxt.ExchangeNotAvailable as e:
-        logger.error(f"Биржа {exchange_id} недоступна: {str(e)}")
+        logger.error("Биржа {exchange_id} недоступна: {str(e)}" %)
         raise
     except Exception as e:
-        logger.error(f"Ошибка при подключении к бирже {exchange_id}: {str(e)}")
+        logger.error("Ошибка при подключении к бирже {exchange_id}: {str(e)}" %)
         raise
 
 
@@ -115,7 +112,7 @@ async def close_exchange(exchange_id: str) -> None:
     if exchange_id in _exchange_instances:
         try:
             await _exchange_instances[exchange_id].close()
-            logger.info(f"Соединение с биржей {exchange_id} закрыто")
+            logger.info("Соединение с биржей {exchange_id} закрыто" %)
             del _exchange_instances[exchange_id]
         except Exception as e:
             logger.error(
@@ -132,7 +129,7 @@ async def close_all_exchanges() -> None:
     for exchange_id, exchange in list(_exchange_instances.items()):
         try:
             await exchange.close()
-            logger.debug(f"Соединение с биржей {exchange_id} закрыто")
+            logger.debug("Соединение с биржей {exchange_id} закрыто" %)
         except Exception as e:
             logger.error(
                 f"Ошибка при закрытии соединения с биржей {exchange_id}: {str(e)}"
@@ -158,10 +155,10 @@ async def fetch_ticker(exchange_id: str, symbol: str) -> Dict[str, Any]:
 
     try:
         ticker = await exchange.fetch_ticker(symbol)
-        logger.debug(f"Получен тикер для {symbol} на {exchange_id}")
+        logger.debug("Получен тикер для {symbol} на {exchange_id}" %)
         return ticker
     except ccxt.BadSymbol as e:
-        logger.error(f"Неверный символ {symbol} для биржи {exchange_id}: {str(e)}")
+        logger.error("Неверный символ {symbol} для биржи {exchange_id}: {str(e)}" %)
         raise
     except Exception as e:
         logger.error(
@@ -225,7 +222,7 @@ async def fetch_order_book(
 
     try:
         order_book = await exchange.fetch_order_book(symbol, limit)
-        logger.debug(f"Получена книга ордеров для {symbol} на {exchange_id}")
+        logger.debug("Получена книга ордеров для {symbol} на {exchange_id}" %)
         return order_book
     except Exception as e:
         logger.error(
@@ -250,10 +247,10 @@ async def fetch_balance(exchange_id: str) -> Dict[str, Any]:
     try:
         balance = await exchange.fetch_balance()
         # Не логируем весь баланс из соображений безопасности
-        logger.debug(f"Получен баланс на {exchange_id}")
+        logger.debug("Получен баланс на {exchange_id}" %)
         return balance
     except Exception as e:
-        logger.error(f"Ошибка при получении баланса на {exchange_id}: {str(e)}")
+        logger.error("Ошибка при получении баланса на {exchange_id}: {str(e)}" %)
         raise
 
 
@@ -293,7 +290,7 @@ async def create_order(
         )
         return order
     except Exception as e:
-        logger.error(f"Ошибка при создании ордера на {exchange_id}: {str(e)}")
+        logger.error("Ошибка при создании ордера на {exchange_id}: {str(e)}" %)
         raise
 
 
@@ -321,10 +318,10 @@ async def cancel_order(
 
     try:
         result = await exchange.cancel_order(order_id, symbol, params)
-        logger.info(f"Отменен ордер {order_id} на {exchange_id} для {symbol}")
+        logger.info("Отменен ордер {order_id} на {exchange_id} для {symbol}" %)
         return result
     except Exception as e:
-        logger.error(f"Ошибка при отмене ордера {order_id} на {exchange_id}: {str(e)}")
+        logger.error("Ошибка при отмене ордера {order_id} на {exchange_id}: {str(e)}" %)
         raise
 
 
@@ -352,7 +349,7 @@ async def fetch_order(
 
     try:
         order = await exchange.fetch_order(order_id, symbol, params)
-        logger.debug(f"Получена информация о ордере {order_id} на {exchange_id}")
+        logger.debug("Получена информация о ордере {order_id} на {exchange_id}" %)
         return order
     except Exception as e:
         logger.error(
@@ -387,7 +384,7 @@ async def fetch_orders(
 
     try:
         orders = await exchange.fetch_orders(symbol, since, limit, params)
-        logger.debug(f"Получено {len(orders)} ордеров для {symbol} на {exchange_id}")
+        logger.debug("Получено {len(orders)} ордеров для {symbol} на {exchange_id}" %)
         return orders
     except Exception as e:
         logger.error(
@@ -422,7 +419,7 @@ async def fetch_open_orders(
 
     try:
         orders = await exchange.fetch_open_orders(symbol, since, limit, params)
-        logger.debug(f"Получено {len(orders)} открытых ордеров на {exchange_id}")
+        logger.debug("Получено {len(orders)} открытых ордеров на {exchange_id}" %)
         return orders
     except Exception as e:
         logger.error(
@@ -457,7 +454,7 @@ async def fetch_closed_orders(
 
     try:
         orders = await exchange.fetch_closed_orders(symbol, since, limit, params)
-        logger.debug(f"Получено {len(orders)} закрытых ордеров на {exchange_id}")
+        logger.debug("Получено {len(orders)} закрытых ордеров на {exchange_id}" %)
         return orders
     except Exception as e:
         logger.error(
@@ -492,8 +489,8 @@ async def fetch_my_trades(
 
     try:
         trades = await exchange.fetch_my_trades(symbol, since, limit, params)
-        logger.debug(f"Получено {len(trades)} сделок на {exchange_id}")
+        logger.debug("Получено {len(trades)} сделок на {exchange_id}" %)
         return trades
     except Exception as e:
-        logger.error(f"Ошибка при получении списка сделок на {exchange_id}: {str(e)}")
+        logger.error("Ошибка при получении списка сделок на {exchange_id}: {str(e)}" %)
         raise

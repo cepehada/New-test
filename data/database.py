@@ -1,15 +1,12 @@
 import asyncio
-import logging
-import time
 import json
 import os
-from typing import Dict, List, Optional, Any, Union, Tuple
+import time
 from datetime import datetime, timedelta
+from typing import Dict, List
+
 import aiosqlite
 import pandas as pd
-import numpy as np
-from pathlib import Path
-
 from project.utils.logging_utils import setup_logger
 
 logger = setup_logger("database")
@@ -32,7 +29,7 @@ class Database:
         # Создаем директорию для БД, если её нет
         os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
 
-        logger.info(f"Database initialized: {self.db_path}")
+        logger.info("Database initialized: {self.db_path}" %)
 
     async def connect(self):
         """Устанавливает соединение с базой данных"""
@@ -47,13 +44,13 @@ class Database:
                 await self._connection.execute("PRAGMA cache_size = 10000")
                 await self._connection.commit()
 
-                logger.info(f"Connected to database: {self.db_path}")
+                logger.info("Connected to database: {self.db_path}" %)
 
                 # Инициализируем таблицы
                 await self._init_tables()
 
             except Exception as e:
-                logger.error(f"Error connecting to database: {str(e)}")
+                logger.error("Error connecting to database: {str(e)}" %)
                 if self._connection:
                     await self._connection.close()
                     self._connection = None
@@ -316,7 +313,7 @@ class Database:
                 logger.info("Database tables initialized")
 
             except Exception as e:
-                logger.error(f"Error initializing database tables: {str(e)}")
+                logger.error("Error initializing database tables: {str(e)}" %)
                 raise
 
     async def save_ohlcv(
@@ -374,7 +371,7 @@ class Database:
             except Exception as e:
                 # Отменяем транзакцию в случае ошибки
                 await self._connection.execute("ROLLBACK")
-                logger.error(f"Error saving OHLCV data: {str(e)}")
+                logger.error("Error saving OHLCV data: {str(e)}" %)
                 raise
 
     async def get_ohlcv(
@@ -454,7 +451,7 @@ class Database:
                 )
 
         except Exception as e:
-            logger.error(f"Error getting OHLCV data: {str(e)}")
+            logger.error("Error getting OHLCV data: {str(e)}" %)
             raise
 
     async def save_trade(self, trade: Dict):
@@ -504,10 +501,10 @@ class Database:
                 await self._connection.execute(query, params)
                 await self._connection.commit()
 
-                logger.debug(f"Saved trade {trade.get('id')} for {trade.get('symbol')}")
+                logger.debug("Saved trade {trade.get('id')} for {trade.get('symbol')}" %)
 
             except Exception as e:
-                logger.error(f"Error saving trade: {str(e)}")
+                logger.error("Error saving trade: {str(e)}" %)
                 raise
 
     async def get_trades(
@@ -598,7 +595,7 @@ class Database:
             return result
 
         except Exception as e:
-            logger.error(f"Error getting trades: {str(e)}")
+            logger.error("Error getting trades: {str(e)}" %)
             raise
 
     async def save_order(self, order: Dict):
@@ -681,7 +678,7 @@ class Database:
                 )
 
             except Exception as e:
-                logger.error(f"Error saving order: {str(e)}")
+                logger.error("Error saving order: {str(e)}" %)
                 raise
 
     async def get_orders(
@@ -791,7 +788,7 @@ class Database:
             return result
 
         except Exception as e:
-            logger.error(f"Error getting orders: {str(e)}")
+            logger.error("Error getting orders: {str(e)}" %)
             raise
 
     async def save_signal(self, signal: Dict):
@@ -866,7 +863,7 @@ class Database:
                 )
 
             except Exception as e:
-                logger.error(f"Error saving signal: {str(e)}")
+                logger.error("Error saving signal: {str(e)}" %)
                 raise
 
     async def get_signals(
@@ -975,7 +972,7 @@ class Database:
             return result
 
         except Exception as e:
-            logger.error(f"Error getting signals: {str(e)}")
+            logger.error("Error getting signals: {str(e)}" %)
             raise
 
     async def save_position(self, position: Dict):
@@ -1069,7 +1066,7 @@ class Database:
                 )
 
             except Exception as e:
-                logger.error(f"Error saving position: {str(e)}")
+                logger.error("Error saving position: {str(e)}" %)
                 raise
 
     async def get_positions(
@@ -1178,7 +1175,7 @@ class Database:
             return result
 
         except Exception as e:
-            logger.error(f"Error getting positions: {str(e)}")
+            logger.error("Error getting positions: {str(e)}" %)
             raise
 
     async def save_optimization_result(self, result: Dict):
@@ -1233,7 +1230,7 @@ class Database:
                 )
 
             except Exception as e:
-                logger.error(f"Error saving optimization result: {str(e)}")
+                logger.error("Error saving optimization result: {str(e)}" %)
                 raise
 
     async def get_optimization_results(
@@ -1330,7 +1327,7 @@ class Database:
             return result
 
         except Exception as e:
-            logger.error(f"Error getting optimization results: {str(e)}")
+            logger.error("Error getting optimization results: {str(e)}" %)
             raise
 
     async def save_strategy_parameters(
@@ -1384,10 +1381,10 @@ class Database:
 
                 await self._connection.commit()
 
-                logger.debug(f"Saved parameters for strategy {strategy_id}")
+                logger.debug("Saved parameters for strategy {strategy_id}" %)
 
             except Exception as e:
-                logger.error(f"Error saving strategy parameters: {str(e)}")
+                logger.error("Error saving strategy parameters: {str(e)}" %)
                 raise
 
     async def get_strategy_parameters(
@@ -1453,7 +1450,7 @@ class Database:
             return result
 
         except Exception as e:
-            logger.error(f"Error getting strategy parameters: {str(e)}")
+            logger.error("Error getting strategy parameters: {str(e)}" %)
             raise
 
     async def save_backtest(self, backtest: Dict):
@@ -1525,7 +1522,7 @@ class Database:
                 )
 
             except Exception as e:
-                logger.error(f"Error saving backtest: {str(e)}")
+                logger.error("Error saving backtest: {str(e)}" %)
                 raise
 
     async def get_backtests(
@@ -1607,7 +1604,7 @@ class Database:
             return result
 
         except Exception as e:
-            logger.error(f"Error getting backtests: {str(e)}")
+            logger.error("Error getting backtests: {str(e)}" %)
             raise
 
     async def save_bot_state(self, bot_state: Dict):
@@ -1651,10 +1648,10 @@ class Database:
                 await self._connection.execute(query, params)
                 await self._connection.commit()
 
-                logger.debug(f"Saved state for bot {bot_state.get('bot_id')}")
+                logger.debug("Saved state for bot {bot_state.get('bot_id')}" %)
 
             except Exception as e:
-                logger.error(f"Error saving bot state: {str(e)}")
+                logger.error("Error saving bot state: {str(e)}" %)
                 raise
 
     async def get_bot_states(self, is_active: bool = None) -> List[Dict]:
@@ -1729,7 +1726,7 @@ class Database:
             return result
 
         except Exception as e:
-            logger.error(f"Error getting bot states: {str(e)}")
+            logger.error("Error getting bot states: {str(e)}" %)
             raise
 
     async def save_event(self, event: Dict):
@@ -1776,7 +1773,7 @@ class Database:
                 )
 
             except Exception as e:
-                logger.error(f"Error saving event: {str(e)}")
+                logger.error("Error saving event: {str(e)}" %)
                 raise
 
     async def get_events(
@@ -1867,7 +1864,7 @@ class Database:
             return result
 
         except Exception as e:
-            logger.error(f"Error getting events: {str(e)}")
+            logger.error("Error getting events: {str(e)}" %)
             raise
 
     async def save_log(self, log: Dict):
@@ -1995,7 +1992,7 @@ class Database:
             return result
 
         except Exception as e:
-            logger.error(f"Error getting logs: {str(e)}")
+            logger.error("Error getting logs: {str(e)}" %)
             raise
 
     async def execute_query(self, query: str, params: List = None) -> List[Dict]:
@@ -2026,7 +2023,7 @@ class Database:
             return result
 
         except Exception as e:
-            logger.error(f"Error executing query: {str(e)}")
+            logger.error("Error executing query: {str(e)}" %)
             raise
 
     async def execute_update(self, query: str, params: List = None) -> int:
@@ -2052,7 +2049,7 @@ class Database:
                 return cursor.rowcount
 
             except Exception as e:
-                logger.error(f"Error executing update: {str(e)}")
+                logger.error("Error executing update: {str(e)}" %)
                 raise
 
     async def get_table_schema(self, table_name: str) -> List[Dict]:
@@ -2085,7 +2082,7 @@ class Database:
             return result
 
         except Exception as e:
-            logger.error(f"Error getting table schema: {str(e)}")
+            logger.error("Error getting table schema: {str(e)}" %)
             raise
 
     async def backup_database(self, backup_path: str) -> bool:
@@ -2119,11 +2116,11 @@ class Database:
                 None, lambda: self._backup_db_sync(backup_path)
             )
 
-            logger.info(f"Database backup created: {backup_path}")
+            logger.info("Database backup created: {backup_path}" %)
             return True
 
         except Exception as e:
-            logger.error(f"Error creating database backup: {str(e)}")
+            logger.error("Error creating database backup: {str(e)}" %)
             return False
 
     def _backup_db_sync(self, backup_path: str):
@@ -2159,7 +2156,7 @@ class Database:
         try:
             # Проверяем, существует ли резервная копия
             if not os.path.exists(backup_path):
-                logger.error(f"Backup file not found: {backup_path}")
+                logger.error("Backup file not found: {backup_path}" %)
                 return False
 
             # Закрываем текущее соединение
@@ -2173,11 +2170,11 @@ class Database:
             # Повторно подключаемся к БД
             await self.connect()
 
-            logger.info(f"Database restored from: {backup_path}")
+            logger.info("Database restored from: {backup_path}" %)
             return True
 
         except Exception as e:
-            logger.error(f"Error restoring database: {str(e)}")
+            logger.error("Error restoring database: {str(e)}" %)
             return False
 
     def _restore_db_sync(self, backup_path: str):
@@ -2187,7 +2184,6 @@ class Database:
         Args:
             backup_path: Путь к резервной копии
         """
-        import sqlite3
         import shutil
 
         # Создаем резервную копию текущей БД
@@ -2246,7 +2242,7 @@ class Database:
             return info
 
         except Exception as e:
-            logger.error(f"Error getting database info: {str(e)}")
+            logger.error("Error getting database info: {str(e)}" %)
             raise
 
     async def optimize_database(self) -> bool:
@@ -2275,7 +2271,7 @@ class Database:
                 return True
 
             except Exception as e:
-                logger.error(f"Error optimizing database: {str(e)}")
+                logger.error("Error optimizing database: {str(e)}" %)
                 return False
 
     async def get_individual(self, individual_id: str) -> Dict:
@@ -2352,7 +2348,7 @@ class Database:
             return None
 
         except Exception as e:
-            logger.error(f"Error getting individual: {str(e)}")
+            logger.error("Error getting individual: {str(e)}" %)
             raise
 
     async def clean_old_data(self, older_than_days: int = 30) -> Dict:
@@ -2393,9 +2389,9 @@ class Database:
                 # Фиксируем изменения
                 await self._connection.commit()
 
-                logger.info(f"Cleaned old data: {results}")
+                logger.info("Cleaned old data: {results}" %)
                 return results
 
             except Exception as e:
-                logger.error(f"Error cleaning old data: {str(e)}")
+                logger.error("Error cleaning old data: {str(e)}" %)
                 raise

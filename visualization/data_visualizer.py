@@ -1,19 +1,19 @@
-import logging
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-from matplotlib.figure import Figure
-from typing import Dict, List, Optional, Tuple, Union, Any, Callable
-import io
 import base64
-from datetime import datetime, timedelta
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-import plotly.express as px
+import io
 import json
+import logging
 import os
+from datetime import datetime, timedelta
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+from matplotlib.figure import Figure
+from plotly.subplots import make_subplots
 from project.utils.logging_utils import setup_logger
 
 logger = setup_logger("data_visualizer")
@@ -59,7 +59,7 @@ class DataVisualizer:
             },
         }
 
-        logger.info(f"DataVisualizer initialized with theme: {theme}")
+        logger.info("DataVisualizer initialized with theme: {theme}" %)
 
     def plot_ohlc(
         self,
@@ -87,7 +87,7 @@ class DataVisualizer:
             required_columns = ["open", "high", "low", "close"]
             for col in required_columns:
                 if col not in data.columns:
-                    logger.error(f"Missing required column: {col}")
+                    logger.error("Missing required column: {col}" %)
                     return None
 
             # Создаем figure и определяем размер подграфиков
@@ -251,7 +251,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error(f"Error plotting OHLC chart: {str(e)}")
+            logger.error("Error plotting OHLC chart: {str(e)}" %)
             return None
 
     def plot_ohlc_plotly(
@@ -280,7 +280,7 @@ class DataVisualizer:
             required_columns = ["open", "high", "low", "close"]
             for col in required_columns:
                 if col not in data.columns:
-                    logger.error(f"Missing required column: {col}")
+                    logger.error("Missing required column: {col}" %)
                     return None
 
             # Определяем количество подграфиков
@@ -424,7 +424,7 @@ class DataVisualizer:
             return html
 
         except Exception as e:
-            logger.error(f"Error plotting OHLC chart with Plotly: {str(e)}")
+            logger.error("Error plotting OHLC chart with Plotly: {str(e)}" %)
             return None
 
     def plot_equity_curve(
@@ -525,7 +525,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error(f"Error plotting equity curve: {str(e)}")
+            logger.error("Error plotting equity curve: {str(e)}" %)
             return None
 
     def plot_equity_curve_plotly(
@@ -653,7 +653,7 @@ class DataVisualizer:
             return html
 
         except Exception as e:
-            logger.error(f"Error plotting equity curve with Plotly: {str(e)}")
+            logger.error("Error plotting equity curve with Plotly: {str(e)}" %)
             return None
 
     def plot_trades(
@@ -736,7 +736,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error(f"Error plotting trades: {str(e)}")
+            logger.error("Error plotting trades: {str(e)}" %)
             return None
 
     def plot_trades_plotly(
@@ -835,7 +835,7 @@ class DataVisualizer:
             return html
 
         except Exception as e:
-            logger.error(f"Error plotting trades with Plotly: {str(e)}")
+            logger.error("Error plotting trades with Plotly: {str(e)}" %)
             return None
 
     def plot_drawdown(
@@ -938,7 +938,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error(f"Error plotting drawdown: {str(e)}")
+            logger.error("Error plotting drawdown: {str(e)}" %)
             return None
 
     def plot_monthly_returns(
@@ -1041,7 +1041,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error(f"Error plotting monthly returns: {str(e)}")
+            logger.error("Error plotting monthly returns: {str(e)}" %)
             return None
 
     def plot_win_loss_distribution(
@@ -1160,7 +1160,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error(f"Error plotting win/loss distribution: {str(e)}")
+            logger.error("Error plotting win/loss distribution: {str(e)}" %)
             return None
 
     def plot_trade_durations(
@@ -1293,7 +1293,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error(f"Error plotting trade durations: {str(e)}")
+            logger.error("Error plotting trade durations: {str(e)}" %)
             return None
 
     def plot_correlation_matrix(
@@ -1389,7 +1389,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error(f"Error plotting correlation matrix: {str(e)}")
+            logger.error("Error plotting correlation matrix: {str(e)}" %)
             return None
 
     def plot_optimization_results(
@@ -1512,7 +1512,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error(f"Error plotting optimization results: {str(e)}")
+            logger.error("Error plotting optimization results: {str(e)}" %)
             return None
 
     def plot_optimization_3d(
@@ -1686,7 +1686,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error(f"Error plotting 3D optimization results: {str(e)}")
+            logger.error("Error plotting 3D optimization results: {str(e)}" %)
             return None
 
     def plot_signals(
@@ -1813,7 +1813,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error(f"Error plotting signals: {str(e)}")
+            logger.error("Error plotting signals: {str(e)}" %)
             return None
 
     def plot_market_dashboard(
@@ -1958,7 +1958,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error(f"Error plotting market dashboard: {str(e)}")
+            logger.error("Error plotting market dashboard: {str(e)}" %)
             return None
 
     def save_figure(self, fig: Figure, filename: str, dpi: int = 100) -> bool:
@@ -1983,11 +1983,11 @@ class DataVisualizer:
             # Закрываем фигуру, чтобы избежать утечки памяти
             plt.close(fig)
 
-            logger.info(f"Figure saved to {filename}")
+            logger.info("Figure saved to {filename}" %)
             return True
 
         except Exception as e:
-            logger.error(f"Error saving figure: {str(e)}")
+            logger.error("Error saving figure: {str(e)}" %)
             return False
 
     def get_connection_params(self) -> Tuple[str, dict]:

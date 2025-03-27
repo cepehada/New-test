@@ -5,12 +5,11 @@
 
 import asyncio
 import json
-import logging
-from typing import Dict, List, Any, Optional, Callable, Awaitable, Set, Union
+from typing import Any, Awaitable, Callable, Dict, List, Optional, Set
 
 from project.config import get_config
-from project.utils.logging_utils import get_logger
 from project.utils.error_handler import async_handle_error, async_with_retry
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -71,7 +70,7 @@ class MessageBroker:
                 self.channel = True
                 logger.info("Соединение с брокером сообщений установлено")
             except Exception as e:
-                logger.error(f"Ошибка при подключении к брокеру сообщений: {str(e)}")
+                logger.error("Ошибка при подключении к брокеру сообщений: {str(e)}" %)
                 raise
 
     @async_handle_error
@@ -114,7 +113,7 @@ class MessageBroker:
 
             return True
         except Exception as e:
-            logger.error(f"Ошибка при публикации сообщения в тему {topic}: {str(e)}")
+            logger.error("Ошибка при публикации сообщения в тему {topic}: {str(e)}" %)
             return False
 
     @async_handle_error
@@ -151,7 +150,7 @@ class MessageBroker:
 
             return True
         except Exception as e:
-            logger.error(f"Ошибка при подписке на тему {topic}: {str(e)}")
+            logger.error("Ошибка при подписке на тему {topic}: {str(e)}" %)
             return False
 
     @async_handle_error
@@ -182,7 +181,7 @@ class MessageBroker:
 
             return True
         except Exception as e:
-            logger.error(f"Ошибка при отписке от темы {topic}: {str(e)}")
+            logger.error("Ошибка при отписке от темы {topic}: {str(e)}" %)
             return False
 
     async def close(self) -> None:

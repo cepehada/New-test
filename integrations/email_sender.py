@@ -4,17 +4,16 @@
 """
 
 import asyncio
-import logging
 import smtplib
 import ssl
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
-from typing import Dict, List, Any, Optional, Union
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from typing import Any, Dict, List, Optional, Union
 
 from project.config import get_config
-from project.utils.logging_utils import get_logger
 from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -73,7 +72,7 @@ class EmailSender:
                 "Email-отправитель не настроен - письма не будут отправляться"
             )
         else:
-            logger.info(f"Email-отправитель инициализирован для {self.username}")
+            logger.info("Email-отправитель инициализирован для {self.username}" %)
 
     @async_handle_error
     async def send_email(
@@ -161,10 +160,10 @@ class EmailSender:
                 server.login(self.username, self.password)
                 server.sendmail(self.username, to_email, msg.as_string())
 
-            logger.info(f"Письмо отправлено на {', '.join(to_email)}")
+            logger.info("Письмо отправлено на {', '.join(to_email)}" %)
             return True
         except Exception as e:
-            logger.error(f"Ошибка при отправке письма: {str(e)}")
+            logger.error("Ошибка при отправке письма: {str(e)}" %)
             return False
 
     @async_handle_error

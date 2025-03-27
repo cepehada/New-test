@@ -3,19 +3,18 @@
 Предоставляет функции для отслеживания и оптимизации портфеля активов.
 """
 
+import time
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
+
 import numpy as np
 import pandas as pd
-import logging
-import time
-from typing import Dict, List, Any, Optional, Union, Tuple
-from dataclasses import dataclass
-
 from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import handle_error, async_handle_error
-from project.utils.ccxt_exchanges import fetch_ticker, fetch_balance
-from project.risk_management.var_calculator import VarCalculator
 from project.risk_management.position_sizer import PositionSizer
+from project.risk_management.var_calculator import VarCalculator
+from project.utils.ccxt_exchanges import fetch_balance, fetch_ticker
+from project.utils.error_handler import async_handle_error, handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -88,7 +87,7 @@ class PortfolioManager:
             True в случае успеха, иначе False
         """
         if amount <= 0:
-            logger.warning(f"Некорректное количество актива: {amount}")
+            logger.warning("Некорректное количество актива: {amount}" %)
             return False
 
         # Генерируем ключ актива
@@ -160,7 +159,7 @@ class PortfolioManager:
 
         # Проверяем наличие актива в портфеле
         if asset_key not in self.assets:
-            logger.warning(f"Актив {symbol} на {exchange_id} не найден в портфеле")
+            logger.warning("Актив {symbol} на {exchange_id} не найден в портфеле" %)
             return False
 
         # Получаем текущий актив
@@ -171,7 +170,7 @@ class PortfolioManager:
             if amount <= 0:
                 # Удаляем актив из портфеля
                 del self.assets[asset_key]
-                logger.info(f"Актив {symbol} на {exchange_id} удален из портфеля")
+                logger.info("Актив {symbol} на {exchange_id} удален из портфеля" %)
                 self._recalculate_portfolio()
                 return True
 
@@ -232,7 +231,7 @@ class PortfolioManager:
 
         # Проверяем наличие актива в портфеле
         if asset_key not in self.assets:
-            logger.warning(f"Актив {symbol} на {exchange_id} не найден в портфеле")
+            logger.warning("Актив {symbol} на {exchange_id} не найден в портфеле" %)
             return False
 
         # Удаляем актив из портфеля
@@ -241,7 +240,7 @@ class PortfolioManager:
         # Обновляем общую стоимость и веса
         self._recalculate_portfolio()
 
-        logger.info(f"Актив {symbol} на {exchange_id} удален из портфеля")
+        logger.info("Актив {symbol} на {exchange_id} удален из портфеля" %)
 
         return True
 
@@ -322,7 +321,7 @@ class PortfolioManager:
             # Получаем баланс с биржи
             balance = await fetch_balance(exchange_id)
             if not balance:
-                logger.error(f"Не удалось получить баланс на {exchange_id}")
+                logger.error("Не удалось получить баланс на {exchange_id}" %)
                 return False
 
             # Получаем список активов с ненулевым балансом
@@ -382,7 +381,7 @@ class PortfolioManager:
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка при обновлении портфеля с {exchange_id}: {str(e)}")
+            logger.error("Ошибка при обновлении портфеля с {exchange_id}: {str(e)}" %)
             return False
 
     @handle_error
@@ -432,7 +431,7 @@ class PortfolioManager:
             # Предполагаем, что активы не полностью коррелированы (используем множитель 0.8)
             portfolio_var = total_var * 0.8
 
-            logger.debug(f"Рассчитан приблизительный VaR портфеля: {portfolio_var}")
+            logger.debug("Рассчитан приблизительный VaR портфеля: {portfolio_var}" %)
             return portfolio_var
 
         # Рассчитываем VaR портфеля с учетом корреляций
@@ -440,7 +439,7 @@ class PortfolioManager:
             asset_returns, asset_weights, self.total_value
         )
 
-        logger.debug(f"Рассчитан VaR портфеля: {portfolio_var}")
+        logger.debug("Рассчитан VaR портфеля: {portfolio_var}" %)
         return portfolio_var
 
     @handle_error
@@ -478,7 +477,7 @@ class PortfolioManager:
             asset_returns, asset_weights, self.total_value
         )
 
-        logger.debug(f"Рассчитаны вклады в риск портфеля: {risk_contributions}")
+        logger.debug("Рассчитаны вклады в риск портфеля: {risk_contributions}" %)
         return risk_contributions
 
     @handle_error
@@ -549,7 +548,7 @@ class PortfolioManager:
             return weights
 
         except Exception as e:
-            logger.error(f"Ошибка при оптимизации портфеля: {str(e)}")
+            logger.error("Ошибка при оптимизации портфеля: {str(e)}" %)
             return asset_weights
 
     @handle_error
@@ -561,7 +560,7 @@ class PortfolioManager:
             asset_returns: Словарь с сериями исторических доходностей для каждого актива
         """
         self.returns_history.update(asset_returns)
-        logger.debug(f"Обновлена история доходностей для {len(asset_returns)} активов")
+        logger.debug("Обновлена история доходностей для {len(asset_returns)} активов" %)
 
     def _recalculate_portfolio(self) -> None:
         """

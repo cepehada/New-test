@@ -1,12 +1,14 @@
-import asyncio
-import logging
-import time
-from typing import Dict, List, Optional, Tuple, Union, Any, Callable
-from datetime import datetime, timedelta
-import pandas as pd
-import numpy as np
-from abc import ABC, abstractmethod
+"""
+Базовый модуль для реализации торговых стратегий.
+Содержит классы для создания сигналов, управления позициями
+и абстрактный класс стратегии.
+"""
 
+from abc import ABC, abstractmethod
+from datetime import datetime
+from typing import Dict, List
+
+import pandas as pd
 from project.utils.logging_utils import setup_logger
 
 logger = setup_logger("strategy_base")
@@ -352,7 +354,7 @@ class Strategy(ABC):
                 self.parameters[param] = value
 
         # Логируем параметры
-        self.logger.info(f"Strategy parameters: {self.parameters}")
+        self.logger.info("Strategy parameters: %s", self.parameters)
 
     @classmethod
     def get_default_parameters(cls) -> Dict:
@@ -375,7 +377,6 @@ class Strategy(ABC):
         Returns:
             Dict: Словарь с рассчитанными индикаторами
         """
-        pass
 
     @abstractmethod
     async def generate_signals(
@@ -391,7 +392,6 @@ class Strategy(ABC):
         Returns:
             List[Signal]: Список сигналов
         """
-        pass
 
     @abstractmethod
     async def on_data(self, data: pd.DataFrame) -> List[Signal]:
@@ -404,7 +404,6 @@ class Strategy(ABC):
         Returns:
             List[Signal]: Список сигналов
         """
-        pass
 
     async def update(self, data: pd.DataFrame) -> List[Signal]:
         """
@@ -444,7 +443,7 @@ class Strategy(ABC):
             return self.signals
 
         except Exception as e:
-            self.logger.error(f"Error updating strategy: {str(e)}")
+            self.logger.error("Error updating strategy: %s", str(e))
             return []
 
     async def on_tick(self, tick: Dict) -> List[Signal]:
@@ -556,7 +555,7 @@ class StrategyRegistry:
             raise TypeError(f"{strategy_class.__name__} is not a subclass of Strategy")
 
         cls._strategies[strategy_class.__name__] = strategy_class
-        logger.info(f"Registered strategy: {strategy_class.__name__}")
+        logger.info("Registered strategy: %s", strategy_class.__name__)
 
         return strategy_class
 

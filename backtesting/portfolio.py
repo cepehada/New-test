@@ -1,10 +1,5 @@
-import asyncio
-import logging
-import time
-from typing import Dict, List, Optional, Tuple, Union, Any
 from datetime import datetime
-import uuid
-import copy
+from typing import Dict, List, Optional
 
 from project.utils.logging_utils import setup_logger
 
@@ -508,7 +503,7 @@ class Portfolio:
         # Хронология изменений капитала
         self.equity_history = []
 
-        logger.debug(f"Portfolio initialized with balance: {initial_balance}")
+        logger.debug("Portfolio initialized with balance: {initial_balance}" %)
 
     async def open_position(
         self,
@@ -602,7 +597,7 @@ class Portfolio:
         # Обновляем хронологию капитала
         self._update_equity_history()
 
-        logger.debug(f"Opened position: {position}")
+        logger.debug("Opened position: {position}" %)
 
         return position
 
@@ -622,7 +617,7 @@ class Portfolio:
         """
         # Проверяем, существует ли позиция
         if position_id not in self.positions:
-            logger.warning(f"Cannot close position: position not found ({position_id})")
+            logger.warning("Cannot close position: position not found ({position_id})" %)
             return None
 
         # Получаем позицию
@@ -689,7 +684,7 @@ class Portfolio:
         # Обновляем хронологию капитала
         self._update_equity_history()
 
-        logger.debug(f"Closed position: {position}")
+        logger.debug("Closed position: {position}" %)
 
         return position
 

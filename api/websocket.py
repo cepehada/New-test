@@ -3,22 +3,21 @@
 Предоставляет интерфейс для получения данных в реальном времени.
 """
 
-import logging
 import asyncio
 import json
+import logging
 import time
-from typing import Dict, List, Any, Set, Callable
+from typing import Any, Callable, Dict, List, Set
 
 import aiohttp
-from aiohttp import web
 import jwt
-
-from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import async_handle_error
-from project.data.market_data import MarketData
+from aiohttp import web
 from project.bots.bot_manager import BotManager
 from project.bots.strategies.strategy_manager import StrategyManager
+from project.config import get_config
+from project.data.market_data import MarketData
+from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -103,7 +102,7 @@ async def authenticate_ws(message, ws):
             return False
 
     except Exception as e:
-        logger.error(f"Authentication error: {str(e)}")
+        logger.error("Authentication error: {str(e)}" %)
         await ws.send_json(
             {"type": "error", "code": "auth_error", "message": "Authentication error"}
         )
@@ -189,7 +188,7 @@ async def websocket_handler(request):
                         }
                     )
                 except Exception as e:
-                    logger.error(f"WebSocket message error: {str(e)}")
+                    logger.error("WebSocket message error: {str(e)}" %)
                     await ws.send_json(
                         {
                             "type": "error",
@@ -314,7 +313,7 @@ async def broadcast_to_channel(channel: str, message: Dict[str, Any]) -> None:
         message: Сообщение для отправки
     """
     if channel not in active_clients:
-        logger.warning(f"Unknown channel: {channel}")
+        logger.warning("Unknown channel: {channel}" %)
         return
 
     # Добавляем тип и timestamp, если их нет
@@ -334,13 +333,13 @@ async def broadcast_to_channel(channel: str, message: Dict[str, Any]) -> None:
         try:
             await ws.send_json(message)
         except Exception as e:
-            logger.error(f"Error sending message to client: {str(e)}")
+            logger.error("Error sending message to client: {str(e)}" %)
             disconnected.add(ws)
 
     # Удаляем отключенные соединения
     for ws in disconnected:
         active_clients[channel].discard(ws)
-        logger.debug(f"Removed disconnected client from channel: {channel}")
+        logger.debug("Removed disconnected client from channel: {channel}" %)
 
 
 # Обновление рыночных данных
@@ -379,7 +378,7 @@ async def update_market_data() -> None:
             await asyncio.sleep(5)
 
     except Exception as e:
-        logger.error(f"Error in market data update: {str(e)}")
+        logger.error("Error in market data update: {str(e)}" %)
 
 
 # Обновление состояния ботов
@@ -427,7 +426,7 @@ async def update_bots_state() -> None:
             await asyncio.sleep(10)
 
     except Exception as e:
-        logger.error(f"Error in bots state update: {str(e)}")
+        logger.error("Error in bots state update: {str(e)}" %)
 
 
 # Обновление состояния стратегий
@@ -457,7 +456,7 @@ async def update_strategies_state() -> None:
             await asyncio.sleep(10)
 
     except Exception as e:
-        logger.error(f"Error in strategies state update: {str(e)}")
+        logger.error("Error in strategies state update: {str(e)}" %)
 
 
 # Обновление системной информации
@@ -494,7 +493,7 @@ async def update_system_info() -> None:
     except ImportError:
         logger.warning("psutil not installed, system info updates disabled")
     except Exception as e:
-        logger.error(f"Error in system info update: {str(e)}")
+        logger.error("Error in system info update: {str(e)}" %)
 
 
 # Запуск WebSocket-сервера

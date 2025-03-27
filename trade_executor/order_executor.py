@@ -3,26 +3,23 @@
 Предоставляет функции для создания и управления ордерами на биржах.
 """
 
-import asyncio
-import logging
 import time
 import uuid
-from typing import Dict, List, Any, Optional, Union, Tuple
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
 from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import async_handle_error, async_with_retry
+from project.data.symbol_manager import SymbolManager
+from project.infrastructure.database import Database
 from project.utils.ccxt_exchanges import (
-    connect_exchange,
-    create_order,
     cancel_order,
-    fetch_order,
+    create_order,
     fetch_open_orders,
+    fetch_order,
     fetch_ticker,
 )
-from project.infrastructure.database import Database
-from project.data.symbol_manager import SymbolManager
+from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
 from project.utils.notify import send_trading_signal
 
 logger = get_logger(__name__)
@@ -201,7 +198,7 @@ class OrderExecutor:
             symbol = await self._normalize_symbol(exchange_id, symbol)
 
             # Логируем информацию об отменяемом ордере
-            logger.info(f"Отменяем ордер {order_id} на {exchange_id} для {symbol}")
+            logger.info("Отменяем ордер {order_id} на {exchange_id} для {symbol}" %)
 
             # Отправляем уведомление об отмене ордера
             await send_trading_signal(f"Отмена ордера: {order_id} ({symbol})")
@@ -557,10 +554,10 @@ class OrderExecutor:
                 raw_data=order,
             )
 
-            logger.debug(f"Ордер {order_id} сохранен в базе данных")
+            logger.debug("Ордер {order_id} сохранен в базе данных" %)
 
         except Exception as e:
-            logger.error(f"Ошибка при сохранении ордера в базу данных: {str(e)}")
+            logger.error("Ошибка при сохранении ордера в базу данных: {str(e)}" %)
 
     async def _update_order_in_db(
         self, exchange_id: str, order: Dict[str, Any]

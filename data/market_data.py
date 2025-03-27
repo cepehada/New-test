@@ -4,21 +4,17 @@
 """
 
 import asyncio
-import logging
 import time
-from typing import Dict, List, Any, Optional, Union, Tuple
-import numpy as np
-import pandas as pd
+from typing import Any, Dict, List, Optional
 
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import async_handle_error, async_with_retry
+import pandas as pd
 from project.utils.cache_utils import async_cache
 from project.utils.ccxt_exchanges import (
-    connect_exchange,
-    fetch_ticker,
     fetch_ohlcv,
     fetch_order_book,
+    fetch_ticker,
 )
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -147,7 +143,7 @@ class MarketData:
             cache_key in self.ohlcv_cache
             and time.time() - self.ohlcv_timestamps.get(cache_key, 0) < self.ohlcv_ttl
         ):
-            logger.debug(f"Получены данные OHLCV из кэша для {symbol} на {exchange_id}")
+            logger.debug("Получены данные OHLCV из кэша для {symbol} на {exchange_id}" %)
             return self.ohlcv_cache[cache_key]
 
         # Получаем данные с биржи
@@ -168,7 +164,7 @@ class MarketData:
             self.ohlcv_cache[cache_key] = df
             self.ohlcv_timestamps[cache_key] = time.time()
 
-            logger.debug(f"Получены данные OHLCV с биржи для {symbol} на {exchange_id}")
+            logger.debug("Получены данные OHLCV с биржи для {symbol} на {exchange_id}" %)
             return df
         except Exception as e:
             logger.error(

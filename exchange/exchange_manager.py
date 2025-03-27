@@ -1,20 +1,24 @@
 import asyncio
-import logging
-import time
-import random
-import json
-from typing import Dict, List, Optional, Tuple, Union, Any, Set, Callable
-from datetime import datetime, timedelta
-import ccxt.async_support as ccxt
-import os
+import base64
 import hashlib
 import hmac
-import base64
+import json
+import logging
+import os
+import random
+import time
 import uuid
+from datetime import datetime, timedelta
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
+import ccxt.async_support as ccxt
+from project.utils.error_handler import ExchangeErrorHandler, handle_exchange_errors
 from project.utils.logging_utils import setup_logger
-from project.utils.error_handler import handle_exchange_errors, ExchangeErrorHandler
-from project.utils.websocket_client import WebSocketClient, get_ws_pool, get_message_processor
+from project.utils.websocket_client import (
+    WebSocketClient,
+    get_message_processor,
+    get_ws_pool,
+)
 
 logger = setup_logger("exchange_manager")
 
@@ -460,7 +464,7 @@ class ExchangeManager:
         # Инициализируем соответствия временных интервалов
         self._init_timeframe_mappings()
 
-        logger.info(f"Exchange manager initialized with {len(self.exchange_configs)} exchanges")
+        logger.info("Exchange manager initialized with {len(self.exchange_configs)} exchanges" %)
 
     async def start(self):
         """Запускает менеджер бирж"""
@@ -511,7 +515,7 @@ class ExchangeManager:
                 try:
                     await ws_client.disconnect()
                 except Exception as e:
-                    logger.error(f"Error disconnecting WebSocket for {exchange_id}: {str(e)}")
+                    logger.error("Error disconnecting WebSocket for {exchange_id}: {str(e)}" %)
 
             self.websocket_clients = {}
             self.initialized = False
@@ -523,9 +527,9 @@ class ExchangeManager:
         for exchange_id, exchange in list(exchange_instances.items()):
             try:
                 await exchange.close()
-                logger.debug(f"Closed connection to exchange: {exchange_id}")
+                logger.debug("Closed connection to exchange: {exchange_id}" %)
             except Exception as e:
-                logger.error(f"Error closing exchange {exchange_id}: {str(e)}")
+                logger.error("Error closing exchange {exchange_id}: {str(e)}" %)
 
         # Очищаем словарь экземпляров
         exchange_instances.clear()
@@ -542,7 +546,7 @@ class ExchangeManager:
             # Получаем URL для WebSocket
             ws_url = self._get_websocket_url(exchange_id, exchange_config)
             if not ws_url:
-                logger.warning(f"WebSocket URL not found for exchange: {exchange_id}")
+                logger.warning("WebSocket URL not found for exchange: {exchange_id}" %)
                 return
 
             # Получаем пул WebSocket соединений
@@ -555,11 +559,11 @@ class ExchangeManager:
                     processor = get_message_processor()
                     await processor.process_message(message)
                 except Exception as e:
-                    logger.error(f"Error processing WebSocket message from {exchange_id}: {str(e)}")
+                    logger.error("Error processing WebSocket message from {exchange_id}: {str(e)}" %)
 
             # Создаем обработчик подключения
             async def on_ws_connect():
-                logger.info(f"Connected to {exchange_id} WebSocket")
+                logger.info("Connected to {exchange_id} WebSocket" %)
 
                 # Отправляем сообщения авторизации, если необходимо
                 if exchange_config.ws_type == 'private':
@@ -569,11 +573,11 @@ class ExchangeManager:
 
             # Создаем обработчик отключения
             async def on_ws_disconnect():
-                logger.info(f"Disconnected from {exchange_id} WebSocket")
+                logger.info("Disconnected from {exchange_id} WebSocket" %)
 
             # Создаем обработчик ошибок
             async def on_ws_error(error):
-                logger.error(f"WebSocket error for {exchange_id}: {error}")
+                logger.error("WebSocket error for {exchange_id}: {error}" %)
 
                 # Увеличиваем счетчик ошибок
                 self.error_counters[exchange_id]['connection'] += 1
@@ -608,10 +612,10 @@ class ExchangeManager:
             # Подключаемся
             await client.connect()
 
-            logger.info(f"Initialized WebSocket for exchange: {exchange_id}")
+            logger.info("Initialized WebSocket for exchange: {exchange_id}" %)
 
         except Exception as e:
-            logger.error(f"Error initializing WebSocket for {exchange_id}: {str(e)}")
+            logger.error("Error initializing WebSocket for {exchange_id}: {str(e)}" %)
 
     def _get_websocket_url(self, exchange_id: str, exchange_config: ExchangeConfig) -> Optional[str]:
         """
@@ -707,7 +711,7 @@ class ExchangeManager:
         """
         # Проверяем наличие ключей
         if not exchange_config.api_key or not exchange_config.api_secret:
-            logger.warning(f"Missing API keys for {exchange_id} WebSocket authentication")
+            logger.warning("Missing API keys for {exchange_id} WebSocket authentication" %)
             return None
 
         # Генерируем сообщение авторизации для разных бирж
@@ -768,7 +772,7 @@ class ExchangeManager:
 
         # Добавить другие биржи по необходимости
 
-        logger.warning(f"WebSocket authentication not implemented for {exchange_id}")
+        logger.warning("WebSocket authentication not implemented for {exchange_id}" %)
         return None
 
     def _get_websocket_auth_provider(self, exchange_id: str) -> Optional[Callable]:
@@ -910,7 +914,7 @@ class ExchangeManager:
                 self.exchange_scores[exchange_id] = final_score
 
             except Exception as e:
-                logger.error(f"Error updating score for {exchange_id}: {str(e)}")
+                logger.error("Error updating score for {exchange_id}: {str(e)}" %)
                 self.exchange_scores[exchange_id] = 0
 
     async def get_exchange(self, exchange_id: str) -> ccxt.Exchange:
@@ -952,7 +956,7 @@ class ExchangeManager:
             return exchange
 
         except Exception as e:
-            logger.error(f"Error creating exchange {exchange_id}: {str(e)}")
+            logger.error("Error creating exchange {exchange_id}: {str(e)}" %)
             raise
 
     async def select_best_exchange(self, symbol: str, required_features: List[str] = None) -> Tuple[str, float]:
@@ -998,7 +1002,7 @@ class ExchangeManager:
                     best_score = score
 
             except Exception as e:
-                logger.error(f"Error checking exchange {exchange_id}: {str(e)}")
+                logger.error("Error checking exchange {exchange_id}: {str(e)}" %)
 
         return best_exchange, best_score
 
@@ -1040,7 +1044,7 @@ class ExchangeManager:
             return None
 
         except Exception as e:
-            logger.error(f"Error mapping symbol {symbol} for {exchange_id}: {str(e)}")
+            logger.error("Error mapping symbol {symbol} for {exchange_id}: {str(e)}" %)
             return None
 
     def _normalize_symbol(self, symbol: str) -> str:
@@ -1119,7 +1123,7 @@ class ExchangeManager:
             return None
 
         except Exception as e:
-            logger.error(f"Error mapping symbol {symbol} from {source_exchange} to {target_exchange}: {str(e)}")
+            logger.error("Error mapping symbol {symbol} from {source_exchange} to {target_exchange}: {str(e)}" %)
             return None
 
     async def map_timeframe(self, timeframe: str, exchange_id: str) -> Optional[str]:
@@ -1149,7 +1153,7 @@ class ExchangeManager:
             return None
 
         except Exception as e:
-            logger.error(f"Error mapping timeframe {timeframe} for {exchange_id}: {str(e)}")
+            logger.error("Error mapping timeframe {timeframe} for {exchange_id}: {str(e)}" %)
             return None
 
     async def fetch_ticker(self, symbol: str, exchange_id: str) -> Optional[Dict]:
@@ -1175,7 +1179,7 @@ class ExchangeManager:
             # Преобразуем символ
             mapped_symbol = await self.map_symbol(symbol, exchange_id)
             if not mapped_symbol:
-                logger.warning(f"Symbol {symbol} not found on {exchange_id}")
+                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
                 return None
 
             # Получаем экземпляр биржи
@@ -1193,7 +1197,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(f"Error fetching ticker for {symbol} on {exchange_id}: {str(e)}")
+            logger.error("Error fetching ticker for {symbol} on {exchange_id}: {str(e)}" %)
             return None
 
     async def fetch_order_book(self, symbol: str, exchange_id: str, limit: int = 20) -> Optional[Dict]:
@@ -1220,7 +1224,7 @@ class ExchangeManager:
             # Преобразуем символ
             mapped_symbol = await self.map_symbol(symbol, exchange_id)
             if not mapped_symbol:
-                logger.warning(f"Symbol {symbol} not found on {exchange_id}")
+                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
                 return None
 
             # Получаем экземпляр биржи
@@ -1238,7 +1242,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(f"Error fetching order book for {symbol} on {exchange_id}: {str(e)}")
+            logger.error("Error fetching order book for {symbol} on {exchange_id}: {str(e)}" %)
             return None
 
     async def fetch_ohlcv(self, symbol: str, exchange_id: str, timeframe: str = '1h', limit: int = 100, since: int = None) -> Optional[List]:
@@ -1268,12 +1272,12 @@ class ExchangeManager:
             # Преобразуем символ и временной интервал
             mapped_symbol = await self.map_symbol(symbol, exchange_id)
             if not mapped_symbol:
-                logger.warning(f"Symbol {symbol} not found on {exchange_id}")
+                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
                 return None
 
             mapped_timeframe = await self.map_timeframe(timeframe, exchange_id)
             if not mapped_timeframe:
-                logger.warning(f"Timeframe {timeframe} not supported on {exchange_id}")
+                logger.warning("Timeframe {timeframe} not supported on {exchange_id}" %)
                 return None
 
             # Получаем экземпляр биржи
@@ -1291,7 +1295,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(f"Error fetching OHLCV for {symbol} on {exchange_id}: {str(e)}")
+            logger.error("Error fetching OHLCV for {symbol} on {exchange_id}: {str(e)}" %)
             return None
 
     async def fetch_trades(self, symbol: str, exchange_id: str, limit: int = 100, since: int = None) -> Optional[List]:
@@ -1320,7 +1324,7 @@ class ExchangeManager:
             # Преобразуем символ
             mapped_symbol = await self.map_symbol(symbol, exchange_id)
             if not mapped_symbol:
-                logger.warning(f"Symbol {symbol} not found on {exchange_id}")
+                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
                 return None
 
             # Получаем экземпляр биржи
@@ -1338,7 +1342,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(f"Error fetching trades for {symbol} on {exchange_id}: {str(e)}")
+            logger.error("Error fetching trades for {symbol} on {exchange_id}: {str(e)}" %)
             return None
 
     async def fetch_balance(self, exchange_id: str) -> Optional[Dict]:
@@ -1375,7 +1379,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(f"Error fetching balance on {exchange_id}: {str(e)}")
+            logger.error("Error fetching balance on {exchange_id}: {str(e)}" %)
             return None
 
     async def create_order(self, symbol: str, order_type: str, side: str, amount: float, price: float = None, exchange_id: str = None, params: Dict = None) -> Optional[Dict]:
@@ -1398,7 +1402,7 @@ class ExchangeManager:
         if not exchange_id:
             exchange_id, _ = await self.select_best_exchange(symbol, ['createOrder'])elect_best_exchange(symbol, ['createOrder'])
             if not exchange_id:
-                logger.error(f"No suitable exchange found for {symbol}")logger.error(f"No suitable exchange found for {symbol}")
+                logger.error("No suitable exchange found for {symbol}" %)logger.error("No suitable exchange found for {symbol}" %)
                 return None
 
         try:
@@ -1408,7 +1412,7 @@ class ExchangeManager:
             # Преобразуем символ
             mapped_symbol = await self.map_symbol(symbol, exchange_id)
             if not mapped_symbol:ot mapped_symbol:
-                logger.warning(f"Symbol {symbol} not found on {exchange_id}")
+                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
                 return None
 
             # Получаем экземпляр биржи
@@ -1427,7 +1431,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок            # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)r_counter(exchange_id, e)
 
-            logger.error(f"Error creating order for {symbol} on {exchange_id}: {str(e)}")creating order for {symbol} on {exchange_id}: {str(e)}")
+            logger.error("Error creating order for {symbol} on {exchange_id}: {str(e)}" %)creating order for {symbol} on {exchange_id}: {str(e)}")
             return None
 
     async def cancel_order(self, order_id: str, symbol: str, exchange_id: str) -> Optional[Dict]:    async def cancel_order(self, order_id: str, symbol: str, exchange_id: str) -> Optional[Dict]:
@@ -1449,7 +1453,7 @@ class ExchangeManager:
             # Преобразуем символ            # Преобразуем символ
             mapped_symbol = await self.map_symbol(symbol, exchange_id)
             if not mapped_symbol:ed_symbol:
-                logger.warning(f"Symbol {symbol} not found on {exchange_id}")                logger.warning(f"Symbol {symbol} not found on {exchange_id}")
+                logger.warning("Symbol {symbol} not found on {exchange_id}" %)                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
                 return None
 
             # Получаем экземпляр биржи экземпляр биржи
@@ -1467,7 +1471,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)            self._increment_error_counter(exchange_id, e)
 
-            logger.error(f"Error canceling order {order_id} for {symbol} on {exchange_id}: {str(e)}")l} on {exchange_id}: {str(e)}")
+            logger.error("Error canceling order {order_id} for {symbol} on {exchange_id}: {str(e)}" %)l} on {exchange_id}: {str(e)}")
             return None
 
     async def fetch_order(self, order_id: str, symbol: str, exchange_id: str) -> Optional[Dict]:elf, order_id: str, symbol: str, exchange_id: str) -> Optional[Dict]:
@@ -1489,7 +1493,7 @@ class ExchangeManager:
             # Преобразуем символ            # Преобразуем символ
             mapped_symbol = await self.map_symbol(symbol, exchange_id)
             if not mapped_symbol:ed_symbol:
-                logger.warning(f"Symbol {symbol} not found on {exchange_id}")                logger.warning(f"Symbol {symbol} not found on {exchange_id}")
+                logger.warning("Symbol {symbol} not found on {exchange_id}" %)                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
                 return None
 
             # Получаем экземпляр биржии
@@ -1504,7 +1508,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)self._increment_error_counter(exchange_id, e)
 
-            logger.error(f"Error fetching order {order_id} for {symbol} on {exchange_id}: {str(e)}")} for {symbol} on {exchange_id}: {str(e)}")
+            logger.error("Error fetching order {order_id} for {symbol} on {exchange_id}: {str(e)}" %)} for {symbol} on {exchange_id}: {str(e)}")
             return None            return None
 
     async def fetch_orders(self, symbol: str, exchange_id: str, since: int = None, limit: int = None) -> Optional[List]: int = None, limit: int = None) -> Optional[List]:
@@ -1527,7 +1531,7 @@ class ExchangeManager:
             # Преобразуем символ
             mapped_symbol = await self.map_symbol(symbol, exchange_id)ol = await self.map_symbol(symbol, exchange_id)
             if not mapped_symbol:            if not mapped_symbol:
-                logger.warning(f"Symbol {symbol} not found on {exchange_id}")
+                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
                 return None     return None
 
             # Получаем экземпляр биржи            # Получаем экземпляр биржи
@@ -1542,7 +1546,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)self._increment_error_counter(exchange_id, e)
 
-            logger.error(f"Error fetching orders for {symbol} on {exchange_id}: {str(e)}")bol} on {exchange_id}: {str(e)}")
+            logger.error("Error fetching orders for {symbol} on {exchange_id}: {str(e)}" %)bol} on {exchange_id}: {str(e)}")
             return None            return None
 
     async def fetch_open_orders(self, symbol: str = None, exchange_id: str = None) -> Optional[List]: str = None) -> Optional[List]:
@@ -1577,7 +1581,7 @@ class ExchangeManager:
             if symbol:
                 mapped_symbol = await self.map_symbol(symbol, exchange_id)     mapped_symbol = await self.map_symbol(symbol, exchange_id)
                 if not mapped_symbol:
-                    logger.warning(f"Symbol {symbol} not found on {exchange_id}")warning(f"Symbol {symbol} not found on {exchange_id}")
+                    logger.warning("Symbol {symbol} not found on {exchange_id}" %)warning(f"Symbol {symbol} not found on {exchange_id}")
                     return Noneturn None
 
             # Получаем экземпляр биржиучаем экземпляр биржи
@@ -1592,7 +1596,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(f"Error fetching open orders on {exchange_id}: {str(e)}")n orders on {exchange_id}: {str(e)}")
+            logger.error("Error fetching open orders on {exchange_id}: {str(e)}" %)n orders on {exchange_id}: {str(e)}")
             return None
 
     async def fetch_my_trades(self, symbol: str, exchange_id: str, since: int = None, limit: int = None) -> Optional[List]:int = None, limit: int = None) -> Optional[List]:
@@ -1621,7 +1625,7 @@ class ExchangeManager:
             # Преобразуем символ            # Преобразуем символ
             mapped_symbol = await self.map_symbol(symbol, exchange_id)apped_symbol = await self.map_symbol(symbol, exchange_id)
             if not mapped_symbol:symbol:
-                logger.warning(f"Symbol {symbol} not found on {exchange_id}")Symbol {symbol} not found on {exchange_id}")
+                logger.warning("Symbol {symbol} not found on {exchange_id}" %)Symbol {symbol} not found on {exchange_id}")
                 return None
 
             # Получаем экземпляр биржи            # Получаем экземпляр биржи
@@ -1639,7 +1643,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)            self._increment_error_counter(exchange_id, e)
 
-            logger.error(f"Error fetching my trades for {symbol} on {exchange_id}: {str(e)}")xchange_id}: {str(e)}")
+            logger.error("Error fetching my trades for {symbol} on {exchange_id}: {str(e)}" %)xchange_id}: {str(e)}")
             return None
 
     def _increment_error_counter(self, exchange_id: str, error: Exception):unter(self, exchange_id: str, error: Exception):
@@ -1734,20 +1738,20 @@ class ExchangeManager:
             bool: True, если подписка успешна, иначе False
         """
         if exchange_id not in self.websocket_clients:_id not in self.websocket_clients:
-            logger.warning(f"WebSocket not initialized for {exchange_id}")            logger.warning(f"WebSocket not initialized for {exchange_id}")
+            logger.warning("WebSocket not initialized for {exchange_id}" %)            logger.warning("WebSocket not initialized for {exchange_id}" %)
             return Falseeturn False
 
         try:
             # Преобразуем символ # Преобразуем символ
             mapped_symbol = await self.map_symbol(symbol, exchange_id)l(symbol, exchange_id)
             if not mapped_symbol:            if not mapped_symbol:
-                logger.warning(f"Symbol {symbol} not found on {exchange_id}")
+                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
                 return False     return False
 
             # Формируем сообщение подписки            # Формируем сообщение подписки
             subscription = self._get_ticker_subscription(exchange_id, mapped_symbol)ubscription = self._get_ticker_subscription(exchange_id, mapped_symbol)
             if not subscription:ption:
-                logger.warning(f"Ticker subscription not supported for {exchange_id}")Ticker subscription not supported for {exchange_id}")
+                logger.warning("Ticker subscription not supported for {exchange_id}" %)Ticker subscription not supported for {exchange_id}")
                 return False
 
             # Добавляем подпискубавляем подписку
@@ -1763,7 +1767,7 @@ class ExchangeManager:
             return True
 
         except Exception as e:e:
-            logger.error(f"Error subscribing to ticker for {symbol} on {exchange_id}: {str(e)}")            logger.error(f"Error subscribing to ticker for {symbol} on {exchange_id}: {str(e)}")
+            logger.error("Error subscribing to ticker for {symbol} on {exchange_id}: {str(e)}" %)            logger.error("Error subscribing to ticker for {symbol} on {exchange_id}: {str(e)}" %)
             return False
 
     def _get_ticker_subscription(self, exchange_id: str, symbol: str) -> Optional[Dict]:(self, exchange_id: str, symbol: str) -> Optional[Dict]:
@@ -1837,20 +1841,20 @@ class ExchangeManager:
             bool: True, если отписка успешна, иначе False успешна, иначе False
         """
         if exchange_id not in self.websocket_clients:ebsocket_clients:
-            logger.warning(f"WebSocket not initialized for {exchange_id}")"WebSocket not initialized for {exchange_id}")
+            logger.warning("WebSocket not initialized for {exchange_id}" %)"WebSocket not initialized for {exchange_id}")
             return False
 
         try:        try:
             # Преобразуем символ
             mapped_symbol = await self.map_symbol(symbol, exchange_id)            mapped_symbol = await self.map_symbol(symbol, exchange_id)
             if not mapped_symbol:mapped_symbol:
-                logger.warning(f"Symbol {symbol} not found on {exchange_id}")                logger.warning(f"Symbol {symbol} not found on {exchange_id}")
+                logger.warning("Symbol {symbol} not found on {exchange_id}" %)                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
                 return False
 
             # Формируем сообщение отписки
             unsubscription = self._get_ticker_unsubscription(exchange_id, mapped_symbol)            unsubscription = self._get_ticker_unsubscription(exchange_id, mapped_symbol)
             if not unsubscription:f not unsubscription:
-                logger.warning(f"Ticker unsubscription not supported for {exchange_id}")ning(f"Ticker unsubscription not supported for {exchange_id}")
+                logger.warning("Ticker unsubscription not supported for {exchange_id}" %)ning(f"Ticker unsubscription not supported for {exchange_id}")
                 return False
 
             # Отправляем сообщение отпискиправляем сообщение отписки
@@ -1864,7 +1868,7 @@ class ExchangeManager:
             return True
 
         except Exception as e:
-            logger.error(f"Error unsubscribing from ticker for {symbol} on {exchange_id}: {str(e)}")xchange_id}: {str(e)}")
+            logger.error("Error unsubscribing from ticker for {symbol} on {exchange_id}: {str(e)}" %)xchange_id}: {str(e)}")
             return False
 
     def _get_ticker_unsubscription(self, exchange_id: str, symbol: str) -> Optional[Dict]:exchange_id: str, symbol: str) -> Optional[Dict]:
@@ -1917,20 +1921,20 @@ class ExchangeManager:
             bool: True, если подписка успешна, иначе Falseешна, иначе False
         """
         if exchange_id not in self.websocket_clients:e_id not in self.websocket_clients:
-            logger.warning(f"WebSocket not initialized for {exchange_id}")ogger.warning(f"WebSocket not initialized for {exchange_id}")
+            logger.warning("WebSocket not initialized for {exchange_id}" %)ogger.warning(f"WebSocket not initialized for {exchange_id}")
             return False            return False
 
         try:        try:
             # Преобразуем символразуем символ
             mapped_symbol = await self.map_symbol(symbol, exchange_id)            mapped_symbol = await self.map_symbol(symbol, exchange_id)
             if not mapped_symbol:
-                logger.warning(f"Symbol {symbol} not found on {exchange_id}")     logger.warning(f"Symbol {symbol} not found on {exchange_id}")
+                logger.warning("Symbol {symbol} not found on {exchange_id}" %)     logger.warning("Symbol {symbol} not found on {exchange_id}" %)
                 return False
 
             # Формируем сообщение подписки Формируем сообщение подписки
             subscription = self._get_orderbook_subscription(exchange_id, mapped_symbol, depth) self._get_orderbook_subscription(exchange_id, mapped_symbol, depth)
             if not subscription:
-                logger.warning(f"Order book subscription not supported for {exchange_id}")ook subscription not supported for {exchange_id}")
+                logger.warning("Order book subscription not supported for {exchange_id}" %)ook subscription not supported for {exchange_id}")
                 return False
 
             # Добавляем подпискубавляем подписку
@@ -1946,7 +1950,7 @@ class ExchangeManager:
             return True
 
         except Exception as e:e:
-            logger.error(f"Error subscribing to order book for {symbol} on {exchange_id}: {str(e)}")            logger.error(f"Error subscribing to order book for {symbol} on {exchange_id}: {str(e)}")
+            logger.error("Error subscribing to order book for {symbol} on {exchange_id}: {str(e)}" %)            logger.error("Error subscribing to order book for {symbol} on {exchange_id}: {str(e)}" %)
             return False
 
     def _get_orderbook_subscription(self, exchange_id: str, symbol: str, depth: int = 20) -> Optional[Dict]:ion(self, exchange_id: str, symbol: str, depth: int = 20) -> Optional[Dict]:
@@ -2029,7 +2033,7 @@ class ExchangeManager:
 
             # Проверяем, поддерживает ли биржа эту функциюряем, поддерживает ли биржа эту функцию
             if not exchange.has.get('fetchDepositAddress', False):            if not exchange.has.get('fetchDepositAddress', False):
-                logger.warning(f"Exchange {exchange_id} does not support deposit addresses"))
+                logger.warning("Exchange {exchange_id} does not support deposit addresses" %))
                 return None     return None
 
             # Получаем адрес            # Получаем адрес
@@ -2041,7 +2045,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e) self._increment_error_counter(exchange_id, e)
 
-            logger.error(f"Error fetching deposit address for {currency} on {exchange_id}: {str(e)}")ess for {currency} on {exchange_id}: {str(e)}")
+            logger.error("Error fetching deposit address for {currency} on {exchange_id}: {str(e)}" %)ess for {currency} on {exchange_id}: {str(e)}")
             return None
 
     async def withdraw(self, currency: str, amount: float, address: str, exchange_id: str, tag: str = None, params: Dict = None) -> Optional[Dict]: str, amount: float, address: str, exchange_id: str, tag: str = None, params: Dict = None) -> Optional[Dict]:
@@ -2068,7 +2072,7 @@ class ExchangeManager:
 
             # Проверяем, поддерживает ли биржа эту функцию поддерживает ли биржа эту функцию
             if not exchange.has.get('withdraw', False):            if not exchange.has.get('withdraw', False):
-                logger.warning(f"Exchange {exchange_id} does not support withdrawals")   logger.warning(f"Exchange {exchange_id} does not support withdrawals")
+                logger.warning("Exchange {exchange_id} does not support withdrawals" %)   logger.warning("Exchange {exchange_id} does not support withdrawals" %)
                 return None
 
             # Формируем параметрыраметры
@@ -2088,7 +2092,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок            # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(f"Error withdrawing {amount} {currency} to {address} on {exchange_id}: {str(e)}")ange_id}: {str(e)}")
+            logger.error("Error withdrawing {amount} {currency} to {address} on {exchange_id}: {str(e)}" %)ange_id}: {str(e)}")
             return None
 
     async def get_transfer_fee(self, currency: str, exchange_id: str) -> Optional[Dict]:lf, currency: str, exchange_id: str) -> Optional[Dict]:
@@ -2113,7 +2117,7 @@ class ExchangeManager:
             currencies = await exchange.fetch_currencies()            currencies = await exchange.fetch_currencies()
 
             if not currencies or currency not in currencies: if not currencies or currency not in currencies:
-                logger.warning(f"Currency {currency} not found on {exchange_id}")urrency {currency} not found on {exchange_id}")
+                logger.warning("Currency {currency} not found on {exchange_id}" %)urrency {currency} not found on {exchange_id}")
                 return None                return None
 
             # Возвращаем информацию о комиссииормацию о комиссии
@@ -2131,7 +2135,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок            # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)exchange_id, e)
 
-            logger.error(f"Error fetching transfer fee for {currency} on {exchange_id}: {str(e)}")            logger.error(f"Error fetching transfer fee for {currency} on {exchange_id}: {str(e)}")
+            logger.error("Error fetching transfer fee for {currency} on {exchange_id}: {str(e)}" %)            logger.error("Error fetching transfer fee for {currency} on {exchange_id}: {str(e)}" %)
             return None
 
     async def get_exchange_info(self, exchange_id: str) -> Optional[Dict]:info(self, exchange_id: str) -> Optional[Dict]:
@@ -2169,7 +2173,7 @@ class ExchangeManager:
             return info
 
         except Exception as e:
-            logger.error(f"Error fetching exchange info for {exchange_id}: {str(e)}")rror(f"Error fetching exchange info for {exchange_id}: {str(e)}")
+            logger.error("Error fetching exchange info for {exchange_id}: {str(e)}" %)rror(f"Error fetching exchange info for {exchange_id}: {str(e)}")
             return None
 
     async def get_markets(self, exchange_id: str, reload: bool = False) -> Optional[Dict]:, reload: bool = False) -> Optional[Dict]:
@@ -2207,7 +2211,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)ter(exchange_id, e)
 
-            logger.error(f"Error fetching markets on {exchange_id}: {str(e)}")            logger.error(f"Error fetching markets on {exchange_id}: {str(e)}")
+            logger.error("Error fetching markets on {exchange_id}: {str(e)}" %)            logger.error("Error fetching markets on {exchange_id}: {str(e)}" %)
             return Nonereturn None
 
     def send_order(self, exchange_id, order_params):

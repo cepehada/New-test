@@ -3,15 +3,13 @@
 Предоставляет интерфейс для получения информации о символах и их параметрах.
 """
 
-import asyncio
-import logging
-from typing import Dict, List, Any, Optional, Set
+from typing import Any, Dict, List, Optional
 
 from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import async_handle_error, async_with_retry
 from project.utils.cache_utils import async_cache
 from project.utils.ccxt_exchanges import connect_exchange
+from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -90,7 +88,7 @@ class SymbolManager:
             return markets
 
         except Exception as e:
-            logger.error(f"Ошибка при загрузке рынков для {exchange_id}: {str(e)}")
+            logger.error("Ошибка при загрузке рынков для {exchange_id}: {str(e)}" %)
             raise
 
     @async_handle_error
@@ -120,7 +118,7 @@ class SymbolManager:
         if normalized_symbol in self.symbols_info.get(exchange_id, {}):
             return self.symbols_info[exchange_id][normalized_symbol]
 
-        logger.warning(f"Символ {symbol} не найден на {exchange_id}")
+        logger.warning("Символ {symbol} не найден на {exchange_id}" %)
         return None
 
     @async_handle_error
@@ -150,7 +148,7 @@ class SymbolManager:
                 else:
                     symbols.append(symbol)
 
-        logger.debug(f"Получено {len(symbols)} активных символов на {exchange_id}")
+        logger.debug("Получено {len(symbols)} активных символов на {exchange_id}" %)
         return symbols
 
     @async_handle_error
@@ -230,7 +228,7 @@ class SymbolManager:
         symbol_info = await self.get_symbol_info(exchange_id, symbol)
 
         if not symbol_info or "precision" not in symbol_info:
-            logger.warning(f"Нет данных о точности для {symbol} на {exchange_id}")
+            logger.warning("Нет данных о точности для {symbol} на {exchange_id}" %)
             return {"amount": 8, "price": 8, "cost": 8}
 
         precision = symbol_info["precision"]
@@ -263,7 +261,7 @@ class SymbolManager:
         symbol_info = await self.get_symbol_info(exchange_id, symbol)
 
         if not symbol_info or "limits" not in symbol_info:
-            logger.warning(f"Нет данных о лимитах для {symbol} на {exchange_id}")
+            logger.warning("Нет данных о лимитах для {symbol} на {exchange_id}" %)
             return {
                 "amount": {"min": 0.0, "max": float("inf")},
                 "price": {"min": 0.0, "max": float("inf")},
@@ -303,7 +301,7 @@ class SymbolManager:
         symbol_info = await self.get_symbol_info(exchange_id, symbol)
 
         if not symbol_info:
-            logger.warning(f"Нет данных о комиссиях для {symbol} на {exchange_id}")
+            logger.warning("Нет данных о комиссиях для {symbol} на {exchange_id}" %)
             return {"maker": 0.001, "taker": 0.001}
 
         return {

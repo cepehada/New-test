@@ -5,18 +5,14 @@
 """
 
 import asyncio
-import logging
 import time
-from typing import Dict, List, Any, Optional, Union, Tuple, Set
-from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
-from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import async_handle_error, async_with_retry
-from project.utils.notify import send_trading_signal
-from project.data.market_data import MarketData
-from project.utils.ccxt_exchanges import fetch_ticker, fetch_order_book, fetch_balance
 from project.bots.arbitrage.core import ArbitrageCore, ArbitrageOpportunity
+from project.config import get_config
+from project.data.market_data import MarketData
+from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -106,7 +102,7 @@ class MultiExchangeArbitrage:
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка при запуске системы арбитража: {str(e)}")
+            logger.error("Ошибка при запуске системы арбитража: {str(e)}" %)
             return False
 
     async def stop(self) -> bool:
@@ -136,7 +132,7 @@ class MultiExchangeArbitrage:
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка при остановке системы арбитража: {str(e)}")
+            logger.error("Ошибка при остановке системы арбитража: {str(e)}" %)
             return False
 
     def _start_monitor(self, symbol: str) -> None:
@@ -147,12 +143,12 @@ class MultiExchangeArbitrage:
             symbol: Символ для мониторинга
         """
         if symbol in self.active_monitors and not self.active_monitors[symbol].done():
-            logger.debug(f"Монитор для {symbol} уже запущен")
+            logger.debug("Монитор для {symbol} уже запущен" %)
             return
 
         task = asyncio.create_task(self._monitor_symbol(symbol))
         self.active_monitors[symbol] = task
-        logger.debug(f"Запущен монитор для {symbol}")
+        logger.debug("Запущен монитор для {symbol}" %)
 
     @async_handle_error
     async def _monitor_symbol(self, symbol: str) -> None:
@@ -163,11 +159,11 @@ class MultiExchangeArbitrage:
             symbol: Символ для мониторинга
         """
         try:
-            logger.debug(f"Начат мониторинг {symbol}")
+            logger.debug("Начат мониторинг {symbol}" %)
 
             while True:
                 if not self.running:
-                    logger.debug(f"Мониторинг {symbol} остановлен")
+                    logger.debug("Мониторинг {symbol} остановлен" %)
                     break
 
                 # Сканируем возможности
@@ -200,10 +196,10 @@ class MultiExchangeArbitrage:
                 await asyncio.sleep(5)  # проверяем каждые 5 секунд
 
         except asyncio.CancelledError:
-            logger.debug(f"Мониторинг {symbol} отменен")
+            logger.debug("Мониторинг {symbol} отменен" %)
             raise
         except Exception as e:
-            logger.error(f"Ошибка при мониторинге {symbol}: {str(e)}")
+            logger.error("Ошибка при мониторинге {symbol}: {str(e)}" %)
 
     @async_handle_error
     async def _execute_if_possible(self, opportunity: ArbitrageOpportunity) -> bool:
@@ -358,7 +354,7 @@ class MultiExchangeArbitrage:
             True, если символ добавлен, иначе False
         """
         if symbol in self.symbols:
-            logger.warning(f"Символ {symbol} уже отслеживается")
+            logger.warning("Символ {symbol} уже отслеживается" %)
             return False
 
         try:
@@ -369,12 +365,12 @@ class MultiExchangeArbitrage:
             if self.running:
                 self._start_monitor(symbol)
 
-            logger.info(f"Добавлен символ {symbol} для мониторинга")
+            logger.info("Добавлен символ {symbol} для мониторинга" %)
 
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка при добавлении символа {symbol}: {str(e)}")
+            logger.error("Ошибка при добавлении символа {symbol}: {str(e)}" %)
             return False
 
     async def remove_symbol(self, symbol: str) -> bool:
@@ -388,7 +384,7 @@ class MultiExchangeArbitrage:
             True, если символ удален, иначе False
         """
         if symbol not in self.symbols:
-            logger.warning(f"Символ {symbol} не отслеживается")
+            logger.warning("Символ {symbol} не отслеживается" %)
             return False
 
         try:
@@ -406,12 +402,12 @@ class MultiExchangeArbitrage:
             if symbol in self.current_opportunities:
                 del self.current_opportunities[symbol]
 
-            logger.info(f"Удален символ {symbol} из мониторинга")
+            logger.info("Удален символ {symbol} из мониторинга" %)
 
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка при удалении символа {symbol}: {str(e)}")
+            logger.error("Ошибка при удалении символа {symbol}: {str(e)}" %)
             return False
 
     async def add_exchange(self, exchange: str) -> bool:
@@ -425,23 +421,23 @@ class MultiExchangeArbitrage:
             True, если биржа добавлена, иначе False
         """
         if exchange in self.exchanges:
-            logger.warning(f"Биржа {exchange} уже отслеживается")
+            logger.warning("Биржа {exchange} уже отслеживается" %)
             return False
 
         if exchange not in self.arbitrage_core.supported_exchanges:
-            logger.warning(f"Биржа {exchange} не поддерживается")
+            logger.warning("Биржа {exchange} не поддерживается" %)
             return False
 
         try:
             # Добавляем биржу в список
             self.exchanges.append(exchange)
 
-            logger.info(f"Добавлена биржа {exchange} для мониторинга")
+            logger.info("Добавлена биржа {exchange} для мониторинга" %)
 
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка при добавлении биржи {exchange}: {str(e)}")
+            logger.error("Ошибка при добавлении биржи {exchange}: {str(e)}" %)
             return False
 
     async def remove_exchange(self, exchange: str) -> bool:
@@ -455,7 +451,7 @@ class MultiExchangeArbitrage:
             True, если биржа удалена, иначе False
         """
         if exchange not in self.exchanges:
-            logger.warning(f"Биржа {exchange} не отслеживается")
+            logger.warning("Биржа {exchange} не отслеживается" %)
             return False
 
         try:
@@ -470,12 +466,12 @@ class MultiExchangeArbitrage:
                 ):
                     del self.current_opportunities[symbol]
 
-            logger.info(f"Удалена биржа {exchange} из мониторинга")
+            logger.info("Удалена биржа {exchange} из мониторинга" %)
 
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка при удалении биржи {exchange}: {str(e)}")
+            logger.error("Ошибка при удалении биржи {exchange}: {str(e)}" %)
             return False
 
     async def update_settings(
@@ -501,7 +497,7 @@ class MultiExchangeArbitrage:
                     )
                 else:
                     self.min_profit_pct = min_profit_pct
-                    logger.info(f"Обновлен min_profit_pct: {min_profit_pct}")
+                    logger.info("Обновлен min_profit_pct: {min_profit_pct}" %)
 
             if max_trade_size is not None:
                 if max_trade_size <= 0:
@@ -510,10 +506,10 @@ class MultiExchangeArbitrage:
                     )
                 else:
                     self.max_trade_size = max_trade_size
-                    logger.info(f"Обновлен max_trade_size: {max_trade_size}")
+                    logger.info("Обновлен max_trade_size: {max_trade_size}" %)
 
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка при обновлении настроек: {str(e)}")
+            logger.error("Ошибка при обновлении настроек: {str(e)}" %)
             return False

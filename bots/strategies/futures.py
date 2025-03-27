@@ -3,19 +3,14 @@
 Использует особенности фьючерсного рынка, включая маржинальную торговлю и плечо.
 """
 
-import asyncio
-import logging
 import time
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Any, Optional, Union, Tuple, Set
+from typing import Any, Dict, List, Optional, Set
 
-from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import async_handle_error
-from project.data.market_data import MarketData
+import numpy as np
+from project.bots.strategies.base_strategy import BaseStrategy
 from project.technicals.indicators import Indicators
-from project.bots.strategies.base_strategy import BaseStrategy, StrategyStatus
+from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -97,7 +92,7 @@ class FuturesStrategy(BaseStrategy):
         )  # символы, для которых уже установлено плечо
         self.liquidation_prices: Dict[str, float] = {}  # symbol -> цена ликвидации
 
-        logger.debug(f"Создана стратегия для фьючерсов {self.name}")
+        logger.debug("Создана стратегия для фьючерсов {self.name}" %)
 
     def _update_config(self, config: Dict[str, Any]) -> None:
         """
@@ -157,7 +152,6 @@ class FuturesStrategy(BaseStrategy):
         Выполняет дополнительную очистку ресурсов стратегии.
         """
         # Нет специфических ресурсов для очистки
-        pass
 
     @async_handle_error
     async def _set_leverage(self, symbol: str) -> bool:
@@ -188,7 +182,7 @@ class FuturesStrategy(BaseStrategy):
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка при установке плеча для {symbol}: {str(e)}")
+            logger.error("Ошибка при установке плеча для {symbol}: {str(e)}" %)
             return False
 
     @async_handle_error
@@ -209,7 +203,7 @@ class FuturesStrategy(BaseStrategy):
                     await self._update_order_book(symbol)
 
             except Exception as e:
-                logger.error(f"Ошибка при загрузке данных для {symbol}: {str(e)}")
+                logger.error("Ошибка при загрузке данных для {symbol}: {str(e)}" %)
 
     @async_handle_error
     async def _get_funding_rate(self, symbol: str) -> Optional[float]:
@@ -230,7 +224,7 @@ class FuturesStrategy(BaseStrategy):
             # (случайное значение в диапазоне [-0.001, 0.001])
             funding_rate = (np.random.random() * 0.002) - 0.001
 
-            logger.debug(f"Ставка финансирования для {symbol}: {funding_rate:.6f}")
+            logger.debug("Ставка финансирования для {symbol}: {funding_rate:.6f}" %)
             return funding_rate
 
         except Exception as e:
@@ -255,10 +249,10 @@ class FuturesStrategy(BaseStrategy):
 
             if order_book and "bids" in order_book and "asks" in order_book:
                 self.order_book_data[symbol] = order_book
-                logger.debug(f"Обновлен ордербук для {symbol}")
+                logger.debug("Обновлен ордербук для {symbol}" %)
 
         except Exception as e:
-            logger.error(f"Ошибка при обновлении ордербука для {symbol}: {str(e)}")
+            logger.error("Ошибка при обновлении ордербука для {symbol}: {str(e)}" %)
 
     @async_handle_error
     async def _calculate_liquidation_price(
@@ -600,7 +594,7 @@ class FuturesStrategy(BaseStrategy):
                     }
 
             except Exception as e:
-                logger.error(f"Ошибка при генерации сигналов для {symbol}: {str(e)}")
+                logger.error("Ошибка при генерации сигналов для {symbol}: {str(e)}" %)
 
         return signals
 

@@ -3,19 +3,13 @@
 Торгует на небольших движениях цены с быстрым входом и выходом.
 """
 
-import asyncio
-import logging
 import time
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Any, Optional, Union, Tuple, Set
+from typing import Any, Dict, List, Optional
 
-from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import async_handle_error
-from project.data.market_data import MarketData
+from project.bots.strategies.base_strategy import BaseStrategy
 from project.technicals.indicators import Indicators
-from project.bots.strategies.base_strategy import BaseStrategy, StrategyStatus
+from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -82,7 +76,7 @@ class ScalpingStrategy(BaseStrategy):
         self.momentum_data: Dict[str, float] = {}  # symbol -> импульс
         self.trade_start_times: Dict[str, float] = {}  # symbol -> время начала сделки
 
-        logger.debug(f"Создана стратегия скальпинга {self.name}")
+        logger.debug("Создана стратегия скальпинга {self.name}" %)
 
     def _update_config(self, config: Dict[str, Any]) -> None:
         """
@@ -142,7 +136,6 @@ class ScalpingStrategy(BaseStrategy):
         Выполняет дополнительную очистку ресурсов стратегии.
         """
         # Нет специфических ресурсов для очистки
-        pass
 
     @async_handle_error
     async def _update_market_data(self) -> None:
@@ -232,7 +225,7 @@ class ScalpingStrategy(BaseStrategy):
                     await self._check_position_duration(symbol)
 
             except Exception as e:
-                logger.error(f"Ошибка при генерации сигналов для {symbol}: {str(e)}")
+                logger.error("Ошибка при генерации сигналов для {symbol}: {str(e)}" %)
 
         return signals
 
@@ -427,7 +420,7 @@ class ScalpingStrategy(BaseStrategy):
             return None
 
         except Exception as e:
-            logger.error(f"Ошибка при расчете импульса для {symbol}: {str(e)}")
+            logger.error("Ошибка при расчете импульса для {symbol}: {str(e)}" %)
             return None
 
     def _combine_signals(

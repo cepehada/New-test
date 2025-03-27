@@ -1,36 +1,36 @@
-import logging
 import asyncio
-import time
-import json
-import uuid
-import traceback
-import os
-from typing import Dict, List, Optional, Any, Union
-from datetime import datetime, timedelta
-import pandas as pd
-import numpy as np
-from fastapi import FastAPI, APIRouter, Depends, HTTPException, BackgroundTasks, Query, Path, Body, Header, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field
-import jwt
-from starlette.requests import Request
-from starlette.responses import Response
-import uvicorn
 import io
-import base64
+import os
+import time
+import traceback
+import uuid
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
 
-from project.utils.logging_utils import setup_logger
+import jwt
+import uvicorn
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Body,
+    Depends,
+    FastAPI,
+    HTTPException,
+    status,
+)
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from project.backtesting.backtester import Backtester
 from project.config.configuration import get_config
-from project.trading.trading_bot import TradingBot
+from project.data.database import Database
 from project.exchange.exchange_manager import get_exchange_manager
 from project.trading.strategy_base import StrategyRegistry
-from project.data.database import Database
-from project.visualization.data_visualizer import DataVisualizer
-from project.backtesting.backtester import Backtester
+from project.trading.trading_bot import TradingBot
+from project.utils.logging_utils import setup_logger
 from project.utils.notify import NotificationManager
+from project.visualization.data_visualizer import DataVisualizer
+from pydantic import BaseModel
 
 logger = setup_logger("api_server")
 
@@ -263,7 +263,7 @@ class APIServer:
                 
                 return json_response({"success": True, "data": stats})
             except Exception as e:
-                logger.error(f"Error getting performance stats: {e}")
+                logger.error("Error getting performance stats: {e}" %)
                 return json_response({"success": False, "error": str(e)}, status=500)
 
         # Маршруты для бэктестинга
@@ -383,15 +383,15 @@ class APIServer:
                     if bot_state.get('is_active', False):
                         await bot.start()
 
-                    logger.info(f"Loaded bot: {bot_state.get('bot_id')}")
+                    logger.info("Loaded bot: {bot_state.get('bot_id')}" %)
 
                 except Exception as e:
-                    logger.error(f"Error loading bot {bot_state.get('bot_id')}: {str(e)}")
+                    logger.error("Error loading bot {bot_state.get('bot_id')}: {str(e)}" %)
 
-            logger.info(f"Loaded {len(self.bots)} active bots")
+            logger.info("Loaded {len(self.bots)} active bots" %)
 
         except Exception as e:
-            logger.error(f"Error loading active bots: {str(e)}")
+            logger.error("Error loading active bots: {str(e)}" %)
 
     async def _update_bots_task(self):
         """Задача для периодического обновления состояния ботов"""
@@ -404,7 +404,7 @@ class APIServer:
                             # Сохраняем состояние бота
                             await bot._save_state()
                     except Exception as e:
-                        logger.error(f"Error updating bot {bot_id}: {str(e)}")
+                        logger.error("Error updating bot {bot_id}: {str(e)}" %)
 
                 # Ждем перед следующим обновлением
                 await asyncio.sleep(60)  # Обновляем каждую минуту
@@ -413,7 +413,7 @@ class APIServer:
             logger.info("Bot update task cancelled")
             raise
         except Exception as e:
-            logger.error(f"Error in bot update task: {str(e)}")
+            logger.error("Error in bot update task: {str(e)}" %)
 
     async def verify_token(self, token: str = Depends(OAuth2PasswordBearer(tokenUrl="api/auth/token"))) -> Dict:
         """
@@ -1401,10 +1401,10 @@ class APIServer:
 
                 await self.database.save_backtest(result_data)
 
-                logger.info(f"Backtest {backtest_id} completed and saved")
+                logger.info("Backtest {backtest_id} completed and saved" %)
 
         except Exception as e:
-            logger.error(f"Error during backtest: {str(e)}")
+            logger.error("Error during backtest: {str(e)}" %)
             logger.error(traceback.format_exc())
 
     async def get_backtest_results(self, limit: int = 10, token: Dict = Depends(verify_token)) -> List[Dict]:
@@ -1626,10 +1626,10 @@ class APIServer:
                 self.optimization_tasks[task_id]['end_time'] = datetime.now().isoformat()
                 self.optimization_tasks[task_id]['result'] = optimization_result
 
-            logger.info(f"Optimization {task_id} completed")
+            logger.info("Optimization {task_id} completed" %)
 
         except Exception as e:
-            logger.error(f"Error during optimization: {str(e)}")
+            logger.error("Error during optimization: {str(e)}" %)
             logger.error(traceback.format_exc())
 
             # Обновляем статус задачи

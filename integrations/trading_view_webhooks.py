@@ -3,20 +3,17 @@
 Позволяет получать и обрабатывать торговые сигналы от TradingView.
 """
 
-import asyncio
 import hashlib
 import hmac
 import json
-import logging
 import time
-from typing import Dict, List, Any, Optional, Callable, Awaitable
+from typing import Any, Awaitable, Callable, Dict, List, Optional
 
 from aiohttp import web
-
-from project.config import get_config
-from project.utils.logging_utils import get_logger
-from project.utils.error_handler import async_handle_error
 from project.bots.strategies.strategy_manager import StrategyManager
+from project.config import get_config
+from project.utils.error_handler import async_handle_error
+from project.utils.logging_utils import get_logger
 from project.utils.notify import send_trading_signal
 
 logger = get_logger(__name__)
@@ -56,7 +53,7 @@ class TradingViewWebhooks:
         # Словарь для хранения обработчиков вебхуков
         self.handlers: Dict[str, List[WebhookHandler]] = {}
 
-        logger.debug(f"TradingView вебхуки настроены на {host}:{port}")
+        logger.debug("TradingView вебхуки настроены на {host}:{port}" %)
 
     def register_handler(self, alert_name: str, handler: WebhookHandler) -> None:
         """
@@ -71,7 +68,7 @@ class TradingViewWebhooks:
 
         if handler not in self.handlers[alert_name]:
             self.handlers[alert_name].append(handler)
-            logger.debug(f"Зарегистрирован обработчик для оповещения {alert_name}")
+            logger.debug("Зарегистрирован обработчик для оповещения {alert_name}" %)
 
     def unregister_handler(self, alert_name: str, handler: WebhookHandler) -> None:
         """
@@ -83,7 +80,7 @@ class TradingViewWebhooks:
         """
         if alert_name in self.handlers and handler in self.handlers[alert_name]:
             self.handlers[alert_name].remove(handler)
-            logger.debug(f"Удален обработчик для оповещения {alert_name}")
+            logger.debug("Удален обработчик для оповещения {alert_name}" %)
 
             # Удаляем ключ, если больше нет обработчиков
             if not self.handlers[alert_name]:
@@ -157,11 +154,11 @@ class TradingViewWebhooks:
                 data = json.loads(data_str)
                 return data
             except json.JSONDecodeError:
-                logger.error(f"Невалидный JSON: {data_str}")
+                logger.error("Невалидный JSON: {data_str}" %)
                 return None
 
         except Exception as e:
-            logger.error(f"Ошибка при проверке вебхука: {str(e)}")
+            logger.error("Ошибка при проверке вебхука: {str(e)}" %)
             return None
 
     async def handle_webhook(self, request: web.Request) -> web.Response:
@@ -217,7 +214,7 @@ class TradingViewWebhooks:
             return web.json_response({"status": "success"})
 
         except Exception as e:
-            logger.error(f"Ошибка при обработке вебхука: {str(e)}")
+            logger.error("Ошибка при обработке вебхука: {str(e)}" %)
             return web.json_response(
                 {"error": "Internal server error", "message": str(e)}, status=500
             )
@@ -283,4 +280,4 @@ class TradingViewWebhooks:
                 )
 
             except Exception as e:
-                logger.error(f"Ошибка при обработке торгового сигнала: {str(e)}")
+                logger.error("Ошибка при обработке торгового сигнала: {str(e)}" %)

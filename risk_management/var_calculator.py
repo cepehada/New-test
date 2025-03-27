@@ -3,15 +3,14 @@
 Предоставляет функции для оценки рисков портфеля и отдельных позиций.
 """
 
+from typing import Dict
+
 import numpy as np
 import pandas as pd
 import scipy.stats as stats
-import logging
-from typing import Dict, List, Any, Optional, Union, Tuple
-
 from project.config import get_config
-from project.utils.logging_utils import get_logger
 from project.utils.error_handler import handle_error
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -343,7 +342,7 @@ class VarCalculator:
                 contribution * z_score * np.sqrt(self.time_horizon) * portfolio_value
             )
 
-        logger.debug(f"Рассчитаны вклады в VaR портфеля: {var_contributions}")
+        logger.debug("Рассчитаны вклады в VaR портфеля: {var_contributions}" %)
 
         return var_contributions
 
