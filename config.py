@@ -3,10 +3,9 @@
 Загружает настройки из переменных окружения и .env файла.
 """
 
-import os
 import logging
-from typing import Dict, List, Optional, Set, Any
-from pydantic import BaseModel, Field, validator
+from typing import Dict, Any, Set
+from pydantic import BaseModel, validator
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
@@ -47,6 +46,7 @@ class TelegramSettings(BaseModel):
 
     @validator("ALLOWED_USERS", pre=True)
     def parse_allowed_users(cls, v: Any) -> Set[str]:
+        """Преобразует строку или список в набор пользователей"""
         if isinstance(v, str):
             return {user.strip() for user in v.split(",") if user.strip()}
         return set(v)
@@ -93,6 +93,8 @@ class PositionSizingSettings(BaseModel):
 
 
 class GeneticOptimizerSettings(BaseModel):
+    """Настройки генетического оптимизатора"""
+    
     POPULATION_SIZE: int = 50
     GENERATIONS: int = 10
     CROSSOVER_RATE: float = 0.7
@@ -112,6 +114,8 @@ class GeneticOptimizerSettings(BaseModel):
 
 
 class DataVisualizerSettings(BaseModel):
+    """Настройки визуализации данных"""
+    
     THEME: str = "dark"  # или "light"
     FIGSIZE: tuple = (14, 8)
 
@@ -122,6 +126,8 @@ class DataVisualizerSettings(BaseModel):
 
 
 class Config(BaseSettings):
+    """Основной класс конфигурации приложения"""
+    
     # Существующие настройки
     DATABASE_URI: str
     BINANCE_API_KEY: str
@@ -144,7 +150,7 @@ class Config(BaseSettings):
     POSITION_SIZING_MIN_SIZE: float = 0.01
     POSITION_SIZING_MAX_SIZE: float = 0.1
     POSITION_SIZING_WIN_MULTIPLIER: float = 1.1
-    POSITION_SIZING_LOSS_MULTIPLIER: float = 0.9
+    POSITION_SIZING_LOSS_MULTIPЛИЕР: float = 0.9
     POSITION_SIZING_VOLATILITY: bool = True
     POSITION_SIZING_SIGNAL: bool = True
     POSITION_SIZING_MARTINGALE: bool = False
@@ -155,15 +161,18 @@ class Config(BaseSettings):
     DATA_VISUALIZER_SETTINGS: DataVisualizerSettings = DataVisualizerSettings()
 
     class Config:
+        """Настройки pydantic модели"""
         env_file = ".env"
         case_sensitive = True
 
     def get_database_settings(self) -> DatabaseSettings:
+        """Возвращает настройки базы данных"""
         return DatabaseSettings(
             URI=self.DATABASE_URI, POOL_SIZE=10, MAX_OVERFLOW=20, POOL_TIMEOUT=30
         )
 
     def get_exchange_settings(self, exchange_name: str) -> ExchangeSettings:
+        """Возвращает настройки указанной биржи"""
         if exchange_name.lower() == "binance":
             return ExchangeSettings(
                 API_KEY=self.BINANCE_API_KEY,
@@ -180,6 +189,7 @@ class Config(BaseSettings):
             raise ValueError(f"Неизвестная биржа: {exchange_name}")
 
     def get_telegram_settings(self) -> TelegramSettings:
+        """Возвращает настройки Telegram"""
         return TelegramSettings(
             BOT_TOKEN=self.TELEGRAM_BOT_TOKEN,
             CHAT_ID=self.TELEGRAM_CHAT_ID,
@@ -187,9 +197,11 @@ class Config(BaseSettings):
         )
 
     def get_logging_settings(self) -> LoggingSettings:
+        """Возвращает настройки логирования"""
         return LoggingSettings(LEVEL=self.LOG_LEVEL, FILE_PATH=self.LOG_FILE_PATH)
 
     def get_system_settings(self) -> SystemSettings:
+        """Возвращает системные настройки"""
         return SystemSettings(
             ENABLE_BACKTESTING=self.ENABLE_BACKTESTING,
             ENABLE_PAPER_TRADING=self.ENABLE_PAPER_TRADING,
@@ -198,17 +210,18 @@ class Config(BaseSettings):
         )
 
     def get_position_sizing_settings(self) -> PositionSizingSettings:
+        """Возвращает настройки размера позиции"""
         return PositionSizingSettings(
             adaptive_sizing=self.POSITION_SIZING_ADAPTIVE,
-            base_position_size=self.POSITION_SIZING_BASE_SIZE,
-            min_position_size=self.POSITION_SIZING_MIN_SIZE,
-            max_position_size=self.POSITION_SIZING_MAX_SIZE,
-            win_multiplier=self.POSITION_SIZING_WIN_MULTIPLIER,
-            loss_multiplier=self.POSITION_SIZING_LOSS_MULTIPLIER,
-            volatility_sizing=self.POSITION_SIZING_VOLATILITY,
-            signal_sizing=self.POSITION_SIZING_SIGNAL,
-            martingale=self.POSITION_SIZING_MARTИНГАЛЕ,
-            risk_per_trade=self.POSITION_SIZING_RISK_PER_TRADE,
+            base_position_size=self.POSITION_SИЗИНГ_BASE_SIZE,
+            min_position_size=self.POSITION_SИЗИНГ_MIN_SIZE,
+            max_position_size=self.POSITION_SИЗИНГ_MAX_SIZE,
+            win_multiplier=self.POSITION_SИЗИНГ_WIN_MULTIPЛИЕР,
+            loss_multiplier=self.POSITION_SИЗИНГ_LOSS_MULTИПЛИЕР,
+            volatility_sizing=self.POSITION_SИЗИНГ_VOLATILITY,
+            signal_sizing=self.POSITION_SИЗИНГ_SIGNAL,
+            martingale=self.POSITION_SИЗИНГ_MАРТИНГАЛЕ,
+            risk_per_trade=self.POSITION_SИЗИНГ_RISK_PER_TRADE,
         )
 
 
@@ -219,6 +232,9 @@ def get_config() -> Config:
     """
     Получить экземпляр конфигурации.
     Использует паттерн Singleton для предотвращения многократной загрузки.
+    
+    Returns:
+        Config: Экземпляр класса Config
     """
     global _config_instance
     if _config_instance is None:
@@ -226,6 +242,6 @@ def get_config() -> Config:
             _config_instance = Config()
             logger.info("Конфигурация успешно загружена")
         except Exception as e:
-            logger.error(f"Ошибка загрузки конфигурации: {str(e)}")
+            logger.error("Ошибка загрузки конфигурации: %s", str(e))
             raise
     return _config_instance

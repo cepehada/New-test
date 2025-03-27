@@ -5,18 +5,14 @@
 
 import asyncio
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Union, Tuple
-import json
-import time
-from typing import Dict, List, Any, Optional
 import argparse
-from datetime import datetime
 import cmd
+import json
 import shlex
+import time
 
 from project.config import get_config
 from project.utils.logging_utils import get_logger, setup_logging
-from project.utils.error_handler import async_handle_error
 from project.data.market_data import MarketData
 from project.trade_executor.order_executor import OrderExecutor
 from project.bots.bot_manager import BotManager
@@ -73,7 +69,7 @@ class TradingBotConsole(cmd.Cmd):
         """
         Обрабатывает пустые строки.
         """
-        pass
+        # Ничего не делаем при пустом вводе
 
     def do_exit(self, arg):
         """
@@ -172,7 +168,8 @@ class TradingBotConsole(cmd.Cmd):
                 for index, row in result.iterrows():
                     time_str = index.strftime("%Y-%m-%d %H:%M:%S")
                     print(
-                        f"  {time_str} | O: {row['open']:.8f} | H: {row['high']:.8f} | L: {row['low']:.8f} | C: {row['close']:.8f} | V: {row['volume']:.8f}"
+                        f"  {time_str} | O: {row['open']:.8f} | H: {row['high']:.8f} | "
+                        f"L: {row['low']:.8f} | C: {row['close']:.8f} | V: {row['volume']:.8f}"
                     )
             else:
                 print(f"Failed to get OHLCV data for {symbol} on {exchange}")
@@ -709,6 +706,7 @@ def main():
     args = parser.parse_args()
 
     # Устанавливаем уровень логирования
+    import logging  # Импортируем здесь для избежания неиспользуемого импорта
     logging.getLogger().setLevel(getattr(logging, args.log_level))
 
     # Создаем консольный интерфейс
