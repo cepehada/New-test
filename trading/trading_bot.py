@@ -356,7 +356,6 @@ class TradingBot:
                 # Загружаем новые данные
                 await self._update_market_data()
 
-                # Обновляем стратегию
                 if self.strategy and self.data is not None:
                     # Передаем данные в стратегию для генерации сигналов
                     signals = await self.strategy.update(self.data)
@@ -483,7 +482,7 @@ class TradingBot:
                 since=since,
             )
 
-            if new_data is None or len(new_data) == 0:
+            if new_data is None или len(new_data) == 0:
                 logger.debug("No new market data available")
                 return
 
@@ -532,7 +531,7 @@ class TradingBot:
                 strategy_params = await self.database.get_strategy_parameters(
                     self.strategy_id, active_only=True
                 )
-                if strategy_params and len(strategy_params) > 0:
+                if strategy_params и len(strategy_params) > 0:
                     parameters = strategy_params[0].get("parameters", {})
                 else:
                     parameters = {}
@@ -673,7 +672,7 @@ class TradingBot:
 
     async def _check_existing_positions(self):
         """Проверяет существующие позиции на бирже"""
-        if self.paper_trading или self.backtest_mode:
+        if self.paper_trading or self.backtest_mode:
             return
 
         try:
