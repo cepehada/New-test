@@ -1,259 +1,289 @@
 """
-Модуль для мультибиржевого арбитража.
-Предоставляет функциональность для отслеживания и исполнения арбитражных возможностей
-между различными криптовалютными биржами.
+Модуль для арбитража между несколькими биржами.
+Реализует стратегию межбиржевого арбитража.
 """
 
-import asyncio
+# Стандартные импорты
 import time
-from typing import Any, Dict, List, Optional
+import asyncio
+from typing import Dict, List, Any
 
-from project.bots.arbitrage.core import ArbitrageCore, ArbitrageOpportunity
+# Внутренние импорты
 from project.config import get_config
+from project.bots.base_bot import BaseBot
 from project.data.market_data import MarketData
-from project.utils.error_handler import async_handle_error
 from project.utils.logging_utils import get_logger
+from project.utils.error_handler import async_handle_error
+from project.utils.ccxt_exchanges import fetch_balance
+from project.bots.arbitrage.core import ArbitrageCore, ArbitrageOpportunity
+from project.bots.arbitrage.utils import calculate_max_trade_sizes
 
 logger = get_logger(__name__)
 
 
-class MultiExchangeArbitrage:
+class MultiExchangeArbitrage(BaseBot):
     """
-    Класс для выполнения мультибиржевого арбитража.
+    Бот для межбиржевого арбитража.
+    Отслеживает ценовые разницы между биржами и выполняет арбитражные сделки.
     """
 
-    def __init__(
-        self,
-        exchanges: List[str] = None,
-        symbols: List[str] = None,
-        min_profit_pct: float = 0.01,
-        max_trade_size: float = 100.0,
-    ):
+    def __init__(self, config=None, name="arbitrage_multi_exchange"):
         """
-        Инициализирует систему мультибиржевого арбитража.
-
+        Инициализирует арбитражного бота.
+        
         Args:
-            exchanges: Список бирж для мониторинга
-            symbols: Список символов для мониторинга
-            min_profit_pct: Минимальный процент прибыли для выполнения арбитража
-            max_trade_size: Максимальный размер сделки в базовой валюте
+            config (Dict, optional): Конфигурация бота. По умолчанию None.
+            name (str, optional): Имя бота. По умолчанию "arbitrage_multi_exchange".
         """
-        self.config = get_config()
-        self.arbitrage_core = ArbitrageCore.get_instance()
+        super().__init__(config=config, name=name)
+        
+        # Арбитражное ядро и данные рынка
+        self.arbitrage_core = ArbitrageCore(self.config)
         self.market_data = MarketData.get_instance()
-
-        self.exchanges = exchanges or ["binance", "kucoin", "huobi", "okex"]
-        self.symbols = symbols or [
-            "BTC/USDT",
-            "ETH/USDT",
-            "SOL/USDT",
-            "XRP/USDT",
-            "ADA/USDT",
-        ]
-        self.min_profit_pct = min_profit_pct
-        self.max_trade_size = max_trade_size
-
-        # Внутренние состояния
-        self.active_monitors = {}  # symbol -> task
-        self.current_opportunities = {}  # symbol -> ArbitrageOpportunity
-        self.completed_arbitrages = []  # список завершенных арбитражей
+        
+        # Настройки арбитража
+        arb_config = self.config.get("arbitrage", {})
+        self.min_profit_pct = arb_config.get("min_profit_pct", 0.8)
+        self.min_volume_usd = arb_config.get("min_volume_usd", 10.0)
+        self.check_interval = arb_config.get("check_interval", 5.0)
+        self.max_active_opportunities = arb_config.get("max_active_opportunities", 3)
+        
+        # Биржи и торговые пары
+        self.exchanges = arb_config.get("exchanges", ["binance", "kucoin", "okx"])
+        self.symbols = arb_config.get("symbols", [])
+        
+        # Данные о возможностях и сделках
+        self.current_opportunities = {}
+        self.completed_arbitrages = []
+        self.active_monitors = {}
         self.running = False
 
-        # Статистика
-        self.stats = {
-            "total_opportunities_found": 0,
-            "total_arbitrages_executed": 0,
-            "total_profit": 0.0,
-            "total_volume": 0.0,
-            "start_time": 0,
-            "avg_opportunity_lifetime": 0.0,
-        }
-
-        logger.debug("Создан экземпляр MultiExchangeArbitrage")
-
-    async def start(self) -> bool:
+    @async_handle_error
+    async def start(self):
         """
-        Запускает систему мультибиржевого арбитража.
-
-        Returns:
-            True, если запуск успешен, иначе False
+        Запускает арбитражного бота.
         """
         if self.running:
-            logger.warning("Система арбитража уже запущена")
-            return False
-
-        try:
-            logger.info("Запуск системы мультибиржевого арбитража")
-
-            # Обновляем время запуска
-            self.stats["start_time"] = time.time()
-
-            # Запускаем мониторы для всех символов
-            for symbol in self.symbols:
-                self._start_monitor(symbol)
-
-            self.running = True
-
-            logger.info(
-                f"Система мультибиржевого арбитража запущена: "
-                f"{len(self.symbols)} символов на {len(self.exchanges)} биржах"
-            )
-
-            return True
-
-        except Exception as e:
-            logger.error("Ошибка при запуске системы арбитража: {str(e)}" %)
-            return False
-
-    async def stop(self) -> bool:
+            logger.info("Арбитражный бот уже запущен")
+            return
+            
+        self.running = True
+        logger.info(
+            "Запуск арбитражного бота между %s для %d символов",
+            ", ".join(self.exchanges),
+            len(self.symbols)
+        )
+        
+        # Начинаем главный цикл
+        asyncio.create_task(self._main_loop())
+    
+    @async_handle_error
+    async def stop(self):
         """
-        Останавливает систему мультибиржевого арбитража.
-
-        Returns:
-            True, если остановка успешна, иначе False
+        Останавливает арбитражного бота.
         """
         if not self.running:
-            logger.warning("Система арбитража не запущена")
-            return False
-
-        try:
-            logger.info("Остановка системы мультибиржевого арбитража")
-
-            # Отменяем все активные мониторы
-            for symbol, task in self.active_monitors.items():
-                if not task.done():
-                    task.cancel()
-
-            self.active_monitors = {}
-            self.running = False
-
-            logger.info("Система мультибиржевого арбитража остановлена")
-
-            return True
-
-        except Exception as e:
-            logger.error("Ошибка при остановке системы арбитража: {str(e)}" %)
-            return False
-
-    def _start_monitor(self, symbol: str) -> None:
-        """
-        Запускает задачу для мониторинга арбитражных возможностей для символа.
-
-        Args:
-            symbol: Символ для мониторинга
-        """
-        if symbol in self.active_monitors and not self.active_monitors[symbol].done():
-            logger.debug("Монитор для {symbol} уже запущен" %)
+            logger.info("Арбитражный бот уже остановлен")
             return
-
-        task = asyncio.create_task(self._monitor_symbol(symbol))
-        self.active_monitors[symbol] = task
-        logger.debug("Запущен монитор для {symbol}" %)
-
+            
+        logger.info("Остановка арбитражного бота")
+        self.running = False
+        
+        # Ждем завершения всех задач
+        for symbol, task in self.active_monitors.items():
+            if not task.done():
+                task.cancel()
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    pass
+                
+        logger.info("Арбитражный бот остановлен")
+    
     @async_handle_error
-    async def _monitor_symbol(self, symbol: str) -> None:
+    async def _main_loop(self):
         """
-        Мониторит арбитражные возможности для символа.
-
-        Args:
-            symbol: Символ для мониторинга
+        Основной цикл работы арбитражного бота.
         """
         try:
-            logger.debug("Начат мониторинг {symbol}" %)
-
-            while True:
-                if not self.running:
-                    logger.debug("Мониторинг {symbol} остановлен" %)
-                    break
-
-                # Сканируем возможности
-                opportunities = await self.arbitrage_core.scan_opportunities(
-                    [symbol], self.exchanges
+            logger.info("Начало основного цикла арбитражного бота")
+            
+            while self.running:
+                # Поиск новых возможностей
+                opportunities = await self.arbitrage_core.check_arbitrage_opportunities(
+                    symbols=self.symbols,
+                    exchanges=self.exchanges,
+                    min_profit_pct=self.min_profit_pct,
+                    min_volume_usd=self.min_volume_usd
                 )
-
-                # Если найдены возможности
-                if opportunities:
-                    opportunity = opportunities[0]  # берем лучшую возможность
-
-                    # Проверяем, достаточна ли прибыль
-                    if opportunity.profit_margin_pct >= self.min_profit_pct:
-                        self.stats["total_opportunities_found"] += 1
-
+                
+                # Обрабатываем найденные возможности
+                for opportunity in opportunities:
+                    symbol = opportunity.symbol
+                    
+                    # Пропускаем, если возможность уже отслеживается
+                    if symbol in self.current_opportunities:
+                        continue
+                        
+                    # Проверяем возможность
+                    is_valid = await self.arbitrage_core.verify_opportunity(
+                        opportunity=opportunity,
+                        min_volume=self.min_volume_usd / opportunity.buy_price,
+                        max_age_seconds=10.0
+                    )
+                    
+                    if is_valid:
                         logger.info(
-                            f"Найдена арбитражная возможность для {symbol}: "
-                            f"купить на {opportunity.buy_exchange} по {opportunity.buy_price:.8f}, "
-                            f"продать на {opportunity.sell_exchange} по {opportunity.sell_price:.8f}, "
-                            f"прибыль: {opportunity.profit_margin_pct:.2%}"
+                            "Найдена арбитражная возможность для %s: "
+                            "Покупка на %s по %.6f, продажа на %s по %.6f, "
+                            "прибыль: %.2f%%",
+                            symbol, 
+                            opportunity.buy_exchange, 
+                            opportunity.buy_price,
+                            opportunity.sell_exchange, 
+                            opportunity.sell_price, 
+                            opportunity.profit_margin_pct
                         )
-
-                        # Сохраняем возможность
-                        self.current_opportunities[symbol] = opportunity
-
-                        # Проверяем возможность исполнения
-                        await self._execute_if_possible(opportunity)
-
-                # Ждем перед следующей проверкой
-                await asyncio.sleep(5)  # проверяем каждые 5 секунд
-
-        except asyncio.CancelledError:
-            logger.debug("Мониторинг {symbol} отменен" %)
-            raise
+                        
+                        # Проверяем балансы и размеры сделок
+                        trade_sizes = await self.arbitrage_core.check_balances(opportunity)
+                        
+                        if trade_sizes:
+                            # Добавляем возможность и запускаем монитор
+                            self.current_opportunities[symbol] = opportunity
+                            
+                            # Ограничиваем количество активных мониторов
+                            if len(self.active_monitors) < self.max_active_opportunities:
+                                self.active_monitors[symbol] = asyncio.create_task(
+                                    self._monitor_opportunity(symbol, opportunity)
+                                )
+                
+                # Ждем следующей итерации
+                await asyncio.sleep(self.check_interval)
+                
         except Exception as e:
-            logger.error("Ошибка при мониторинге {symbol}: {str(e)}" %)
-
+            logger.error("Ошибка в основном цикле арбитражного бота: %s", str(e))
+    
+    @async_handle_error
+    async def _monitor_opportunity(self, symbol: str, opportunity: ArbitrageOpportunity):
+        """
+        Мониторит и исполняет конкретную арбитражную возможность.
+        
+        Args:
+            symbol: Символ торговой пары
+            opportunity: Объект арбитражной возможности
+        """
+        try:
+            logger.info("Начало мониторинга арбитражной возможности для %s", symbol)
+            
+            monitor_interval = 1.0  # Интервал проверки в секундах
+            max_monitoring_time = 60.0  # Максимальное время мониторинга в секундах
+            start_time = time.time()
+            
+            while self.running and (time.time() - start_time) < max_monitoring_time:
+                # Проверяем актуальность возможности
+                is_valid = await self.arbitrage_core.verify_opportunity(
+                    opportunity=opportunity,
+                    min_volume=self.min_volume_usd / opportunity.buy_price
+                )
+                
+                if not is_valid:
+                    logger.info(
+                        "Арбитражная возможность для %s больше не актуальна", 
+                        symbol
+                    )
+                    break
+                    
+                # Пытаемся выполнить арбитражные сделки
+                executed = await self._execute_if_possible(opportunity)
+                
+                if executed:
+                    logger.info(
+                        "Арбитражные сделки для %s успешно выполнены", 
+                        symbol
+                    )
+                    break
+                    
+                # Ждем следующей итерации
+                await asyncio.sleep(monitor_interval)
+                
+            # Удаляем возможность из текущих, если она еще там
+            if symbol in self.current_opportunities:
+                del self.current_opportunities[symbol]
+                
+            logger.info(
+                "Завершение мониторинга арбитражной возможности для %s", 
+                symbol
+            )
+                
+        except Exception as e:
+            logger.error(
+                "Ошибка при мониторинге арбитража для %s: %s", 
+                symbol, str(e)
+            )
+            
+            # Удаляем возможность при ошибке
+            if symbol in self.current_opportunities:
+                del self.current_opportunities[symbol]
+    
     @async_handle_error
     async def _execute_if_possible(self, opportunity: ArbitrageOpportunity) -> bool:
         """
-        Проверяет и выполняет арбитражную возможность, если она возможна.
-
+        Выполняет арбитражные сделки, если это возможно.
+        
         Args:
             opportunity: Арбитражная возможность
-
+            
         Returns:
-            True, если арбитраж выполнен, иначе False
+            True, если сделки выполнены успешно, иначе False
         """
         try:
-            # Проверяем актуальность возможности
-            is_valid = await self.arbitrage_core.verify_opportunity(opportunity)
-            if not is_valid:
-                logger.debug(
-                    f"Возможность для {opportunity.symbol} больше не актуальна"
-                )
-                return False
-
-            # Проверяем балансы
-            trade_sizes = await self.arbitrage_core.check_balances(
-                opportunity, min_trade_amount=10.0
-            )
+            # Проверяем, достаточно ли у нас балансов
+            trade_sizes = await self.arbitrage_core.check_balances(opportunity)
+            
             if not trade_sizes:
-                logger.debug(
-                    f"Недостаточно балансов для арбитража {opportunity.symbol}"
-                )
                 return False
-
-            # Ограничиваем размер сделки
-            if trade_sizes["buy_cost"] > self.max_trade_size:
-                # Корректируем размеры
-                ratio = self.max_trade_size / trade_sizes["buy_cost"]
-                trade_sizes["buy_amount"] *= ratio
-                trade_sizes["sell_amount"] *= ratio
-                trade_sizes["buy_cost"] *= ratio
-                trade_sizes["sell_proceeds"] *= ratio
-
-                opportunity.trade_sizes = trade_sizes
-
-            # Выполняем арбитраж
-            success = await self.arbitrage_core.execute_arbitrage(opportunity)
-
-            if success:
-                # Обновляем статистику
-                self.stats["total_arbitrages_executed"] += 1
-                self.stats["total_volume"] += trade_sizes["buy_cost"]
-                self.stats["total_profit"] += (
-                    trade_sizes["sell_proceeds"] - trade_sizes["buy_cost"]
+            
+            # Подготавливаем параметры сделки
+            buy_amount = trade_sizes["buy_amount"]
+            sell_amount = trade_sizes["sell_amount"]
+            
+            logger.info(
+                "Выполнение арбитража для %s: покупка %.6f на %s по %.6f, "
+                "продажа %.6f на %s по %.6f",
+                opportunity.symbol,
+                buy_amount, opportunity.buy_exchange, opportunity.buy_price,
+                sell_amount, opportunity.sell_exchange, opportunity.sell_price
+            )
+            
+            # Получаем ордер-исполнитель
+            from project.trade_executor.order_executor import OrderExecutor
+            order_executor = OrderExecutor.get_instance()
+            
+            # Выполняем сделки одновременно
+            buy_result, sell_result = await asyncio.gather(
+                order_executor.execute_order(
+                    symbol=opportunity.symbol,
+                    side="buy",
+                    amount=buy_amount,
+                    price=opportunity.buy_price,
+                    exchange_id=opportunity.buy_exchange,
+                    order_type="limit"
+                ),
+                order_executor.execute_order(
+                    symbol=opportunity.symbol,
+                    side="sell",
+                    amount=sell_amount,
+                    price=opportunity.sell_price,
+                    exchange_id=opportunity.sell_exchange,
+                    order_type="limit"
                 )
-
-                # Добавляем в историю
+            )
+            
+            # Проверяем результаты
+            success = buy_result.success and sell_result.success
+            
+            if success:
                 self.completed_arbitrages.append(
                     {
                         "symbol": opportunity.symbol,
@@ -265,8 +295,7 @@ class MultiExchangeArbitrage:
                         "sell_amount": trade_sizes["sell_amount"],
                         "buy_cost": trade_sizes["buy_cost"],
                         "sell_proceeds": trade_sizes["sell_proceeds"],
-                        "profit": trade_sizes["sell_proceeds"]
-                        - trade_sizes["buy_cost"],
+                        "profit": trade_sizes["sell_proceeds"] - trade_sizes["buy_cost"],
                         "profit_pct": opportunity.profit_margin_pct,
                         "timestamp": time.time(),
                     }
@@ -277,8 +306,9 @@ class MultiExchangeArbitrage:
                     del self.current_opportunities[opportunity.symbol]
 
                 logger.info(
-                    f"Успешно выполнен арбитраж для {opportunity.symbol}: "
-                    f"прибыль {(trade_sizes['sell_proceeds'] - trade_sizes['buy_cost']):.2f} USD"
+                    "Успешно выполнен арбитраж для %s: прибыль %.2f USD",
+                    opportunity.symbol,
+                    trade_sizes['sell_proceeds'] - trade_sizes['buy_cost']
                 )
 
                 return True
@@ -287,7 +317,8 @@ class MultiExchangeArbitrage:
 
         except Exception as e:
             logger.error(
-                f"Ошибка при выполнении арбитража для {opportunity.symbol}: {str(e)}"
+                "Ошибка при выполнении арбитража для %s: %s",
+                opportunity.symbol, str(e)
             )
             return False
 
@@ -320,196 +351,158 @@ class MultiExchangeArbitrage:
         else:
             stats["avg_profit"] = 0
             stats["avg_volume"] = 0
-
-        # Добавляем текущие возможности
-        stats["current_opportunities"] = []
-        for symbol, opportunity in self.current_opportunities.items():
-            stats["current_opportunities"].append(
-                {
-                    "symbol": opportunity.symbol,
-                    "buy_exchange": opportunity.buy_exchange,
-                    "sell_exchange": opportunity.sell_exchange,
-                    "buy_price": opportunity.buy_price,
-                    "sell_price": opportunity.sell_price,
-                    "profit_pct": opportunity.profit_margin_pct,
-                    "age": time.time() - opportunity.timestamp,
-                }
-            )
-
-        # Добавляем последние выполненные арбитражи (максимум 10)
-        stats["recent_arbitrages"] = (
-            self.completed_arbitrages[-10:] if self.completed_arbitrages else []
-        )
-
+            
         return stats
 
-    async def add_symbol(self, symbol: str) -> bool:
+    @async_handle_error
+    async def _check_exchanges_are_ready(self, opportunity: ArbitrageOpportunity) -> bool:
         """
-        Добавляет символ для мониторинга.
-
+        Проверяет готовность бирж для выполнения арбитража.
+        
         Args:
-            symbol: Символ для добавления
-
+            opportunity: Объект арбитражной возможности
+            
         Returns:
-            True, если символ добавлен, иначе False
+            True если биржи готовы, иначе False
         """
-        if symbol in self.symbols:
-            logger.warning("Символ {symbol} уже отслеживается" %)
-            return False
-
         try:
-            # Добавляем символ в список
-            self.symbols.append(symbol)
-
-            # Если система запущена, запускаем монитор для нового символа
-            if self.running:
-                self._start_monitor(symbol)
-
-            logger.info("Добавлен символ {symbol} для мониторинга" %)
-
+            # Проверяем доступность бирж
+            exchanges_to_check = [opportunity.buy_exchange, opportunity.sell_exchange]
+            
+            for exchange in exchanges_to_check:
+                # Проверяем наличие доступного баланса
+                balance = await fetch_balance(exchange)
+                
+                if not balance:
+                    logger.info(
+                        "Не удалось получить баланс на бирже %s", 
+                        exchange
+                    )
+                    return False
+            
             return True
-
+            
         except Exception as e:
-            logger.error("Ошибка при добавлении символа {symbol}: {str(e)}" %)
+            logger.error(
+                "Ошибка при проверке готовности бирж для %s: %s",
+                opportunity.symbol, str(e)
+            )
             return False
 
-    async def remove_symbol(self, symbol: str) -> bool:
+    @async_handle_error
+    async def _get_market_data(
+        self, 
+        exchange_id: str, 
+        symbol: str
+    ) -> Dict[str, Any]:
         """
-        Удаляет символ из мониторинга.
-
+        Получает данные о рынке с указанной биржи.
+        
         Args:
-            symbol: Символ для удаления
-
+            exchange_id: Идентификатор биржи
+            symbol: Символ торговой пары
+            
         Returns:
-            True, если символ удален, иначе False
+            Словарь с данными рынка
         """
-        if symbol not in self.symbols:
-            logger.warning("Символ {symbol} не отслеживается" %)
-            return False
-
         try:
-            # Удаляем символ из списка
-            self.symbols.remove(symbol)
-
-            # Если есть активный монитор, отменяем его
-            if symbol in self.active_monitors:
-                task = self.active_monitors[symbol]
-                if not task.done():
-                    task.cancel()
-                del self.active_monitors[symbol]
-
-            # Удаляем из текущих возможностей
-            if symbol in self.current_opportunities:
-                del self.current_opportunities[symbol]
-
-            logger.info("Удален символ {symbol} из мониторинга" %)
-
-            return True
-
+            # Получаем текущий тикер
+            ticker = await self.market_data.get_ticker(exchange_id, symbol)
+            
+            # Получаем стакан заказов
+            orderbook = await self.market_data.get_orderbook(exchange_id, symbol)
+            
+            # Получаем последние сделки
+            trades = await self.market_data.get_recent_trades(exchange_id, symbol)
+            
+            # Получаем баланс
+            balance = await fetch_balance(exchange_id)
+            
+            return {
+                "ticker": ticker,
+                "orderbook": orderbook,
+                "trades": trades,
+                "balance": balance
+            }
+            
         except Exception as e:
-            logger.error("Ошибка при удалении символа {symbol}: {str(e)}" %)
-            return False
+            logger.error(
+                "Ошибка при получении рыночных данных для %s на %s: %s",
+                symbol, exchange_id, str(e)
+            )
+            return {}
 
-    async def add_exchange(self, exchange: str) -> bool:
-        """
-        Добавляет биржу для мониторинга.
-
-        Args:
-            exchange: Биржа для добавления
-
-        Returns:
-            True, если биржа добавлена, иначе False
-        """
-        if exchange in self.exchanges:
-            logger.warning("Биржа {exchange} уже отслеживается" %)
-            return False
-
-        if exchange not in self.arbitrage_core.supported_exchanges:
-            logger.warning("Биржа {exchange} не поддерживается" %)
-            return False
-
-        try:
-            # Добавляем биржу в список
-            self.exchanges.append(exchange)
-
-            logger.info("Добавлена биржа {exchange} для мониторинга" %)
-
-            return True
-
-        except Exception as e:
-            logger.error("Ошибка при добавлении биржи {exchange}: {str(e)}" %)
-            return False
-
-    async def remove_exchange(self, exchange: str) -> bool:
-        """
-        Удаляет биржу из мониторинга.
-
-        Args:
-            exchange: Биржа для удаления
-
-        Returns:
-            True, если биржа удалена, иначе False
-        """
-        if exchange not in self.exchanges:
-            logger.warning("Биржа {exchange} не отслеживается" %)
-            return False
-
-        try:
-            # Удаляем биржу из списка
-            self.exchanges.remove(exchange)
-
-            # Удаляем возможности, связанные с этой биржей
-            for symbol, opportunity in list(self.current_opportunities.items()):
-                if (
-                    opportunity.buy_exchange == exchange
-                    or opportunity.sell_exchange == exchange
-                ):
-                    del self.current_opportunities[symbol]
-
-            logger.info("Удалена биржа {exchange} из мониторинга" %)
-
-            return True
-
-        except Exception as e:
-            logger.error("Ошибка при удалении биржи {exchange}: {str(e)}" %)
-            return False
-
-    async def update_settings(
-        self,
-        min_profit_pct: Optional[float] = None,
-        max_trade_size: Optional[float] = None,
+    @async_handle_error
+    async def _execute_arbitrage(
+        self, 
+        opportunity: ArbitrageOpportunity, 
+        trade_sizes: Dict[str, float]
     ) -> bool:
         """
-        Обновляет настройки арбитражной системы.
-
+        Выполняет арбитражные сделки.
+        
         Args:
-            min_profit_pct: Минимальный процент прибыли для арбитража
-            max_trade_size: Максимальный размер сделки
-
+            opportunity: Арбитражная возможность
+            trade_sizes: Размеры сделок
+            
         Returns:
-            True, если настройки обновлены, иначе False
+            True, если сделки выполнены успешно, иначе False
         """
         try:
-            if min_profit_pct is not None:
-                if min_profit_pct <= 0:
-                    logger.warning(
-                        f"Некорректное значение min_profit_pct: {min_profit_pct}"
-                    )
-                else:
-                    self.min_profit_pct = min_profit_pct
-                    logger.info("Обновлен min_profit_pct: {min_profit_pct}" %)
-
-            if max_trade_size is not None:
-                if max_trade_size <= 0:
-                    logger.warning(
-                        f"Некорректное значение max_trade_size: {max_trade_size}"
-                    )
-                else:
-                    self.max_trade_size = max_trade_size
-                    logger.info("Обновлен max_trade_size: {max_trade_size}" %)
-
+            # Логика исполнения арбитражных сделок
+            logger.info(
+                "Выполнение арбитражных сделок для %s: "
+                "Покупка %.6f на %s по %.6f, "
+                "Продажа %.6f на %s по %.6f",
+                opportunity.symbol,
+                trade_sizes["buy_amount"], opportunity.buy_exchange, opportunity.buy_price,
+                trade_sizes["sell_amount"], opportunity.sell_exchange, opportunity.sell_price
+            )
+            
+            # Получаем ордер-исполнитель
+            from project.trade_executor.order_executor import OrderExecutor
+            order_executor = OrderExecutor.get_instance()
+            
+            # Выполняем покупку
+            buy_result = await order_executor.market_buy(
+                symbol=opportunity.symbol,
+                amount=trade_sizes["buy_amount"],
+                exchange_id=opportunity.buy_exchange
+            )
+            
+            if not buy_result.success:
+                logger.error(
+                    "Ошибка при выполнении покупки для %s: %s",
+                    opportunity.symbol, buy_result.error
+                )
+                return False
+            
+            # Выполняем продажу
+            sell_result = await order_executor.market_sell(
+                symbol=opportunity.symbol,
+                amount=trade_sizes["sell_amount"],
+                exchange_id=opportunity.sell_exchange
+            )
+            
+            if not sell_result.success:
+                logger.error(
+                    "Ошибка при выполнении продажи для %s: %s",
+                    opportunity.symbol, sell_result.error
+                )
+                return False
+            
+            # Обновляем статистику
+            self.stats["total_arbitrages_executed"] += 1
+            self.stats["total_profit"] += (
+                trade_sizes["sell_proceeds"] - trade_sizes["buy_cost"]
+            )
+            self.stats["total_volume"] += trade_sizes["buy_cost"]
+            
             return True
-
+            
         except Exception as e:
-            logger.error("Ошибка при обновлении настроек: {str(e)}" %)
+            logger.error(
+                "Ошибка при выполнении арбитража для %s: %s",
+                opportunity.symbol, str(e)
+            )
             return False
