@@ -94,7 +94,7 @@ class PositionSizingSettings(BaseModel):
 
 class GeneticOptimizerSettings(BaseModel):
     """Настройки генетического оптимизатора"""
-    
+
     POPULATION_SIZE: int = 50
     GENERATIONS: int = 10
     CROSSOVER_RATE: float = 0.7
@@ -115,7 +115,7 @@ class GeneticOptimizerSettings(BaseModel):
 
 class DataVisualizerSettings(BaseModel):
     """Настройки визуализации данных"""
-    
+
     THEME: str = "dark"  # или "light"
     FIGSIZE: tuple = (14, 8)
 
@@ -127,7 +127,7 @@ class DataVisualizerSettings(BaseModel):
 
 class Config(BaseSettings):
     """Основной класс конфигурации приложения"""
-    
+
     # Существующие настройки
     DATABASE_URI: str
     BINANCE_API_KEY: str
@@ -162,6 +162,7 @@ class Config(BaseSettings):
 
     class Config:
         """Настройки pydantic модели"""
+
         env_file = ".env"
         case_sensitive = True
 
@@ -232,7 +233,7 @@ def get_config() -> Config:
     """
     Получить экземпляр конфигурации.
     Использует паттерн Singleton для предотвращения многократной загрузки.
-    
+
     Returns:
         Config: Экземпляр класса Config
     """

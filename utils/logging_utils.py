@@ -1,192 +1,196 @@
 """
-Утилиты для настройки логирования в приложении.
-Предоставляет единый интерфейс для логирования во всех модулях.
+Модуль для настройки и управления логированием в приложении.
+Предоставляет функции для получения логгеров и настройки форматирования.
 """
 
-import logging
 import os
 import sys
-import time
-from logging.handlers import RotatingFileHandler
+import logging
+from datetime import datetime
+from typing import Dict, Any
 
-from project.config import get_config
+# Глобальная настройка логирования
+_logging_initialized = False
+_loggers = {}
+logger = logging.getLogger(__name__)
 
-# Настройки логирования по умолчанию
-DEFAULT_LOG_LEVEL = "INFO"
-DEFAULT_LOG_FORMAT = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
-DEFAULT_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+# Цвета для логов в консоли
+COLORS = {
+    'CRITICAL': '\033[91m',  # Красный
+    'ERROR': '\033[91m',     # Красный
+    'WARNING': '\033[93m',   # Желтый
+    'INFO': '\033[92m',      # Зеленый
+    'DEBUG': '\033[94m',     # Синий
+    'RESET': '\033[0m',      # Сброс цвета
+}
 
-# Константы
-MAX_LOG_FILE_SIZE = 10 * 1024 * 1024  # 10 МБ
-BACKUP_COUNT = 5
 
-
-def setup_logging() -> None:
+def setup_logging(
+    log_level=None, 
+    log_file=None, 
+    console_format=None, 
+    file_format=None
+):
     """
-    Настраивает систему логирования для всего приложения.
-    Должна вызываться один раз при запуске.
-    """
-    try:
-        config = get_config()
-        log_level = getattr(logging, config.LOG_LEVEL.upper(), logging.INFO)
-
-        # Создаем корневой логгер
-        root_logger = logging.getLogger()
-        root_logger.setLevel(log_level)
-
-        # Очищаем существующие обработчики
-        for handler in root_logger.handlers[:]:
-            root_logger.removeHandler(handler)
-
-        # Добавляем обработчик для консоли
-        console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.setLevel(log_level)
-        console_formatter = logging.Formatter(
-            DEFAULT_LOG_FORMAT, datefmt=DEFAULT_DATE_FORMAT
-        )
-        console_handler.setFormatter(console_formatter)
-        root_logger.addHandler(console_handler)
-
-        # Если указан путь к файлу логов, добавляем файловый обработчик
-        if config.LOG_FILE_PATH:
-            # Создаем директорию для логов, если она не существует
-            log_dir = os.path.dirname(config.LOG_FILE_PATH)
-            if log_dir and not os.path.exists(log_dir):
-                os.makedirs(log_dir, exist_ok=True)
-
-            file_handler = RotatingFileHandler(
-                config.LOG_FILE_PATH,
-                maxBytes=MAX_LOG_FILE_SIZE,
-                backupCount=BACKUP_COUNT,
-                encoding="utf-8",
-            )
-            file_handler.setLevel(log_level)
-            file_formatter = logging.Formatter(
-                "%(asctime)s [%(levelname)s] %(name)s (%(filename)s:%(lineno)d): %(message)s",
-                datefmt=DEFAULT_DATE_FORMAT,
-            )
-            file_handler.setFormatter(file_formatter)
-            root_logger.addHandler(file_handler)
-
-        # Настраиваем сторонние библиотеки на уровень WARNING, чтобы снизить шум в логах
-        for logger_name in ["asyncio", "matplotlib", "urllib3", "websockets"]:
-            logging.getLogger(logger_name).setLevel(logging.WARNING)
-
-        root_logger.info("Logging initialized at level {config.LOG_LEVEL}" %)
-
-    except Exception as e:
-        # Запасной вариант при ошибке конфигурации
-        print(f"Error setting up logging: {str(e)}")
-
-        # Базовая настройка логирования
-        logging.basicConfig(
-            level=logging.INFO,
-            format=DEFAULT_LOG_FORMAT,
-            datefmt=DEFAULT_DATE_FORMAT,
-            stream=sys.stdout,
-        )
-
-        logging.error(f"Failed to configure logging properly: {str(e)}", exc_info=True)
-
-
-def get_logger(name: str) -> logging.Logger:
-    """
-    Получает настроенный логгер для указанного модуля.
-
+    Настраивает логирование приложения.
+    
     Args:
-        name: Имя модуля или компонента
-
-    Returns:
-        Настроенный объект логгера
+        log_level: Уровень логирования (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+        log_file: Путь к файлу логов
+        console_format: Формат логов для консоли
+        file_format: Формат логов для файла
     """
-    # Если это __main__, используем имя файла
-    if name == "__main__":
-        # Извлекаем имя файла из стека вызовов
-        import inspect
+    global _logging_initialized
+    
+    if _logging_initialized:
+        return
+    
+    # Получение настроек из конфигурации
+    try:
+        from project.config import get_config
+        config = get_config()
+        
+        log_level = log_level or config.LOG_LEVEL
+        log_file = log_file or config.LOG_FILE_PATH
+        console_format = console_format or "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+        file_format = file_format or "%(asctime)s [%(levelname)s] %(name)s (%(filename)s:%(lineno)d): %(message)s"
+        
+    except Exception as e:
+        # Если конфигурация недоступна, используем значения по умолчанию
+        logger.warning("Не удалось загрузить конфигурацию: %s", str(e))
+        log_level = log_level or "INFO"
+        console_format = console_format or "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+        file_format = file_format or "%(asctime)s [%(levelname)s] %(name)s (%(filename)s:%(lineno)d): %(message)s"
+    
+    # Настройка уровня логирования
+    level = getattr(logging, log_level.upper())
+    
+    # Настраиваем корневой логгер
+    root_logger = logging.getLogger()
+    root_logger.setLevel(level)
+    
+    # Очистка всех обработчиков
+    for handler in root_logger.handlers[:]:
+        root_logger.removeHandler(handler)
+    
+    # Консольный обработчик
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(level)
+    console_handler.setFormatter(ColoredFormatter(console_format))
+    root_logger.addHandler(console_handler)
+    
+    # Файловый обработчик (если задан)
+    if log_file:
+        # Создаем директорию для логов, если она не существует
+        log_dir = os.path.dirname(log_file)
+        if log_dir and not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+            
+        file_handler = logging.FileHandler(log_file, mode='a', encoding='utf-8')
+        file_handler.setLevel(level)
+        file_handler.setFormatter(logging.Formatter(file_format))
+        root_logger.addHandler(file_handler)
+    
+    # Отключаем логи от библиотек
+    for log_name in ['urllib3', 'requests', 'ccxt', 'matplotlib', 'asyncio', 'websockets']:
+        logging.getLogger(log_name).setLevel(logging.WARNING)
+    
+    _logging_initialized = True
+    logger.info("Логирование настроено. Уровень: %s, Файл логов: %s", log_level, log_file or "не задан")
 
+
+def get_logger(name=None):
+    """
+    Возвращает настроенный логгер.
+    
+    Args:
+        name: Имя логгера
+        
+    Returns:
+        Настроенный логгер
+    """
+    # Определяем имя модуля
+    if name is None:
+        # Получаем имя вызывающего модуля
+        import inspect
         frame = inspect.stack()[1]
         module = inspect.getmodule(frame[0])
-        if module:
-            # Используем имя файла без расширения
-            name = os.path.splitext(os.path.basename(module.__file__))[0]
+        name = module.__name__
+    
+    # Проверяем, не является ли имя файлом
+    if name == '__main__':
+        name = name  # Оставляем как есть
+    
+    # Проверяем, если логгер уже существует
+    if name in _loggers:
+        return _loggers[name]
+    
+    # Настраиваем логирование, если еще не настроено
+    if not _logging_initialized:
+        setup_logging()
+    
+    # Создаем логгер
+    new_logger = logging.getLogger(name)
+    _loggers[name] = new_logger
+    
+    return new_logger
 
-    # Если имя начинается с project, используем только относительный путь
-    if name.startswith("project."):
-        name = name
-    elif not name.startswith("project"):
-        name = f"project.{name}"
 
-    return logging.getLogger(name)
-
-
-def log_execution_time(func):
+def get_function_logger(current_module=None):
     """
-    Декоратор для логирования времени выполнения функции.
-
+    Получает логгер для текущей функции.
+    
     Args:
-        func: Декорируемая функция
-
+        current_module: Текущий модуль
+        
     Returns:
-        Декорированная функция
+        Логгер для текущей функции
     """
-    logger = get_logger(func.__module__)
+    import inspect
+    
+    # Получаем стек вызовов
+    stack = inspect.stack()
+    
+    # Имя вызывающей функции
+    calling_func = stack[1].function
+    
+    # Модуль, из которого вызвана функция
+    if current_module is None:
+        module = inspect.getmodule(stack[1].frame)
+        module_name = module.__name__ if module else "__main__"
+    else:
+        module_name = current_module.__name__
+    
+    # Создаем имя логгера
+    logger_name = f"{module_name}.{calling_func}"
+    
+    # Получаем логгер
+    function_logger = get_logger(logger_name)
+    
+    return function_logger
 
-    def wrapper(*args, **kwargs):
-        start_time = time.time()
-        result = func(*args, **kwargs)
-        elapsed_time = time.time() - start_time
-        logger.debug("Function %s executed in %.4f seconds", func.__name__, elapsed_time)
-        return result
 
-    return wrapper
-
-
-async def log_async_execution_time(func):
+class ColoredFormatter(logging.Formatter):
     """
-    Декоратор для логирования времени выполнения асинхронной функции.
-
-    Args:
-        func: Декорируемая асинхронная функция
-
-    Returns:
-        Декорированная асинхронная функция
+    Форматтер для цветных логов в консоли.
     """
-    logger = get_logger(func.__module__)
-
-    async def wrapper(*args, **kwargs):
-        start_time = time.time()
-        result = await func(*args, **kwargs)
-        elapsed_time = time.time() - start_time
-        logger.debug(
-            "Async function %s executed in %.4f seconds", func.__name__, elapsed_time
-        )
-        return result
-
-    return wrapper
-
-
-def log_error_with_context(logger, message, error, context=None):
-    """Логирует ошибку с дополнительным контекстом"""
-    try:
-        # Заменяем f-string на % форматирование
-        logger.error("%s: %s", message, str(error))
-        if context:
-            logger.error("Контекст: %s", context)
-    except Exception:
-        logger.exception("Ошибка при логировании с контекстом")
-
-
-def setup_file_handler(name, log_file, formatter):
-    # ...existing code...
-    logger.debug("Настроен файловый обработчик для %s", name)
-    # ...existing code...
-
-
-def setup_console_handler(name, formatter):
-    # ...existing code...
-    logger.debug("Настроен консольный обработчик для %s", name)
-    # ...existing code...
-
-
-# Настройка логгера для текущего модуля
-logger = get_logger(__name__)
+    
+    def format(self, record):
+        """
+        Форматирует запись лога с цветовым выделением.
+        
+        Args:
+            record: Запись лога
+            
+        Returns:
+            Отформатированная строка лога
+        """
+        log_message = super().format(record)
+        
+        # Добавляем цвета только если вывод идет в терминал
+        if sys.stdout.isatty():
+            levelname = record.levelname
+            if levelname in COLORS:
+                return f"{COLORS[levelname]}{log_message}{COLORS['RESET']}"
+        
+        return log_message

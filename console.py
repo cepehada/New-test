@@ -707,6 +707,7 @@ def main():
 
     # Устанавливаем уровень логирования
     import logging  # Импортируем здесь для избежания неиспользуемого импорта
+
     logging.getLogger().setLevel(getattr(logging, args.log_level))
 
     # Создаем консольный интерфейс

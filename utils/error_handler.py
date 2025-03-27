@@ -1,351 +1,302 @@
 """
-Модуль для централизованной обработки ошибок.
-Обеспечивает единообразную обработку исключений во всем приложении.
+Модуль для обработки исключений и ошибок в приложении.
+Предоставляет декораторы для обработки ошибок в асинхронных и синхронных функциях.
 """
 
 import asyncio
 import functools
-import logging
+import inspect
 import sys
-from typing import Any, Callable, Dict, Optional, Type, TypeVar, cast
+from typing import Any, Callable, Dict, Optional
 
 from project.utils.logging_utils import get_logger
 
-# Типовые переменные для типизации функций
-T = TypeVar("T")
-F = TypeVar("F", bound=Callable[..., Any])
-
 logger = get_logger(__name__)
 
-# Словарь для регистрации обработчиков ошибок
-_error_handlers: Dict[Type[Exception], Callable] = {}
 
-
-def register_error_handler(
-    exception_type: Type[Exception], handler: Callable[[Exception], Any]
-) -> None:
+def handle_error(func):
     """
-    Регистрирует обработчик для определенного типа исключения.
-
+    Декоратор для обработки ошибок в синхронных функциях.
+    
     Args:
-        exception_type: Тип исключения, для которого регистрируется обработчик
-        handler: Функция-обработчик ошибки
-    """
-    _error_handlers[exception_type] = handler
-    logger.debug("Зарегистрирован обработчик для {exception_type.__name__}" %)
-
-
-def handle_exception(exc: Exception) -> Any:
-    """
-    Обрабатывает исключение с использованием зарегистрированных обработчиков.
-
-    Args:
-        exc: Экземпляр исключения для обработки
-
+        func: Оборачиваемая функция
+        
     Returns:
-        Результат обработки исключения или None, если обработчик не найден
+        Обернутая функция с обработкой ошибок
     """
-    # Ищем наиболее специфичный обработчик для данного типа исключения
-    for exc_type, handler in _error_handlers.items():
-        if isinstance(exc, exc_type):
-            logger.debug(
-                f"Найден обработчик для {type(exc).__name__}: {handler.__name__}"
-            )
-            return handler(exc)
-
-    # Если специфичный обработчик не найден, используем общий
-    logger.warning(
-        f"Обработчик для {type(exc).__name__} не найден, "
-        f"используем стандартную обработку"
-    )
-
-    # Логируем исключение
-    logger.error("Необработанное исключение: {str(exc)}" %, exc_info=exc)
-
-    # Для асинхронных отмен не выполняем дополнительных действий
-    if isinstance(exc, asyncio.CancelledError):
-        logger.debug("Обработка отмены асинхронной операции")
-        return None
-
-    # Для критических исключений завершаем программу
-    if isinstance(exc, (SystemExit, KeyboardInterrupt)):
-        logger.critical("Критическое исключение: {type(exc).__name__}" %)
-        raise exc
-
-    return None
-
-
-def handle_error(func: F) -> F:
-    """
-    Декоратор для обработки ошибок в функциях.
-
-    Args:
-        func: Декорируемая функция
-
-    Returns:
-        Декорированная функция
-    """
-
     @functools.wraps(func)
-    def wrapper(*args: Any, **kwargs: Any) -> Any:
+    def wrapper(*args, **kwargs):
+        """Обертка функции с обработкой ошибок."""
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            return handle_exception(e)
-
-    return cast(F, wrapper)
-
-
-def async_handle_error(func: F) -> F:
-    """
-    Декоратор для обработки ошибок в асинхронных функциях.
-
-    Args:
-        func: Декорируемая асинхронная функция
-
-    Returns:
-        Декорированная асинхронная функция
-    """
-
-    @functools.wraps(func)
-    async def wrapper(*args: Any, **kwargs: Any) -> Any:
-        try:
-            return await func(*args, **kwargs)
-        except Exception as e:
-            return handle_exception(e)
-
-    return cast(F, wrapper)
-
-
-def with_retry(
-    max_retries: int = 3,
-    retry_delay: float = 1.0,
-    exceptions: tuple = (Exception,),
-    logger: Optional[logging.Logger] = None,
-) -> Callable[[F], F]:
-    """
-    Декоратор для повторных попыток выполнения функции при возникновении исключения.
-
-    Args:
-        max_retries: Максимальное количество повторных попыток
-        retry_delay: Задержка между попытками в секундах
-        exceptions: Типы исключений, при которых выполняются повторные попытки
-        logger: Логгер для записи информации о повторных попытках
-
-    Returns:
-        Декоратор для функции
-    """
-
-    def decorator(func: F) -> F:
-        _logger = logger or get_logger(func.__module__)
-
-        @functools.wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
-            last_exception = None
-
-            for attempt in range(1, max_retries + 1):
-                try:
-                    return func(*args, **kwargs)
-                except exceptions as e:
-                    last_exception = e
-                    if attempt < max_retries:
-                        _logger.warning(
-                            f"Attempt {attempt}/{max_retries} failed: {str(e)}. "
-                            f"Retrying in {retry_delay} seconds..."
-                        )
-                        import time
-
-                        time.sleep(retry_delay)
-                    else:
-                        _logger.error("All {max_retries} attempts failed." %)
-                        raise last_exception
-
-            # Этот код не должен выполниться, но на всякий случай
-            if last_exception:
-                raise last_exception
+            # Получаем имя функции для лога
+            func_name = func.__qualname__
+            logger.error("Ошибка в %s: %s", func_name, str(e))
+            
+            # Возвращаем None при ошибке
             return None
-
-        return cast(F, wrapper)
-
-    return decorator
-
-
-def async_with_retry(
-    max_retries: int = 3,
-    retry_delay: float = 1.0,
-    exceptions: tuple = (Exception,),
-    logger: Optional[logging.Logger] = None,
-) -> Callable[[F], F]:
-    """
-    Декоратор для повторных попыток выполнения асинхронной функции при возникновении исключения.
-
-    Args:
-        max_retries: Максимальное количество повторных попыток
-        retry_delay: Задержка между попытками в секундах
-        exceptions: Типы исключений, при которых выполняются повторные попытки
-        logger: Логгер для записи информации о повторных попытках
-
-    Returns:
-        Декоратор для асинхронной функции
-    """
-
-    def decorator(func: F) -> F:
-        _logger = logger or get_logger(func.__module__)
-
-        @functools.wraps(func)
-        async def wrapper(*args: Any, **kwargs: Any) -> Any:
-            last_exception = None
-
-            for attempt in range(1, max_retries + 1):
-                try:
-                    return await func(*args, **kwargs)
-                except exceptions as e:
-                    last_exception = e
-                    if attempt < max_retries:
-                        _logger.warning(
-                            f"Attempt {attempt}/{max_retries} failed: {str(e)}. "
-                            f"Retrying in {retry_delay} seconds..."
-                        )
-                        await asyncio.sleep(retry_delay)
-                    else:
-                        _logger.error("All {max_retries} attempts failed." %)
-                        raise last_exception
-
-            # Этот код не должен выполниться, но на всякий случай
-            if last_exception:
-                raise last_exception
-            return None
-
-        return cast(F, wrapper)
-
-    return decorator
-
-
-def setup_error_handlers() -> None:
-    """
-    Настраивает обработчики ошибок по умолчанию.
-    Должна вызываться при инициализации приложения.
-    """
-    # Регистрируем стандартные обработчики ошибок
-    register_error_handler(
-        ConnectionError, lambda e: logger.error("Ошибка соединения: {str(e)}" %)
-    )
-    register_error_handler(
-        TimeoutError, lambda e: logger.error("Таймаут операции: {str(e)}" %)
-    )
-    register_error_handler(
-        ValueError, lambda e: logger.error("Ошибка значения: {str(e)}" %)
-    )
-    register_error_handler(KeyError, lambda e: logger.error("Ошибка ключа: {str(e)}" %))
-
-    # Настраиваем обработчик неперехваченных исключений
-    def handle_uncaught_exception(exc_type, exc_value, exc_traceback):
-        if issubclass(exc_type, KeyboardInterrupt):
-            # Для Ctrl+C выводим короткое сообщение и выполняем стандартную обработку
-            sys.__excepthook__(exc_type, exc_value, exc_traceback)
-            return
-
-        logger.critical(
-            "Неперехваченное исключение:", exc_info=(exc_type, exc_value, exc_traceback)
-        )
-
-    # Устанавливаем глобальный обработчик исключений
-    sys.excepthook = handle_uncaught_exception
-
-    logger.info("Обработчики ошибок настроены")
-
-
-# Частые обработчики ошибок для повторного использования
-def log_and_ignore_error(e: Exception) -> None:
-    """
-    Логирует ошибку и игнорирует её.
-
-    Args:
-        e: Исключение для логирования
-    """
-    logger.warning("Игнорируемая ошибка: {str(e)}" %)
-    return None
-
-
-def log_and_raise_error(e: Exception) -> None:
-    """
-    Логирует ошибку и пробрасывает её дальше.
-
-    Args:
-        e: Исключение для логирования и пробрасывания
-    """
-    logger.error("Ошибка требует дальнейшей обработки: {str(e)}" %)
-    raise e
-
-
-def log_and_return_fallback(fallback_value: T) -> Callable[[Exception], T]:
-    """
-    Создает обработчик, который логирует ошибку и возвращает запасное значение.
-
-    Args:
-        fallback_value: Запасное значение для возврата
-
-    Returns:
-        Функция-обработчик ошибки
-    """
-
-    def handler(e: Exception) -> T:
-        logger.warning("Ошибка, возвращаем запасное значение: {str(e)}" %)
-        return fallback_value
-
-    return handler
-
-
-def handle_exceptions(func):
-    """
-    Decorator to handle exceptions in a standardized way.
-    
-    Args:
-        func: The function to wrap with exception handling
-        
-    Returns:
-        Wrapped function with exception handling
-    """
-    @functools.wraps(func)
-    async def wrapper(*args, **kwargs):
-        try:
-            return await func(*args, **kwargs)
-        except (RequestError, NetworkError) as e:
-            # Handle specific API-related errors
-            logger.error("API error occurred: %s", str(e))
-            raise
-        except (ValueError, TypeError) as e:
-            # Handle input validation errors
-            logger.error("Input validation error: %s", str(e))
-            raise
-        except Exception as e:
-            # Handle unexpected errors
-            logger.error("Unexpected error: %s", str(e), exc_info=True)
-            raise
     return wrapper
 
 
-def log_error(message, e, *args, **kwargs):
-    """Логирует ошибку с сообщением"""
-    # Заменяем f-string на % форматирование
-    logger.error("%s: %s", message, str(e))
-
-
-async def async_retry(func, max_retries=3, delay=1, *args, **kwargs):
-    """Выполняет асинхронную функцию с повторными попытками в случае ошибки"""
-    last_exception = None
+def async_handle_error(func):
+    """
+    Декоратор для обработки ошибок в асинхронных функциях.
     
-    for attempt in range(max_retries):
+    Args:
+        func: Оборачиваемая корутина
+        
+    Returns:
+        Обернутая корутина с обработкой ошибок
+    """
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        """Асинхронная обертка функции с обработкой ошибок."""
         try:
             return await func(*args, **kwargs)
         except Exception as e:
-            last_exception = e
-            logger.warning("Попытка %d из %d не удалась: %s", 
-                          attempt + 1, max_retries, str(e))
-            await asyncio.sleep(delay * (2 ** attempt))
+            # Получаем имя функции для лога
+            func_name = func.__qualname__
+            logger.error("Ошибка в асинхронной функции %s: %s", func_name, str(e))
+            
+            # Возвращаем None при ошибке
+            return None
+    return wrapper
+
+
+def notify_on_error(func=None, *, notification_type="log"):
+    """
+    Декоратор для уведомления об ошибках.
     
-    # Если все попытки не удались, выбрасываем последнее исключение
-    if last_exception:
-        raise last_exception
+    Args:
+        func: Оборачиваемая функция
+        notification_type: Тип уведомления (log, telegram, email)
         
-    return None  # Это никогда не должно выполняться, но для удовлетворения линтера
+    Returns:
+        Обернутая функция с уведомлениями об ошибках
+    """
+    def decorator(func):
+        """Внутренний декоратор."""
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            """Обертка функции с уведомлениями об ошибках."""
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                # Получаем имя функции для лога
+                func_name = func.__qualname__
+                error_message = f"Ошибка в {func_name}: {str(e)}"
+                
+                # Выбираем тип уведомления
+                if notification_type == "log":
+                    logger.error("%s", error_message)
+                elif notification_type == "telegram":
+                    # Уведомление через телеграм
+                    logger.error("%s", error_message)
+                    # TODO: Добавить отправку в телеграм
+                elif notification_type == "email":
+                    # Уведомление по email
+                    logger.error("%s", error_message)
+                    # TODO: Добавить отправку на email
+                
+                # Пробрасываем исключение дальше
+                raise
+        return wrapper
+    
+    # Обработка случаев вызова с аргументами и без
+    if func is None:
+        return decorator
+    return decorator(func)
+
+
+def async_notify_on_error(func=None, *, notification_type="log"):
+    """
+    Декоратор для уведомления об ошибках в асинхронных функциях.
+    
+    Args:
+        func: Оборачиваемая асинхронная функция
+        notification_type: Тип уведомления (log, telegram, email)
+        
+    Returns:
+        Обернутая асинхронная функция с уведомлениями об ошибках
+    """
+    def decorator(func):
+        """Внутренний декоратор."""
+        @functools.wraps(func)
+        async def wrapper(*args, **kwargs):
+            """Асинхронная обертка функции с уведомлениями об ошибках."""
+            try:
+                return await func(*args, **kwargs)
+            except Exception as e:
+                # Для отслеживания ошибок может понадобиться импортировать время
+                import time
+                
+                # Получаем имя функции для лога
+                func_name = func.__qualname__
+                error_message = f"Ошибка в асинхронной функции {func_name}: {str(e)}"
+                timestamp = time.strftime("%Y-%м-%d %H:%M:%S")
+                
+                # Выбираем тип уведомления
+                if notification_type == "log":
+                    logger.error("%s [%s]", error_message, timestamp)
+                elif notification_type == "telegram":
+                    # Уведомление через телеграм
+                    logger.error("%s [%s]", error_message, timestamp)
+                    # TODO: Добавить отправку в телеграм
+                elif notification_type == "email":
+                    # Уведомление по email
+                    logger.error("%s [%s]", error_message, timestamp)
+                    # TODO: Добавить отправку на email
+                
+                # Пробрасываем исключение дальше
+                raise e
+        return wrapper
+    
+    # Обработка случаев вызова с аргументами и без
+    if func is None:
+        return decorator
+    return decorator(func)
+
+
+def async_with_retry(
+    func=None, 
+    *, 
+    retries=3, 
+    delay=1, 
+    backoff=2, 
+    exceptions=None
+):
+    """
+    Декоратор для повторных попыток выполнения асинхронной функции при ошибке.
+    
+    Args:
+        func: Оборачиваемая асинхронная функция
+        retries: Количество повторных попыток
+        delay: Начальная задержка между попытками (в секундах)
+        backoff: Коэффициент увеличения задержки
+        exceptions: Список исключений для перехвата (по умолчанию все)
+        
+    Returns:
+        Обернутая асинхронная функция с повторными попытками
+    """
+    def decorator(func):
+        """Внутренний декоратор."""
+        @functools.wraps(func)
+        async def wrapper(*args, **kwargs):
+            """Асинхронная обертка функции с повторными попытками."""
+            local_logger = get_logger(f"{func.__module__}.{func.__qualname__}")
+            
+            # Настройка перехватываемых исключений
+            nonlocal exceptions
+            if exceptions is None:
+                exceptions = (Exception,)
+            
+            # Счетчик попыток
+            attempt = 0
+            current_delay = delay
+            last_exception = None
+            
+            # Попытки выполнения с повторами
+            while attempt < retries + 1:
+                try:
+                    return await func(*args, **kwargs)
+                except exceptions as e:
+                    attempt += 1
+                    last_exception = e
+                    
+                    if attempt > retries:
+                        local_logger.error(
+                            "Превышено количество попыток (%d) для %s: %s", 
+                            retries, func.__qualname__, str(e)
+                        )
+                        raise last_exception
+                    
+                    # Логируем информацию о повторе
+                    local_logger.warning(
+                        "Попытка %d/%d для %s не удалась: %s. Повтор через %.2f с",
+                        attempt, retries, func.__qualname__, str(e), current_delay
+                    )
+                    
+                    # Задержка перед следующей попыткой
+                    await asyncio.sleep(current_delay)
+                    current_delay *= backoff
+        return wrapper
+    
+    # Обработка случаев вызова с аргументами и без
+    if func is None:
+        return decorator
+    return decorator(func)
+
+
+def log_call(func):
+    """
+    Декоратор для логирования вызовов функции.
+    
+    Args:
+        func: Оборачиваемая функция
+        
+    Returns:
+        Обернутая функция с логированием вызовов
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        """Обертка функции с логированием вызовов."""
+        # Получаем имя функции
+        func_name = func.__qualname__
+        
+        # Логируем вызов
+        logger.debug("Вызов функции %s с аргументами %s, %s", func_name, args, kwargs)
+        
+        # Выполняем функцию
+        result = func(*args, **kwargs)
+        
+        # Логируем завершение
+        logger.debug("Функция %s завершена с результатом: %s", func_name, result)
+        
+        return result
+    return wrapper
+
+
+def async_log_call(func):
+    """
+    Декоратор для логирования вызовов асинхронной функции.
+    
+    Args:
+        func: Оборачиваемая асинхронная функция
+        
+    Returns:
+        Обернутая асинхронная функция с логированием вызовов
+    """
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        """Асинхронная обертка функции с логированием вызовов."""
+        # Получаем имя функции
+        func_name = func.__qualname__
+        
+        # Логируем вызов
+        logger.debug("Вызов асинхронной функции %s с аргументами %s, %s", 
+                    func_name, args, kwargs)
+        
+        # Выполняем функцию
+        result = await func(*args, **kwargs)
+        
+        # Логируем завершение
+        logger.debug("Асинхронная функция %s завершена с результатом: %s", 
+                    func_name, result)
+        
+        return result
+    return wrapper
+
+
+def report_error(error_message, exc_info=None):
+    """
+    Сообщает об ошибке и отправляет уведомление.
+    
+    Args:
+        error_message: Сообщение об ошибке
+        exc_info: Информация об исключении (sys.exc_info())
+    """
+    # Логируем ошибку
+    logger.error("%s", error_message, exc_info=exc_info)
+    
+    # TODO: Отправка уведомления через нужный канал
