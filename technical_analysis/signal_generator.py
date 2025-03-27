@@ -4,7 +4,7 @@
 """
 
 # Standard imports
-from typing import Dict, List
+from typing import Dict, Any, List, Optional, Union, Tuple
 
 # Third-party imports
 try:
@@ -16,12 +16,12 @@ except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy", "pandas"])
     import pandas as pd
 
-from project.technical_analysis.indicators import Indicators
-from project.technical_analysis.patterns import Patterns
+from project.technical_analysis.indicators import calculate_indicators
+from project.technical_analysis.patterns import detect_patterns
 from project.utils.error_handler import handle_error
-from project.utils.logging_utils import get_logger
+from project.utils.logging_utils import setup_logger
 
-logger = get_logger(__name__)
+logger = setup_logger(__name__)
 
 
 class SignalGenerator:
