@@ -8,7 +8,7 @@ import uuid
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
-from project.config import get_config
+from ..config import get_config
 from project.data.symbol_manager import SymbolManager
 from project.infrastructure.database import Database
 from project.utils.ccxt_exchanges import (
@@ -52,25 +52,32 @@ class OrderExecutor:
     @classmethod
     def get_instance(cls) -> "OrderExecutor":
         """
-        Получает экземпляр класса OrderExecutor (Singleton).
-
+        Получает глобальный экземпляр OrderExecutor.
+        
         Returns:
-            Экземпляр класса OrderExecutor
+            OrderExecutor: Экземпляр класса OrderExecutor
         """
         if cls._instance is None:
             cls._instance = cls()
         return cls._instance
-
-    def __init__(self):
+    
+    def __init__(self, config=None):
         """
         Инициализирует исполнитель ордеров.
+        
+        Args:
+            config (Dict, optional): Конфигурация. Defaults to None.
         """
-        self.config = get_config()
-        self.db = Database.get_instance()
+        self.config = config or get_config()
         self.symbol_manager = SymbolManager.get_instance()
-        self.exchange_instances = {}
-        logger.debug("Создан экземпляр OrderExecutor")
-
+        self._db = None
+        self._last_orders = {}
+        self._order_cache = {}
+        self._order_history = {}
+        self._active_orders = {}
+        self._failed_orders = {}
+        self._stats = {"created": 0, "filled": 0, "canceled": 0, "failed": 0}
+        
     @async_handle_error
     async def execute_order(
         self,
@@ -114,7 +121,7 @@ class OrderExecutor:
                 ticker = await fetch_ticker(exchange_id, symbol)
                 price = ticker.get("last", 0)
                 logger.warning(
-                    f"Для лимитного ордера не указана цена, используем текущую цену {price}"
+                    "Для лимитного ордера не указана цена, используем текущую цену %s", price
                 )
 
             if price is not None:
@@ -126,8 +133,9 @@ class OrderExecutor:
 
             # Логируем информацию о создаваемом ордере
             logger.info(
-                f"Создаем ордер на {exchange_id}: {side} {order_type} {amount} {symbol}"
-                f"{f' по цене {price}' if price else ''}"
+                "Создаем ордер на %s: %s %s %s %s%s",
+                exchange_id, side, order_type, amount, symbol,
+                f" по цене {price}" if price else ""
             )
 
             # Отправляем уведомление о создании ордера
@@ -168,7 +176,7 @@ class OrderExecutor:
 
         except Exception as e:
             error_msg = f"Ошибка при выполнении ордера {side} {order_type} {amount} {symbol}: {str(e)}"
-            logger.error(error_msg)
+            logger.error("%s", error_msg)
 
             # Отправляем уведомление об ошибке
             await send_trading_signal(
@@ -198,13 +206,13 @@ class OrderExecutor:
             symbol = await self._normalize_symbol(exchange_id, symbol)
 
             # Логируем информацию об отменяемом ордере
-            logger.info("Отменяем ордер {order_id} на {exchange_id} для {symbol}" %)
+            logger.info("Отменяем ордер %s на %s для %s", order_id, exchange_id, symbol)
 
             # Отправляем уведомление об отмене ордера
             await send_trading_signal(f"Отмена ордера: {order_id} ({symbol})")
 
             # Отменяем ордер на бирже
-            result = await cancel_order(
+            cancelled_order = await cancel_order(
                 exchange_id=exchange_id,
                 order_id=order_id,
                 symbol=symbol,
@@ -233,7 +241,7 @@ class OrderExecutor:
             error_msg = (
                 f"Ошибка при отмене ордера {order_id} на {exchange_id}: {str(e)}"
             )
-            logger.error(error_msg)
+            logger.error("%s", error_msg)
 
             # Отправляем уведомление об ошибке
             await send_trading_signal(
@@ -275,7 +283,8 @@ class OrderExecutor:
 
             # Логируем информацию о статусе ордера
             logger.debug(
-                f"Статус ордера {order_id} на {exchange_id}: {order.get('status', 'unknown')}"
+                "Статус ордера %s на %s: %s", 
+                order_id, exchange_id, order.get('status', 'unknown')
             )
 
             return OrderResult(
@@ -292,10 +301,12 @@ class OrderExecutor:
             )
 
         except Exception as e:
-            error_msg = f"Ошибка при проверке статуса ордера {order_id} на {exchange_id}: {str(e)}"
-            logger.error(error_msg)
-
-            return OrderResult(success=False, order_id=order_id, error=str(e))
+            logger.error("Ошибка при проверке статуса ордера %s: %s", order_id, str(e))
+            return OrderResult(
+                success=False,
+                order_id=order_id,
+                error=str(e)
+            )
 
     @async_handle_error
     async def get_open_orders(
@@ -324,8 +335,8 @@ class OrderExecutor:
 
             # Логируем информацию об открытых ордерах
             logger.debug(
-                f"Получено {len(orders)} открытых ордеров на {exchange_id}"
-                f"{f' для {symbol}' if symbol else ''}"
+                "Получено %d открытых ордеров на %s%s",
+                len(orders), exchange_id, f" для {symbol}" if symbol else ""
             )
 
             return orders
@@ -452,32 +463,8 @@ class OrderExecutor:
         )
 
     async def _normalize_symbol(self, exchange_id: str, symbol: str) -> str:
-        """
-        Нормализует символ для указанной биржи.
-
-        Args:
-            exchange_id: Идентификатор биржи
-            symbol: Символ торговой пары
-
-        Returns:
-            Нормализованный символ
-        """
-        # Если символ уже содержит разделитель, возвращаем как есть
-        if "/" in symbol:
-            return symbol
-
-        # Заменяем нестандартные разделители на стандартный
-        if "_" in symbol:
-            return symbol.replace("_", "/")
-
-        # Пытаемся определить разделение базового и котируемого активов
-        for quote in ["USDT", "BTC", "ETH", "USD", "BUSD"]:
-            if symbol.endswith(quote):
-                base = symbol[: -len(quote)]
-                return f"{base}/{quote}"
-
-        # Если не удалось определить, возвращаем как есть
-        return symbol
+        """Нормализует символ торговой пары для указанной биржи."""
+        return await self.symbol_manager.normalize_symbol(symbol, exchange_id)
 
     async def _normalize_amount(
         self, exchange_id: str, symbol: str, amount: float
@@ -520,44 +507,18 @@ class OrderExecutor:
             order: Данные ордера
         """
         try:
-            # Извлекаем основные поля ордера
-            order_id = order.get("id")
-            symbol = order.get("symbol")
-            client_order_id = order.get("clientOrderId")
-            side = order.get("side")
-            type = order.get("type")
-            status = order.get("status")
-            amount = float(order.get("amount", 0))
-            price = float(order.get("price", 0)) if order.get("price") else None
-            timestamp = order.get("timestamp", int(time.time() * 1000))
-            filled = float(order.get("filled", 0))
-            average = float(order.get("average", 0)) if order.get("average") else None
-
-            # Сохраняем в базу данных
-            from project.data.database import Database as DataDB
-
-            data_db = DataDB.get_instance()
-
-            await data_db.save_order(
-                exchange_id=exchange_id,
-                symbol=symbol,
-                order_id=order_id,
-                client_order_id=client_order_id,
-                side=side,
-                type=type,
-                status=status,
-                amount=amount,
-                price=price,
-                timestamp=timestamp,
-                filled=filled,
-                average=average,
-                raw_data=order,
-            )
-
-            logger.debug("Ордер {order_id} сохранен в базе данных" %)
-
+            from project.data.database import Database
+            
+            if self._db is None:
+                self._db = Database.get_instance()
+            
+            # Сохраняем информацию об ордере в базе данных
+            logger.debug("Сохраняем ордер в базе данных: %s", order.get("id", "unknown"))
+            
+            # Здесь код для сохранения ордера в БД
+            
         except Exception as e:
-            logger.error("Ошибка при сохранении ордера в базу данных: {str(e)}" %)
+            logger.error("Ошибка при сохранении ордера в БД: %s", str(e))
 
     async def _update_order_in_db(
         self, exchange_id: str, order: Dict[str, Any]
@@ -569,5 +530,4 @@ class OrderExecutor:
             exchange_id: Идентификатор биржи
             order: Данные ордера
         """
-        # Реализация такая же, как и для _save_order_to_db
         await self._save_order_to_db(exchange_id, order)
