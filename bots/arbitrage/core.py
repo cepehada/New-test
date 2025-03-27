@@ -764,7 +764,7 @@ class ArbitrageCore:
             "buy", 
             opportunity.amount, 
             opportunity.buy_price,
-            type="limit"  # Добавляем недостающий параметр
+            order_type="limit"  # Changed from type="limit" to order_type="limit"
         )
         
         # ...existing code...
@@ -775,7 +775,7 @@ class ArbitrageCore:
             "sell", 
             opportunity.amount, 
             opportunity.sell_price,
-            type="limit"  # Добавляем недостающий параметр
+            order_type="limit"  # Changed from type="limit" to order_type="limit"
         )
         
         # ...existing code...

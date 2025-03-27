@@ -513,3 +513,11 @@ class CrossStrategy(BaseStrategy):
             return "sell"
         else:
             return "neutral"
+
+    def calculate_signal(self):
+        # Make sure this is properly indented
+        if self.data is None or len(self.data) < self.fast_ma_period + 10:
+            return "neutral"
+        
+        # Rest of the method with proper indentation
+        # ...

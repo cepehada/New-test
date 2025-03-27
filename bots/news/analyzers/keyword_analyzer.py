@@ -461,31 +461,19 @@ class KeywordAnalyzer:
                 impact = "negative"
                 confidence = 0.7
             elif category == "market":
-                # Рыночные новости могут быть различными
-                # Определение проводится по ключевым словам
-                keywords = topic.get("top_keywords", [])
-                bull_terms = ["bull", "rally", "surge", "increase", "rise", "growth"]
-                bear_terms = ["bear", "crash", "drop", "decrease", "fall", "decline"]
-
-                bull_count = sum(
-                    1
-                    for keyword in keywords
-                    if any(term in keyword for term in bull_terms)
-                )
-                bear_count = sum(
-                    1
-                    for keyword in keywords
-                    if any(term in keyword for term in bear_terms)
-                )
-
-                if bull_count > bear_count:
+                # Рыночные новости могут быть позитивными или негативными
+                # в зависимости от содержания
+                if any(kw in " ".join(topic["top_keywords"]) for kw in 
+                       ["bull", "rally", "breakout", "surge", "all-time high"]):
                     impact = "positive"
-                elif bear_count > bull_count:
+                    confidence = 0.7
+                elif any(kw in " ".join(topic["top_keywords"]) for kw in 
+                         ["bear", "crash", "correction", "resistance", "all-time low"]):
                     impact = "negative"
+                    confidence = 0.7
                 else:
                     impact = "neutral"
-
-                confidence = 0.6
+                    confidence = 0.5
             elif category == "macroeconomics":
                 # Макроэкономика сложнее для однозначной оценки
                 impact = "neutral"

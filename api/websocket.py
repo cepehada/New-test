@@ -487,9 +487,9 @@ async def update_system_info() -> None:
                         "timestamp": time.time(),
                     },
                 )
-
+                
             # Ждем перед следующим обновлением
-            await asyncio.sleep(15)
+            await asyncio.sleep(10)
 
     except ImportError:
         logger.warning("psutil not installed, system info updates disabled")

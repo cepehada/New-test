@@ -249,8 +249,7 @@ class APIServer:
         bot_router.post("/{bot_id}/resume")(self.resume_bot)
         bot_router.get("/{bot_id}/status")(self.get_bot_status)
 
-// ...existing code...
-        @app.route('/api/stats/performance', methods=['GET'])
+        @self.app.route('/api/stats/performance', methods=['GET'])
         async def get_performance_stats(request):
             try:
                 # Получаем статистику производительности
@@ -266,7 +265,6 @@ class APIServer:
             except Exception as e:
                 logger.error(f"Error getting performance stats: {e}")
                 return json_response({"success": False, "error": str(e)}, status=500)
-// ...existing code...
 
         # Маршруты для бэктестинга
         backtest_router.post("/")(self.run_backtest)
@@ -1615,14 +1613,12 @@ class APIServer:
                 progress_callback=progress_callback
             )
 
-            // ...existing code...
             # Закрываем скобку, которая была открыта, но не закрыта
             response = {
                 'status': 'success',
                 'message': 'Operation completed',
                 'data': result
             }
-            // ...existing code...
 
             # Обновляем статус задачи
             if task_id in self.optimization_tasks:
@@ -1657,4 +1653,527 @@ class APIServer:
             tasks = []
             for task_id, task_info in self.optimization_tasks.items():
                 task = {
-                    'task_id': task
+                    'task_id': task_id,
+                    'status': task_info['status'],
+                    'start_time': task_info['start_time'],
+                    'progress': task_info['progress'],
+                    'request': task_info['request']
+                }
+                if 'end_time' in task_info:
+                    task['end_time'] = task_info['end_time']
+                if 'result' in task_info:
+                    task['result'] = task_info['result']
+                if 'error' in task_info:
+                    task['error'] = task_info['error']
+                tasks.append(task)
+
+            return tasks
+
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error getting optimization tasks: {str(e)}"
+            )
+
+    async def get_optimization_task(self, task_id: str, token: Dict = Depends(verify_token)) -> Dict:
+        """
+        Endpoint для получения информации о задаче оптимизации
+
+        Args:
+            task_id: ID задачи
+            token: Верифицированный токен
+
+        Returns:
+            Dict: Информация о задаче
+        """
+        try:
+            # Проверяем существование задачи
+            if task_id not in self.optimization_tasks:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Task {task_id} not found"
+                )
+
+            return self.optimization_tasks[task_id]
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error getting optimization task: {str(e)}"
+            )
+
+    async def cancel_optimization_task(self, task_id: str, token: Dict = Depends(verify_token)) -> Dict:
+        """
+        Endpoint для отмены задачи оптимизации
+
+        Args:
+            task_id: ID задачи
+            token: Верифицированный токен
+
+        Returns:
+            Dict: Результат операции
+        """
+        try:
+            # Проверяем существование задачи
+            if task_id not in self.optimization_tasks:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Task {task_id} not found"
+                )
+
+            # Обновляем статус задачи
+            self.optimization_tasks[task_id]['status'] = 'cancelled'
+            self.optimization_tasks[task_id]['end_time'] = datetime.now().isoformat()
+
+            return {
+                'status': 'success',
+                'message': f"Task {task_id} cancelled"
+            }
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error cancelling optimization task: {str(e)}"
+            )
+
+    async def get_optimization_results(self, limit: int = 10, token: Dict = Depends(verify_token)) -> List[Dict]:
+        """
+        Endpoint для получения результатов оптимизаций
+
+        Args:
+            limit: Максимальное количество результатов
+            token: Верифицированный токен
+
+        Returns:
+            List[Dict]: Список результатов оптимизаций
+        """
+        try:
+            # Если база данных недоступна, возвращаем пустой список
+            if not self.database:
+                return []
+
+            # Получаем результаты оптимизаций
+            optimizations = await self.database.get_optimizations(limit=limit)
+
+            return optimizations
+
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error getting optimization results: {str(e)}"
+            )
+
+    async def get_optimization_result(self, optimization_id: str, token: Dict = Depends(verify_token)) -> Dict:
+        """
+        Endpoint для получения результата конкретной оптимизации
+
+        Args:
+            optimization_id: ID оптимизации
+            token: Верифицированный токен
+
+        Returns:
+            Dict: Результат оптимизации
+        """
+        try:
+            # Если база данных недоступна, возвращаем ошибку
+            if not self.database:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Database not available"
+                )
+
+            # Получаем результаты оптимизации
+            optimizations = await self.database.get_optimizations()
+
+            # Ищем нужную оптимизацию
+            for optimization in optimizations:
+                if optimization.get('optimization_id') == optimization_id:
+                    return optimization
+
+            # Если оптимизация не найдена, возвращаем ошибку
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Optimization {optimization_id} not found"
+            )
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error getting optimization result: {str(e)}"
+            )
+
+    async def get_ohlc_chart(self, exchange_id: str, symbol: str, timeframe: str = '1h',
+                          limit: int = 100, token: Dict = Depends(verify_token)) -> StreamingResponse:
+        """
+        Endpoint для получения графика OHLC
+
+        Args:
+            exchange_id: ID биржи
+            symbol: Символ торговой пары
+            timeframe: Временной интервал
+            limit: Количество свечей
+            token: Верифицированный токен
+
+        Returns:
+            StreamingResponse: График OHLC
+        """
+        try:
+            # Получаем OHLCV данные
+            ohlcv = await self.exchange_manager.fetch_ohlcv(symbol, exchange_id, timeframe, limit)
+
+            if ohlcv is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Could not fetch OHLCV data for {symbol} on {exchange_id}"
+                )
+
+            # Преобразуем в pandas DataFrame
+            import pandas as pd
+
+            df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+            df.set_index('timestamp', inplace=True)
+
+            # Создаем график
+            fig = self.visualizer.plot_ohlc(df)
+
+            # Преобразуем график в изображение
+            buf = io.BytesIO()
+            fig.savefig(buf, format='png')
+            buf.seek(0)
+
+            return StreamingResponse(buf, media_type="image/png")
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error getting OHLC chart: {str(e)}"
+            )
+
+    async def get_equity_chart(self, backtest_id: str, token: Dict = Depends(verify_token)) -> StreamingResponse:
+        """
+        Endpoint для получения графика equity
+
+        Args:
+            backtest_id: ID бэктеста
+            token: Верифицированный токен
+
+        Returns:
+            StreamingResponse: График equity
+        """
+        try:
+            # Если база данных недоступна, возвращаем ошибку
+            if not self.database:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Database not available"
+                )
+
+            # Получаем результаты бэктеста
+            backtests = await self.database.get_backtests()
+
+            # Ищем нужный бэктест
+            for backtest in backtests:
+                if backtest.get('backtest_id') == backtest_id:
+                    equity_curve = backtest.get('equity_curve', [])
+
+                    # Преобразуем в pandas DataFrame
+                    import pandas as pd
+
+                    df = pd.DataFrame(equity_curve, columns=['timestamp', 'equity'])
+                    df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+                    df.set_index('timestamp', inplace=True)
+
+                    # Создаем график
+                    fig = self.visualizer.plot_equity_curve(df)
+
+                    # Преобразуем график в изображение
+                    buf = io.BytesIO()
+                    fig.savefig(buf, format='png')
+                    buf.seek(0)
+
+                    return StreamingResponse(buf, media_type="image/png")
+
+            # Если бэктест не найден, возвращаем ошибку
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Backtest {backtest_id} not found"
+            )
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error getting equity chart: {str(e)}"
+            )
+
+    async def get_drawdown_chart(self, backtest_id: str, token: Dict = Depends(verify_token)) -> StreamingResponse:
+        """
+        Endpoint для получения графика drawdown
+
+        Args:
+            backtest_id: ID бэктеста
+            token: Верифицированный токен
+
+        Returns:
+            StreamingResponse: График drawdown
+        """
+        try:
+            # Если база данных недоступна, возвращаем ошибку
+            if not self.database:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Database not available"
+                )
+
+            # Получаем результаты бэктеста
+            backtests = await self.database.get_backtests()
+
+            # Ищем нужный бэктест
+            for backtest in backtests:
+                if backtest.get('backtest_id') == backtest_id:
+                    equity_curve = backtest.get('equity_curve', [])
+
+                    # Преобразуем в pandas DataFrame
+                    import pandas as pd
+
+                    df = pd.DataFrame(equity_curve, columns=['timestamp', 'equity'])
+                    df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+                    df.set_index('timestamp', inplace=True)
+
+                    # Создаем график
+                    fig = self.visualizer.plot_drawdown(df)
+
+                    # Преобразуем график в изображение
+                    buf = io.BytesIO()
+                    fig.savefig(buf, format='png')
+                    buf.seek(0)
+
+                    return StreamingResponse(buf, media_type="image/png")
+
+            # Если бэктест не найден, возвращаем ошибку
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Backtest {backtest_id} not found"
+            )
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error getting drawdown chart: {str(e)}"
+            )
+
+    async def get_monthly_returns_chart(self, backtest_id: str, token: Dict = Depends(verify_token)) -> StreamingResponse:
+        """
+        Endpoint для получения графика monthly returns
+
+        Args:
+            backtest_id: ID бэктеста
+            token: Верифицированный токен
+
+        Returns:
+            StreamingResponse: График monthly returns
+        """
+        try:
+            # Если база данных недоступна, возвращаем ошибку
+            if not self.database:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Database not available"
+                )
+
+            # Получаем результаты бэктеста
+            backtests = await self.database.get_backtests()
+
+            # Ищем нужный бэктест
+            for backtest in backtests:
+                if backtest.get('backtest_id') == backtest_id:
+                    equity_curve = backtest.get('equity_curve', [])
+
+                    # Преобразуем в pandas DataFrame
+                    import pandas as pd
+
+                    df = pd.DataFrame(equity_curve, columns=['timestamp', 'equity'])
+                    df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+                    df.set_index('timestamp', inplace=True)
+
+                    # Создаем график
+                    fig = self.visualizer.plot_monthly_returns(df)
+
+                    # Преобразуем график в изображение
+                    buf = io.BytesIO()
+                    fig.savefig(buf, format='png')
+                    buf.seek(0)
+
+                    return StreamingResponse(buf, media_type="image/png")
+
+            # Если бэктест не найден, возвращаем ошибку
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Backtest {backtest_id} not found"
+            )
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error getting monthly returns chart: {str(e)}"
+            )
+
+    async def get_optimization_chart(self, optimization_id: str, token: Dict = Depends(verify_token)) -> StreamingResponse:
+        """
+        Endpoint для получения графика оптимизации
+
+        Args:
+            optimization_id: ID оптимизации
+            token: Верифицированный токен
+
+        Returns:
+            StreamingResponse: График оптимизации
+        """
+        try:
+            # Если база данных недоступна, возвращаем ошибку
+            if not self.database:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Database not available"
+                )
+
+            # Получаем результаты оптимизации
+            optimizations = await self.database.get_optimizations()
+
+            # Ищем нужную оптимизацию
+            for optimization in optimizations:
+                if optimization.get('optimization_id') == optimization_id:
+                    results = optimization.get('results', [])
+
+                    # Преобразуем в pandas DataFrame
+                    import pandas as pd
+
+                    df = pd.DataFrame(results)
+
+                    # Создаем график
+                    fig = self.visualizer.plot_optimization_results(df)
+
+                    # Преобразуем график в изображение
+                    buf = io.BytesIO()
+                    fig.savefig(buf, format='png')
+                    buf.seek(0)
+
+                    return StreamingResponse(buf, media_type="image/png")
+
+            # Если оптимизация не найдена, возвращаем ошибку
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Optimization {optimization_id} not found"
+            )
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error getting optimization chart: {str(e)}"
+            )
+
+    async def get_system_status(self, token: Dict = Depends(verify_token)) -> Dict:
+        """
+        Endpoint для получения статуса системы
+
+        Args:
+            token: Верифицированный токен
+
+        Returns:
+            Dict: Статус системы
+        """
+        try:
+            # Получаем статус системы
+            status = {
+                'uptime': time.time() - self.start_time,
+                'active_bots': len(self.bots),
+                'database_connected': self.database.is_connected() if self.database else False,
+                'exchange_manager_connected': self.exchange_manager.is_connected() if self.exchange_manager else False
+            }
+
+            return status
+
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error getting system status: {str(e)}"
+            )
+
+    async def get_logs(self, token: Dict = Depends(verify_token)) -> FileResponse:
+        """
+        Endpoint для получения логов
+
+        Args:
+            token: Верифицированный токен
+
+        Returns:
+            FileResponse: Логи
+        """
+        try:
+            # Путь к файлу логов
+            log_file_path = os.path.join(os.path.dirname(__file__), 'logs', 'api_server.log')
+
+            # Проверяем существование файла
+            if not os.path.exists(log_file_path):
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Log file not found"
+                )
+
+            return FileResponse(log_file_path, media_type='text/plain', filename='api_server.log')
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error getting logs: {str(e)}"
+            )
+
+    async def send_notification(self, message: str = Body(...), token: Dict = Depends(verify_token)) -> Dict:
+        """
+        Endpoint для отправки уведомления
+
+        Args:
+            message: Сообщение уведомления
+            token: Верифицированный токен
+
+        Returns:
+            Dict: Результат операции
+        """
+        try:
+            # Отправляем уведомление
+            await self.notification_manager.send_notification(message)
+
+            return {
+                'status': 'success',
+                'message': 'Notification sent'
+            }
+
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error sending notification: {str(e)}"
+            )
+
+
+if __name__ == "__main__":
+    config = get_config()
+    api_server = APIServer(config=config.get('api', {}))
+    uvicorn.run(api_server.app, host=api_server.host, port=api_server.port, reload=api_server.reload, workers=api_server.workers)
