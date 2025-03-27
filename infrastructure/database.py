@@ -4,10 +4,17 @@
 """
 
 import asyncio
-import asyncpg
 import logging
 from typing import Dict, List, Any, Optional, Union, Tuple
 from contextlib import asynccontextmanager
+
+try:
+    import asyncpg
+except ImportError:
+    import subprocess
+    import sys
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "asyncpg"])
+    import asyncpg
 
 from project.config import get_config
 from project.utils.logging_utils import get_logger

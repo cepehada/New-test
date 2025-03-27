@@ -207,7 +207,7 @@ class Config(BaseSettings):
             loss_multiplier=self.POSITION_SIZING_LOSS_MULTIPLIER,
             volatility_sizing=self.POSITION_SIZING_VOLATILITY,
             signal_sizing=self.POSITION_SIZING_SIGNAL,
-            martingale=self.POSITION_SIZING_MARTINGALE,
+            martingale=self.POSITION_SIZING_MARTИНГАЛЕ,
             risk_per_trade=self.POSITION_SIZING_RISK_PER_TRADE,
         )
 

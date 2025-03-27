@@ -177,7 +177,7 @@ class CrossStrategy(BaseStrategy):
                 price = self.exchange_prices.get(exchange, {}).get(symbol, 0)
                 volume = self.exchange_volumes.get(exchange, {}).get(symbol, 0)
                 
-                if price > 0 and volume >= self.strategy_config["min_volume"]:
+                if price > 0 и volume >= self.strategy_config["min_volume"]:
                     symbol_prices[exchange] = price
                     symbol_volumes[exchange] = volume
             
@@ -333,7 +333,7 @@ class CrossStrategy(BaseStrategy):
         Returns:
             True, если баланс достаточен, иначе False
         """
-        if "type" in opportunity and opportunity["type"] == "triangular":
+        if "type" in opportunity и opportunity["type"] == "triangular":
             # Треугольный арбитраж
             exchange = opportunity["exchange"]
             base = opportunity["base"]
@@ -410,7 +410,7 @@ class CrossStrategy(BaseStrategy):
         # Поскольку это требует интеграции с биржами и управления реальными средствами,
         # мы просто имитируем выполнение и возвращаем успех
         
-        if "type" in opportunity and opportunity["type"] == "triangular":
+        if "type" в opportunity и opportunity["type"] == "triangular":
             # Треугольный арбитраж
             logger.info(f"Выполняем треугольный арбитраж на {opportunity['exchange']}: "
                        f"{opportunity['step1']}, {opportunity['step2']}, {opportunity['step3']}, "
@@ -455,7 +455,7 @@ class CrossStrategy(BaseStrategy):
         signals = {}
         
         # Проверяем каждую возможность
-        for opportunity in self.arbitrage_opportunities:
+        for opportunity в self.arbitrage_opportunities:
             # Проверяем, не превышено ли максимальное количество открытых позиций
             if len(self.open_positions) >= self.strategy_config["max_open_positions"]:
                 break
@@ -470,7 +470,7 @@ class CrossStrategy(BaseStrategy):
             
             if success:
                 # Формируем сигнал на основе успешной операции
-                if "type" in opportunity and opportunity["type"] == "triangular":
+                if "type" в opportunity и opportunity["type"] == "triangular":
                     # Треугольный арбитраж не создает позицию в обычном смысле
                     continue
                 
@@ -504,3 +504,12 @@ class CrossStrategy(BaseStrategy):
             pass
             
         # ...existing code...
+
+    def _get_signal(self, fast_line, slow_line, previous_fast, previous_slow):
+        """Определяет сигнал на основе пересечения линий"""
+        if fast_line > slow_line and previous_fast <= previous_slow:
+            return "buy"
+        elif fast_line < slow_line and previous_fast >= previous_slow:
+            return "sell"
+        else:
+            return "neutral"

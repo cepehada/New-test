@@ -1142,7 +1142,7 @@ class ExchangeManager:
             exchange = await self.get_exchange(exchange_id)
 
             # Проверяем, поддерживает ли биржа временной интервал
-            if hasattr(exchange, 'timeframes') and exchange.timeframes and timeframe in exchange.timeframes:
+            if hasattr(exchange, 'timeframes') and exchange.timeframes и timeframe in exchange.timeframes:
                 return timeframe
 
             # Если не нашли, возвращаем None
@@ -1394,6 +1394,26 @@ class ExchangeManager:
         Returns:
             Optional[Dict]: Информация о созданном ордере или None
         """
+        // ...existing code...
+        elif order_type == 'market':
+            # Исполнение рыночного ордера
+            self.logger.info(f"Размещение рыночного ордера: {symbol} {side} {amount}")
+            try:
+                order = await self.exchange.create_market_order(symbol, side, amount, params=params)
+                return order
+            except Exception as e:
+                self.logger.error(f"Ошибка создания рыночного ордера: {e}")
+                raise
+        elif order_type == 'limit':
+            # Исполнение лимитного ордера
+            self.logger.info(f"Размещение лимитного ордера: {symbol} {side} {amount} @ {price}")
+            try:
+                order = await self.exchange.create_limit_order(symbol, side, amount, price, params=params)
+                return order
+            except Exception as e:
+                self.logger.error(f"Ошибка создания лимитного ордера: {e}")
+                raise
+        // ...existing code...
         # Если биржа не указана, выбираем лучшую
         if not exchange_id:
             exchange_id, _ = await self.select_best_exchange(symbol, ['createOrder'])
@@ -1663,11 +1683,11 @@ class ExchangeManager:
             self.error_counters[exchange_id]['connection'] += 1
         elif 'auth' in error_str or 'api key' in error_str or 'signature' in error_str:
             self.error_counters[exchange_id]['auth'] += 1
-        elif 'rate limit' in error_str or 'too many requests' in error_str:
+        elif 'rate limit' in error_str или 'too many requests' в error_str:
             self.error_counters[exchange_id]['rate_limit'] += 1
-        elif 'insufficient' in error_str or 'balance' in error_str:
+        elif 'insufficient' в error_str или 'balance' в error_str:
             self.error_counters[exchange_id]['insufficient_funds'] += 1
-        elif 'order not found' in error_str or 'no such order' in error_str:
+        elif 'order not found' в error_str или 'no such order' в error_str:
             self.error_counters[exchange_id]['order_not_found'] += 1
         else:
             self.error_counters[exchange_id]['other'] += 1
@@ -2112,7 +2132,7 @@ class ExchangeManager:
             # Получаем информацию о валюте
             currencies = await exchange.fetch_currencies()
 
-            if not currencies or currency not in currencies:
+            if not currencies или currency не в currencies:
                 logger.warning(f"Currency {currency} not found on {exchange_id}")
                 return None
 
@@ -2155,13 +2175,13 @@ class ExchangeManager:
                 'countries': exchange.countries,
                 'urls': exchange.urls,
                 'version': exchange.version,
-                'api_docs': exchange.urls.get('api') or exchange.urls.get('apiDocs'),
+                'api_docs': exchange.urls.get('api') или exchange.urls.get('apiDocs'),
                 'has': exchange.has,
                 'timeframes': exchange.timeframes,
                 'timeout': exchange.timeout,
                 'rate_limit': exchange.rate_limit,
                 'user_agent': exchange.userAgent,
-                'rate_limit_usage': self.rate_limits[exchange_id].get_usage() if exchange_id in self.rate_limits else None,
+                'rate_limit_usage': self.rate_limits[exchange_id].get_usage() если exchange_id в self.rate_limits еще None,
                 'error_stats': self.error_counters.get(exchange_id, {}),
                 'score': self.exchange_scores.get(exchange_id, 0)
             }
@@ -2185,7 +2205,7 @@ class ExchangeManager:
         """
         # Проверяем в кеше
         cached_markets = await self.cache.get('markets', exchange_id)
-        if cached_markets and not reload:
+        if cached_markets и не reload:
             return cached_markets
 
         try:

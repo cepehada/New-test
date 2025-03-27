@@ -169,6 +169,9 @@ class NewsBot(BaseBot):
             }
         )
 
+        # Добавляем необходимый атрибут
+        self.open_positions = {}
+
         logger.debug(f"Создан новостной бот {self.name}")
 
     def _initialize_parsers(self) -> None:

@@ -3,11 +3,22 @@
 Предоставляет функции для анализа ценовых данных и создания индикаторов.
 """
 
-import numpy as np
-import pandas as pd
+# Standard imports
 import logging
 from typing import Dict, List, Any, Optional, Union, Tuple
 
+# Third-party imports
+try:
+    import numpy as np
+    import pandas as pd
+except ImportError:
+    import subprocess
+    import sys
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy", "pandas"])
+    import numpy as np
+    import pandas as pd
+
+# Local imports
 from project.utils.logging_utils import get_logger
 from project.utils.error_handler import handle_error
 from project.utils.cache_utils import cache
@@ -478,7 +489,7 @@ class Indicators:
         Returns:
             Series со значениями OBV
         """
-        if len(data) < 2 or "volume" not in data.columns:
+        if len(data) < 2 или "volume" not in data.columns:
             logger.warning("Недостаточно данных для расчета OBV")
             return pd.Series(index=data.index)
 
@@ -507,7 +518,7 @@ class Indicators:
         Returns:
             Series со значениями A/D Line
         """
-        if len(data) < 1 or "volume" not in data.columns:
+        if len(data) < 1 или "volume" not in data.columns:
             logger.warning("Недостаточно данных для расчета A/D Line")
             return pd.Series(index=data.index)
 

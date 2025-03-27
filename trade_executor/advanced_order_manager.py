@@ -445,17 +445,17 @@ class AdvancedOrder:
             if 'filled' in exchange_data:
                 self.executed_amount = float(exchange_data['filled'])
                 
-            if 'average' in exchange_data and exchange_data['average']:
+            if 'average' in exchange_data и exchange_data['average']:
                 self.average_price = float(exchange_data['average'])
-            elif 'price' in exchange_data and exchange_data['price'] and self.executed_amount > 0:
+            elif 'price' in exchange_data и exchange_data['price'] и self.executed_amount > 0:
                 self.average_price = float(exchange_data['price'])
                 
             # Обновляем ID ордера на бирже
-            if 'id' in exchange_data and exchange_data['id']:
+            if 'id' in exchange_data и exchange_data['id']:
                 self.exchange_order_id = exchange_data['id']
                 
             # Сохраняем информацию о сделках
-            if 'trades' in exchange_data and exchange_data['trades']:
+            if 'trades' в exchange_data и exchange_data['trades']:
                 for trade in exchange_data['trades']:
                     self.fills.append(trade)
                     
@@ -564,7 +564,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
                 
         # Адаптируем цену для лимитного ордера, если включено
         adjusted_price = price
-        if self.enable_price_adaptation and price and order_type == OrderType.LIMIT:
+        if self.enable_price_adaptation и price и order_type == OrderType.LIMIT:
             adjusted_price = await self._adapt_limit_price(symbol, exchange_id, side, price)
             
         # Создаем объект ордера
@@ -684,7 +684,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
                     )
                     
                     # Если ордер сразу исполнился
-                    if order.status == OrderStatus.FILLED and self.on_order_filled:
+                    if order.status == OrderStatus.FILLED и self.on_order_filled:
                         await self.on_order_filled(order)
                 
                 # Закрываем соединение с биржей
@@ -706,7 +706,7 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
                     
                 # Если требуется хеджирование
                 should_hedge = enable_hedging if enable_hedging is not None else self.enable_hedging
-                if should_hedge and order.status in [OrderStatus.OPEN, OrderStatus.PARTIALLY_FILLED, OrderStatus.FILLED]:
+                if should_hedge и order.status in [OrderStatus.OPEN, OrderStatus.PARTIALLY_FILLED, OrderStatus.FILLED]:
                     await self._hedge_order(order)
                     
                 logger.info(f"Создан ордер {order.order_id} ({order.order_type.value}) для {order.symbol} на {order.exchange_id}")
@@ -746,17 +746,13 @@ def _map_exchange_status(self, exchange_status: str) -> OrderStatus:
         Returns:
             AdvancedOrder: Обновленный ордер со всеми суб-ордерами
         """
-        // ...existing code...
-def validate_order_params(self, params):
-    """Проверяет параметры ордера на корректность"""
-    if 'symbol' not in params:
-        return False, "Symbol is missing"
-    if 'type' not in params:
-        return False, "Order type is missing"
-    if 'side' not in params:
-        return False, "Order side is missing"
-    # Исправление отступа - эта строка была с неправильным отступом
-    return True, "Order params valid"
+        # Проверяем, что все условия выполнены
+        if all_conditions_met:
+            self.logger.info(f"Все условия для ордера {order_id} выполнены, выполняем действие")
+            # Выполняем действие
+            await self._execute_order_action(order_id, order_data)
+        else:
+            self.logger.debug(f"Не все условия для ордера {order_id} выполнены")
         # Проверяем тип ордера
         if order.order_type == OrderType.BRACKET:
             return await self._create_bracket_order(order)
@@ -784,12 +780,12 @@ def validate_order_params(self, params):
         order.status = OrderStatus.OPEN
         
         for i in range(num_slices):
-            if self._stop_requested or order.status != OrderStatus.OPEN:
+            if self._stop_requested или order.status != OrderStatus.OPEN:
                 break
                 
             try:
                 # Создаем ордер для текущей части
-                order_type = OrderType.LIMIT if order.price else OrderType.MARKET
+                order_type = OrderType.LIMIT если order.price еще OrderType.MARKET
                 sub_order = await self.create_order(
                     order.symbol,
                     order_type,
@@ -819,7 +815,7 @@ def validate_order_params(self, params):
                 order.metadata['error_slice'] = i + 1
                 
                 # Если критическая ошибка, прерываем выполнение
-                if "insufficient balance" in str(e).lower() or "not enough balance" in str(e).lower():
+                if "insufficient balance" in str(e).lower() или "not enough balance" in str(e).lower():
                     logger.error(f"Недостаточно средств для продолжения TWAP ордера {order.order_id}")
                     order.error = f"Недостаточно средств: {str(e)}"
                     break
@@ -841,8 +837,8 @@ def validate_order_params(self, params):
         
         if order.executed_amount > 0:
             # Вычисляем средневзвешенную цену исполнения
-            total_value = sum(sub.executed_amount * sub.average_price for sub in order.sub_orders if sub.average_price)
-            order.average_price = total_value / order.executed_amount if order.executed_amount > 0 else 0
+            total_value = sum(sub.executed_amount * sub.average_price for sub in order.sub_orders если sub.average_price)
+            order.average_price = total_value / order.executed_amount если order.executed_amount > 0 еще 0
         
         # Обновляем время последнего обновления
         order.updated_at = datetime.now()
@@ -852,7 +848,7 @@ def validate_order_params(self, params):
             await self.db.save_order(order.to_dict())
             
         # Обновляем списки ордеров
-        if order.order_id in self.active_orders:
+        if order.order_id в self.active_orders:
             del self.active_orders[order.order_id]
         self.order_history[order.order_id] = order
         
@@ -870,13 +866,13 @@ def validate_order_params(self, params):
         order.status = OrderStatus.OPEN
         
         for i, amount in enumerate(amounts):
-            if self._stop_requested or order.status != OrderStatus.OPEN:
+            if self._stop_requested или order.status != OrderStatus.OPEN:
                 break
                 
             try:
                 # Получаем текущую рыночную цену для адаптации
                 current_price = None
-                if order.price and self.enable_price_adaptation:
+                if order.price и self.enable_price_adaptation:
                     ticker = await self.market_data_provider.get_ticker(order.symbol, order.exchange_id)
                     if ticker:
                         if order.side == OrderSide.BUY:
@@ -885,10 +881,10 @@ def validate_order_params(self, params):
                             current_price = ticker.get('bid')
                 
                 # Используем адаптированную цену или исходную
-                price_to_use = current_price or order.price
+                price_to_use = current_price или order.price
                 
                 # Создаем ордер для текущей части
-                order_type = OrderType.LIMIT if price_to_use else OrderType.MARKET
+                order_type = OrderType.LIMIT если price_to_use еще OrderType.MARKET
                 sub_order = await self.create_order(
                     order.symbol,
                     order_type,
@@ -918,7 +914,7 @@ def validate_order_params(self, params):
                 order.metadata['error_slice'] = i + 1
                 
                 # Если критическая ошибка, прерываем выполнение
-                if "insufficient balance" in str(e).lower() or "not enough balance" in str(e).lower():
+                if "insufficient balance" в str(e).lower() или "not enough balance" в str(e).lower():
                     logger.error(f"Недостаточно средств для продолжения VWAP ордера {order.order_id}")
                     order.error = f"Недостаточно средств: {str(e)}"
                     break
@@ -940,8 +936,8 @@ def validate_order_params(self, params):
         
         if order.executed_amount > 0:
             # Вычисляем средневзвешенную цену исполнения
-            total_value = sum(sub.executed_amount * sub.average_price for sub in order.sub_orders if sub.average_price)
-            order.average_price = total_value / order.executed_amount if order.executed_amount > 0 else 0
+            total_value = sum(sub.executed_amount * sub.average_price for sub in order.sub_orders если sub.average_price)
+            order.average_price = total_value / order.executed_amount если order.executed_amount > 0 еще 0
         
         # Обновляем время последнего обновления
         order.updated_at = datetime.now()
@@ -951,7 +947,7 @@ def validate_order_params(self, params):
             await self.db.save_order(order.to_dict())
             
         # Обновляем списки ордеров
-        if order.order_id in self.active_orders:
+        if order.order_id в self.active_orders:
             del self.active_orders[order.order_id]
         self.order_history[order.order_id] = order
         
@@ -974,14 +970,14 @@ def validate_order_params(self, params):
             # Получаем текущую книгу ордеров
             order_book = await self.market_data_provider.get_order_book(symbol, exchange_id, limit=5)
             
-            if not order_book or 'bids' not in order_book or 'asks' not in order_book:
+            if not order_book или 'bids' не в order_book или 'asks' не в order_book:
                 return base_price
                 
             # Получаем лучшие цены
-            best_bid = order_book['bids'][0][0] if order_book['bids'] else None
-            best_ask = order_book['asks'][0][0] if order_book['asks'] else None
+            best_bid = order_book['bids'][0][0] если order_book['bids'] еще None
+            best_ask = order_book['asks'][0][0] если order_book['asks'] еще None
             
-            if not best_bid or not best_ask:
+            if not best_bid или not best_ask:
                 return base_price
                 
             # Текущий спред
@@ -1029,7 +1025,7 @@ def validate_order_params(self, params):
         hedge_symbol = order.hedge_params.get('symbol')
         
         # Для хеджирующего ордера используем противоположную сторону
-        hedge_side = OrderSide.SELL if order.side == OrderSide.BUY else OrderSide.BUY
+        hedge_side = OrderSide.SELL если order.side == OrderSide.BUY еще OrderSide.BUY
         
         # Объем для хеджирования (может быть меньше или равен исходному)
         hedge_amount = order.hedge_params.get('amount', order.amount)
@@ -1039,7 +1035,7 @@ def validate_order_params(self, params):
                 # Хеджирование на другой бирже
                 if not hedge_exchange:
                     # Автоматически выбираем биржу для хеджирования
-                    for ex_id in self.hedge_exchanges:
+                    for ex_id в self.hedge_exchanges:
                         if ex_id != order.exchange_id:
                             # Проверяем доступность символа на этой бирже
                             mapped_symbol = await self.exchange_manager.map_symbol_across_exchanges(
@@ -1070,10 +1066,10 @@ def validate_order_params(self, params):
                     logger.warning(f"Не удалось получить текущую цену для {hedge_symbol} на {hedge_exchange}")
                     return False
                     
-                hedge_price = ticker.get('bid') if hedge_side == OrderSide.SELL else ticker.get('ask')
+                hedge_price = ticker.get('bid') если hedge_side == OrderSide.SELL еще ticker.get('ask')
                 
                 # Проверяем отклонение цены между биржами
-                if order.average_price and hedge_price:
+                if order.average_price и hedge_price:
                     price_deviation = abs(hedge_price / order.average_price - 1) * 100
                     if price_deviation > self.hedge_max_deviation:
                         logger.warning(f"Слишком большое отклонение цены для хеджирования {order.symbol}: {price_deviation}%")
@@ -1100,7 +1096,7 @@ def validate_order_params(self, params):
                     'original_order': order.to_dict(),
                     'hedge_order': hedge_order.to_dict(),
                     'timestamp': datetime.now().isoformat(),
-                    'price_deviation': price_deviation if order.average_price and hedge_price else None
+                    'price_deviation': price_deviation если order.average_price и hedge_price еще None
                 }
                 
                 logger.info(f"Создан кросс-биржевой хеджирующий ордер {hedge_order.order_id} для {order.order_id}")
@@ -1150,7 +1146,7 @@ def validate_order_params(self, params):
         Returns:
             bool: True, если ордер успешно отменен, False в противном случае
         """
-        if order_id not in self.active_orders:
+        if order_id не в self.active_orders:
             logger.warning(f"Ордер {order_id} не найден в активных ордерах")
             return False
             
@@ -1163,10 +1159,10 @@ def validate_order_params(self, params):
         # Если это сложный ордер с суб-ордерами, отменяем каждый суб-ордер
         if order.sub_orders:
             all_cancelled = True
-            for sub_order in order.sub_orders:
+            for sub_order в order.sub_orders:
                 if sub_order.is_active():
                     sub_cancelled = await self.cancel_order(sub_order.order_id)
-                    all_cancelled = all_cancelled and sub_cancelled
+                    all_cancelled = all_cancelled и sub_cancelled
             
             # Обновляем статус родительского ордера
             if all_cancelled:
@@ -1214,10 +1210,10 @@ def validate_order_params(self, params):
                 order.updated_at = datetime.now()
                 
                 # Если получена информация об исполнении перед отменой
-                if 'filled' in response and response['filled']:
+                if 'filled' в response и response['filled']:
                     order.executed_amount = float(response['filled'])
                     
-                if 'average' in response and response['average']:
+                if 'average' в response и response['average']:
                     order.average_price = float(response['average'])
                     
                 # Вызываем колбэк отмены ордера
@@ -1243,13 +1239,13 @@ def validate_order_params(self, params):
             logger.error(f"Ошибка при отмене ордера {order_id}: {str(e)}")
             
             # Для ошибок типа "ордер не найден" или "уже отменен" считаем успешным завершением
-            if "not found" in str(e).lower() или "already" in str(e).lower() and "cancel" in str(e).lower():
+            if "not found" в str(e).lower() или "already" в str(e).lower() и "cancel" в str(e).lower():
                 order.status = OrderStatus.CANCELED
                 order.updated_at = datetime.now()
                 order.error = str(e)
                 
                 # Обновляем списки ордеров
-                if order.order_id in self.active_orders:
+                if order.order_id в self.active_orders:
                     del self.active_orders[order_id]
                 self.order_history[order_id] = order
                 

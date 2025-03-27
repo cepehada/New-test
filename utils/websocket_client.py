@@ -1,22 +1,21 @@
-import asyncio
-import logging
-import json
-import time
-import random
-import websockets
+# Standard imports
 import ssl
-import certifi
 import zlib
 import base64
 import hmac
 import hashlib
-from typing import Dict, List, Optional, Union, Any, Callable
-from datetime import datetime, timedelta
-from urllib.parse import urlparse
 import inspect
 import signal
 import os
+from typing import Dict, List, Any, Optional, Union, Tuple, Callable
+from datetime import datetime, timedelta
+from urllib.parse import urlparse
 
+# Third party imports
+import websockets
+import certifi
+
+# Local imports
 from project.utils.logging_utils import setup_logger
 
 logger = setup_logger("websocket_client")

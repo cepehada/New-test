@@ -710,73 +710,33 @@ async def execute_arbitrage(request):
 # Создание приложения aiohttp
 
 
-async def create_app():
-    app = web.Application()
+def create_app():
+    """Создает и конфигурирует приложение FastAPI"""
+    from fastapi import FastAPI
+    app = FastAPI(title="Trading API", description="API для торгового бота", version="1.0.0")
+    
+    # Регистрация маршрутов
+    app.include_router(router)
+    app.include_router(strategy_router)
+    app.include_router(market_router)
+    app.include_router(user_router)
+    
+    # Регистрация WebSocket эндпоинтов
+    app.include_router(ws_router)
+    app.include_router(data_ws_router)
+    app.include_router(auth_router)
+    app.include_router(order_router)
+    
+    # Регистрация административных маршрутов
+    app.include_router(admin_router)
+    app.include_router(stats_router)
+    
+    return app
 
-    # Настройка роутов
-    # Аутентификация
-    app.router.add_post('/api/login', login)
+# Создаем приложение
+app = create_app()
 
-    # Рыночные данные
-    app.router.add_get('/api/market/tickers', get_tickers)
-    app.router.add_get('/api/market/orderbook', get_orderbook)
-    app.router.add_get('/api/market/ohlcv', get_ohlcv)
-
-    # Торговля
-    app.router.add_post('/api/trade/order', execute_order)
-    app.router.add_get('/api/trade/open-orders', get_open_orders)
-    app.router.add_post('/api/trade/cancel-order', cancel_order)
-
-    # Боты
-    app.router.add_get('/api/bots', list_bots)
-    app.router.add_get
-app.router.add_get('/api/bots', list_bots)
-app.router.add_get('/api/bots/{bot_id}', get_bot_state)
-app.router.add_post('/api/bots/start', start_bot)
-app.router.add_post('/api/bots/{bot_id}/stop', stop_bot)
-
-# Стратегии
-app.router.add_get('/api/strategies', list_strategies)
-app.router.add_post('/api/strategies/start', start_strategy)
-app.router.add_post('/api/strategies/{strategy_id}/stop', stop_strategy)
-app.router.add_get('/api/strategies/{strategy_id}', get_strategy_state)
-
-# Арбитраж
-app.router.add_get('/api/arbitrage/scan', scan_arbitrage)
-app.router.add_post('/api/arbitrage/execute', execute_arbitrage)
-
-return app
-
-# Запуск API-сервера
-
-
-async def start_api_server(host: str = '0.0.0.0', port: int = 8080):
-    """
-    Запускает API-сервер.
-
-    Args:
-        host: Хост для привязки сервера
-        port: Порт для привязки сервера
-    """
-    app = await create_app()
-    runner = web.AppRunner(app)
-    await runner.setup()
-    site = web.TCPSite(runner, host, port)
-    await site.start()
-
-    logger.info(f"API server started on http://{host}:{port}")
-
-    return runner, site
-
-# Остановка API-сервера
-
-
-async def stop_api_server(runner):
-    """
-    Останавливает API-сервер.
-
-    Args:
-        runner: Объект AppRunner
-    """
-    await runner.cleanup()
-    logger.info("API server stopped")
+if __name__ == "__main__":
+    import uvicorn
+    logger.info("Запуск API сервера...")
+    uvicorn.run("rest_api:app", host="0.0.0.0", port=8000)

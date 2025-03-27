@@ -1088,3 +1088,12 @@ class BaseStrategy(ABC):
             perf["profit_factor"] = perf["total_profit"] / perf["total_loss"]
         else:
             perf["profit_factor"] = float("inf") if perf["total_profit"] > 0 else 0.0
+
+    def _calculate_profit_and_loss(self, entry_price, current_price, position_type, position_size):
+        """Рассчитывает прибыль/убыток для позиции"""
+        # Убираем лишние 'elif' после return
+        if position_type == 'long':
+            return (current_price - entry_price) * position_size
+        if position_type == 'short':
+            return (entry_price - current_price) * position_size
+        return 0

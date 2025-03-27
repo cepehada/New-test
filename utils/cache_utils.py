@@ -192,3 +192,15 @@ async def start_cache_cleanup(interval: float = 300.0) -> None:
         except Exception as e:
             logger.error(f"Error in cache cleanup: {str(e)}")
             await asyncio.sleep(interval)
+
+
+def clear_cache():
+    """Очищает кэш"""
+    global _cache
+    
+    if _cache:
+        logger.debug("Очистка кэша: %d записей", len(_cache))
+        # Заменяем .keys() на прямой перебор по словарю
+        for key in _cache:
+            _cache[key] = {}
+        logger.debug("Кэш очищен")

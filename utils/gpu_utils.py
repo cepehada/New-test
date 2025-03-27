@@ -578,5 +578,31 @@ def is_gpu_available() -> bool:
     return CUDA_AVAILABLE
 
 
+def check_cupy_availability():
+    """Проверяет доступность cupy для работы с GPU"""
+    # Убираем лишнее 'elif' после return
+    try:
+        import cupy as cp
+        return True
+    except ImportError:
+        return False
+
+
+def get_gpu_accelerator():
+    """Возвращает доступный ускоритель для вычислений на GPU"""
+    # Убираем лишнее 'elif' после return
+    try:
+        import cupy as cp
+        return cp
+    except ImportError:
+        try:
+            import numba.cuda as cuda
+            if cuda.is_available():
+                return cuda
+        except ImportError:
+            pass
+    return None
+
+
 # Инициализация при импорте модуля
 logger.info(f"GPU acceleration: {'Available' if CUDA_AVAILABLE else 'Not available'}")

@@ -3,12 +3,25 @@
 Предоставляет функции для поиска паттернов в ценовых данных.
 """
 
-import pandas as pd
-from typing import Dict, List
+# Standard imports
+import logging
+from typing import Dict, List, Any, Optional, Union, Tuple
 
+# Third-party imports
+try:
+    import numpy as np
+    import pandas as pd
+except ImportError:
+    import subprocess
+    import sys
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy", "pandas"])
+    import numpy as np
+    import pandas as pd
+
+# Local imports
+from project.technical_analysis.indicators import Indicators
 from project.utils.logging_utils import get_logger
 from project.utils.error_handler import handle_error
-from project.technical_analysis.indicators import Indicators
 
 logger = get_logger(__name__)
 
@@ -518,3 +531,9 @@ class Patterns:
         )
 
         return dark_cloud_cover
+
+def detect_dark_cloud_cover(data, threshold=None):
+    # ...existing code...
+
+def detect_piercing_pattern(data, threshold=None):
+    # ...existing code...

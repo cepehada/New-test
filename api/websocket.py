@@ -557,3 +557,12 @@ async def send_alert(
         alert["data"] = data
 
     await broadcast_to_channel("alerts", alert)
+
+
+async def broadcast_updates(symbol, data_type, data):
+    """Рассылает обновления всем подписанным клиентам"""
+    
+    # Используем .items() для перебора словаря
+    for client_id, subscriptions in active_subscriptions.items():
+        if symbol in subscriptions and data_type in subscriptions[symbol]:
+            # ...existing code...

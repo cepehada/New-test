@@ -137,7 +137,7 @@ def log_execution_time(func):
         start_time = time.time()
         result = func(*args, **kwargs)
         elapsed_time = time.time() - start_time
-        logger.debug(f"Function {func.__name__} executed in {elapsed_time:.4f} seconds")
+        logger.debug("Function %s executed in %.4f seconds", func.__name__, elapsed_time)
         return result
 
     return wrapper
@@ -160,11 +160,34 @@ async def log_async_execution_time(func):
         result = await func(*args, **kwargs)
         elapsed_time = time.time() - start_time
         logger.debug(
-            f"Async function {func.__name__} executed in {elapsed_time:.4f} seconds"
+            "Async function %s executed in %.4f seconds", func.__name__, elapsed_time
         )
         return result
 
     return wrapper
+
+
+def log_error_with_context(logger, message, error, context=None):
+    """Логирует ошибку с дополнительным контекстом"""
+    try:
+        # Заменяем f-string на % форматирование
+        logger.error("%s: %s", message, str(error))
+        if context:
+            logger.error("Контекст: %s", context)
+    except Exception:
+        logger.exception("Ошибка при логировании с контекстом")
+
+
+def setup_file_handler(name, log_file, formatter):
+    # ...existing code...
+    logger.debug("Настроен файловый обработчик для %s", name)
+    # ...existing code...
+
+
+def setup_console_handler(name, formatter):
+    # ...existing code...
+    logger.debug("Настроен консольный обработчик для %s", name)
+    # ...existing code...
 
 
 # Настройка логгера для текущего модуля

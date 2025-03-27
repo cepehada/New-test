@@ -324,3 +324,30 @@ def handle_exceptions(func):
             logger.error("Unexpected error: %s", str(e), exc_info=True)
             raise
     return wrapper
+
+
+def log_error(message, e, *args, **kwargs):
+    """Логирует ошибку с сообщением"""
+    # Заменяем f-string на % форматирование
+    logger.error("%s: %s", message, str(e))
+
+
+async def async_retry(func, max_retries=3, delay=1, *args, **kwargs):
+    """Выполняет асинхронную функцию с повторными попытками в случае ошибки"""
+    last_exception = None
+    
+    for attempt in range(max_retries):
+        try:
+            return await func(*args, **kwargs)
+        except Exception as e:
+            import time
+            last_exception = e
+            logger.warning("Попытка %d из %d не удалась: %s", 
+                          attempt + 1, max_retries, str(e))
+            await asyncio.sleep(delay * (2 ** attempt))
+    
+    # Если все попытки не удались, выбрасываем последнее исключение
+    if last_exception:
+        raise last_exception
+        
+    return None  # Это никогда не должно выполняться, но для удовлетворения линтера

@@ -249,7 +249,7 @@ class APIServer:
         bot_router.post("/{bot_id}/resume")(self.resume_bot)
         bot_router.get("/{bot_id}/status")(self.get_bot_status)
 
-        // ...existing code...
+// ...existing code...
         @app.route('/api/stats/performance', methods=['GET'])
         async def get_performance_stats(request):
             try:
@@ -266,7 +266,7 @@ class APIServer:
             except Exception as e:
                 logger.error(f"Error getting performance stats: {e}")
                 return json_response({"success": False, "error": str(e)}, status=500)
-        // ...existing code...
+// ...existing code...
 
         # Маршруты для бэктестинга
         backtest_router.post("/")(self.run_backtest)
@@ -1614,6 +1614,15 @@ class APIServer:
                 data=df,
                 progress_callback=progress_callback
             )
+
+            // ...existing code...
+            # Закрываем скобку, которая была открыта, но не закрыта
+            response = {
+                'status': 'success',
+                'message': 'Operation completed',
+                'data': result
+            }
+            // ...existing code...
 
             # Обновляем статус задачи
             if task_id in self.optimization_tasks:

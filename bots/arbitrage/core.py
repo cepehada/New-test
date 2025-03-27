@@ -752,3 +752,30 @@ class ArbitrageCore:
 
         # Симулируем успешное выполнение
         return True
+
+    async def _execute_arbitrage_direct(self, opportunity):
+        """Выполняет прямой арбитраж"""
+        # ...existing code...
+        
+        # Исправляем вызов функции с недостающим параметром
+        order_result_buy = await self._place_order(
+            opportunity.buy_exchange, 
+            opportunity.symbol, 
+            "buy", 
+            opportunity.amount, 
+            opportunity.buy_price,
+            type="limit"  # Добавляем недостающий параметр
+        )
+        
+        # ...existing code...
+        
+        order_result_sell = await self._place_order(
+            opportunity.sell_exchange, 
+            opportunity.symbol, 
+            "sell", 
+            opportunity.amount, 
+            opportunity.sell_price,
+            type="limit"  # Добавляем недостающий параметр
+        )
+        
+        # ...existing code...
