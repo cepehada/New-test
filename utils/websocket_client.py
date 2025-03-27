@@ -1,25 +1,33 @@
 """
 Клиент для работы с WebSocket соединениями.
 """
+# Стандартные библиотеки
 import asyncio
+import ssl
+import zlib
 import base64
-import datetime
-import hashlib
 import hmac
+import hashlib
+import datetime
 import inspect
 import os
-import random
 import signal
-import ssl
-import time
-import zlib
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 from urllib.parse import urlparse
 
-import certifi
-import websockets
+# Сторонние библиотеки (импорт с проверкой)
+try:
+    import websockets
+except ImportError:
+    websockets = None
 
-from project.utils.logging_utils import get_logger, setup_logger
+try:
+    import certifi
+except ImportError:
+    certifi = None
+
+# Модули проекта
+from project.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -91,3 +99,49 @@ class WebSocketClient:
         self.endpoint = parsed_url.path
         
         logger.debug("Initialized WebSocket client for %s", url)
+        
+    async def connect(self):
+        """Устанавливает соединение с WebSocket сервером"""
+        # Проверка зависимостей
+        if websockets is None:
+            raise ImportError("websockets library is not installed")
+            
+        # Создание SSL контекста если необходимо
+        ssl_context = None
+        if self.url.startswith('wss://'):
+            ssl_context = ssl.create_default_context()
+            if certifi:
+                ssl_context.load_verify_locations(certifi.where())
+                
+        # Попытка подключения
+        try:
+            logger.debug("Connecting to %s", self.url)
+            self.ws = await websockets.connect(
+                self.url,
+                extra_headers=self.headers,
+                ssl=ssl_context,
+                ping_interval=self.ping_interval,
+                ping_timeout=self.ping_timeout,
+                close_timeout=self.close_timeout
+            )
+            
+            self.connected = True
+            self.reconnect_count = 0
+            
+            # Запускаем таск для обработки сообщений
+            receive_task = asyncio.create_task(self._receive_messages())
+            self.tasks.append(receive_task)
+            
+            # Вызываем обработчик открытия соединения
+            if self.on_open:
+                await self.on_open()
+                
+            logger.debug("Connected to %s", self.url)
+            return True
+        except Exception as e:
+            logger.error("Failed to connect to %s: %s", self.url, str(e))
+            if self.on_error:
+                await self.on_error(str(e))
+            return False
+            
+    # Другие методы WebSocketClient...

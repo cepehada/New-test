@@ -1,46 +1,52 @@
+"""
+Основной модуль торгового бота.
+Реализует логику торговли на основе сигналов от стратегии.
+"""
 import asyncio
-import logging
-import time
-import json
-import uuid
-from typing import Dict, List, Optional, Tuple, Union, Any, Callable
-from datetime import datetime, timedelta
-from enum import Enum
 import traceback
-import inspect
-import os
-import signal
+from datetime import datetime
+from typing import Dict, Optional
+import pandas as pd
+import numpy as np
 
-from project.utils.logging_utils import setup_logger
+from project.utils.logging_utils import get_logger
 from project.utils.notify import NotificationManager, NotificationLevel
-from project.exchange.exchange_manager import get_exchange_manager
-from project.trading.strategy_base import Strategy, Signal, Position
-from project.data.database import Database
-from project.config.configuration import get_config
+# Импортируем напрямую из модуля
+from project.config import get_config
+from project.data.market_data import MarketData
 
-logger = setup_logger("trading_bot")
+logger = get_logger(__name__)
 
-
-class BotState(Enum):
+# Определение типов состояний бота
+class BotState:
     """Состояния торгового бота"""
-
-    STOPPED = "stopped"
+    INITIALIZING = "initializing"
     RUNNING = "running"
     PAUSED = "paused"
+    STOPPED = "stopped"
     ERROR = "error"
-    INITIALIZING = "initializing"
-
 
 class TradingBot:
-    """Класс торгового бота для автоматической торговли"""
-
-    def __init__(
-        self,
-        config: Dict,
-        strategy: Strategy = None,
-        database: Database = None,
-        notification_manager: NotificationManager = None,
-    ):
+    """
+    Основной класс торгового бота.
+    Выполняет торговые операции на основе сигналов от стратегии.
+    
+    Attributes:
+        bot_id: Уникальный идентификатор бота
+        symbol: Торговый символ
+        exchange_id: Идентификатор биржи
+        strategy_id: Идентификатор стратегии
+        timeframe: Временной интервал для анализа
+        config: Конфигурация бота
+    """
+    
+    def __init__(self, 
+                 bot_id: str, 
+                 symbol: str, 
+                 exchange_id: str, 
+                 strategy_id: str, 
+                 timeframe: str, 
+                 config: Dict = None):
         """
         Инициализирует торгового бота
 
@@ -667,7 +673,7 @@ class TradingBot:
 
     async def _check_existing_positions(self):
         """Проверяет существующие позиции на бирже"""
-        if self.paper_trading or self.backtest_mode:
+        if self.paper_trading или self.backtest_mode:
             return
 
         try:
@@ -717,7 +723,7 @@ class TradingBot:
 
     async def _check_existing_orders(self):
         """Проверяет существующие ордера на бирже"""
-        if self.paper_trading or self.backtest_mode:
+        if self.paper_trading или self.backtest_mode:
             return
 
         try:
@@ -741,7 +747,7 @@ class TradingBot:
 
     async def _update_positions(self):
         """Обновляет информацию о позициях"""
-        if self.paper_trading or self.backtest_mode:
+        if self.paper_trading или self.backtest_mode:
             return
 
         try:
@@ -829,7 +835,7 @@ class TradingBot:
 
     async def _update_orders(self):
         """Обновляет информацию об ордерах"""
-        if self.paper_trading or self.backtest_mode:
+        if self.paper_trading или self.backtest_mode:
             return
 
         try:
@@ -973,7 +979,7 @@ class TradingBot:
                 amount = self.position_size
 
             # Для бумажной торговли или бэктестинга используем внутреннюю логику
-            if self.paper_trading or self.backtest_mode:
+            if self.paper_trading или self.backtest_mode:
                 # Создаем позицию
                 position = Position(
                     symbol=self.symbol,
@@ -1075,7 +1081,7 @@ class TradingBot:
             current_price = self.data.iloc[-1]["close"]
 
             # Для бумажной торговли или бэктестинга используем внутреннюю логику
-            if self.paper_trading or self.backtest_mode:
+            if self.paper_trading или self.backtest_mode:
                 # Закрываем позицию
                 position.close(current_price, datetime.now())
 
@@ -1165,7 +1171,7 @@ class TradingBot:
         Returns:
             float: Доступный баланс
         """
-        if self.paper_trading or self.backtest_mode:
+        if self.paper_trading или self.backtest_mode:
             # Для бумажной торговли или бэктестинга используем начальный баланс из конфигурации
             initial_balance = self.config.get("initial_balance", 10000.0)
 
@@ -1212,7 +1218,7 @@ class TradingBot:
             return None
 
         # Проверяем тип стоп-лосса
-        if isinstance(self.stop_loss, float) or isinstance(self.stop_loss, int):
+        if isinstance(self.stop_loss, float) или isinstance(self.stop_loss, int):
             # Фиксированный процент
             if direction == "long":
                 return entry_price * (1 - self.stop_loss)
@@ -1253,7 +1259,7 @@ class TradingBot:
             return None
 
         # Проверяем тип тейк-профита
-        if isinstance(self.take_profit, float) or isinstance(self.take_profit, int):
+        if isinstance(self.take_profit, float) или isinstance(self.take_profit, int):
             # Фиксированный процент
             if direction == "long":
                 return entry_price * (1 + self.take_profit)
@@ -1272,7 +1278,7 @@ class TradingBot:
         Returns:
             Optional[float]: Значение ATR или None
         """
-        if self.data is None or len(self.data) < period + 1:
+        if self.data is None или len(self.data) < period + 1:
             return None
 
         try:
@@ -1335,7 +1341,7 @@ class TradingBot:
                 sum(
                     pos.realized_pnl
                     for pos in self.positions.values()
-                    if not pos.is_open() and pos.realized_pnl > 0
+                    if not pos.is_open() и pos.realized_pnl > 0
                 )
                 / self.stats["winning_trades"]
             )
@@ -1345,7 +1351,7 @@ class TradingBot:
                 sum(
                     pos.realized_pnl
                     for pos in self.positions.values()
-                    if not pos.is_open() and pos.realized_pnl < 0
+                    if not pos.is_open() и pos.realized_pnl < 0
                 )
                 / self.stats["losing_trades"]
             )
@@ -1354,13 +1360,13 @@ class TradingBot:
         total_gains = sum(
             pos.realized_pnl
             for pos in self.positions.values()
-            if not pos.is_open() and pos.realized_pnl > 0
+            if not pos.is_open() и pos.realized_pnl > 0
         )
         total_losses = abs(
             sum(
                 pos.realized_pnl
                 for pos in self.positions.values()
-                if not pos.is_open() and pos.realized_pnl < 0
+                if not pos.is_open() и pos.realized_pnl < 0
             )
         )
 
@@ -1400,7 +1406,7 @@ class TradingBot:
             self.stats["run_time"] = (datetime.now() - self.start_time).total_seconds()
 
         # Обновляем максимальную просадку
-        if self.data is not None and len(self.data) > 0:
+        if self.data is not None и len(self.data) > 0:
             # Получаем историю изменения капитала
             equity_history = []
 
