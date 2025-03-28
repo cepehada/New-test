@@ -182,8 +182,7 @@ class BinanceLiquidationMonitor:
                     break
 
                 logger.warning(
-                    f"Повторное подключение через {retry_delay} секунд (попытка {retry_count}/{max_retries})"
-                )
+                    f"Повторное подключение через {retry_delay} секунд (попытка {retry_count}/{max_retries})")
                 await asyncio.sleep(retry_delay)
 
         # Закрываем соединение при выходе из цикла
@@ -295,8 +294,9 @@ class BinanceLiquidationMonitor:
 
             await send_alert(message, channel="telegram")
             logger.info(
-                f"Отправлено уведомление о крупной ликвидации: {data['symbol']} ${data['amount_usd']:.2f}"
-            )
+                f"Отправлено уведомление о крупной ликвидации: {
+                    data['symbol']} ${
+                    data['amount_usd']:.2f}")
         except Exception as e:
             logger.error("Ошибка отправки уведомления о ликвидации: {str(e)}")
 

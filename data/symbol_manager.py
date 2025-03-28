@@ -210,8 +210,7 @@ class SymbolManager:
 
         logger.info(
             f"Найдено {
-                len(tradable_symbols)} торгуемых символов с объемом >= {min_volume} на {exchange_id}"
-        )
+                len(tradable_symbols)} торгуемых символов с объемом >= {min_volume} на {exchange_id}")
         return tradable_symbols
 
     @async_handle_error

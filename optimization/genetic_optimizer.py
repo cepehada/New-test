@@ -609,7 +609,7 @@ class GeneticOptimizer:
         # Выполняем оценку с ограничением на количество одновременных задач
         batch_size = self.max_workers
         for i in range(0, len(tasks), batch_size):
-            batch = tasks[i : i + batch_size]
+            batch = tasks[i: i + batch_size]
             await asyncio.gather(*batch)
 
     async def _evaluate_individual(

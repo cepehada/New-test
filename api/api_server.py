@@ -375,7 +375,7 @@ class APIServer:
         for bot_id, bot in list(self.bots.items()):
             try:
                 await bot.stop()
-            except:
+            except BaseException:
                 pass
 
         # Отменяем задачу обновления ботов

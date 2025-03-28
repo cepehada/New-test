@@ -224,7 +224,7 @@ class PositionSizer:
         # Ограничиваем историю
         if len(self.volatility_history) > self.volatility_lookback:
             self.volatility_history = self.volatility_history[
-                -self.volatility_lookback :
+                -self.volatility_lookback:
             ]
 
         # Рассчитываем среднюю волатильность

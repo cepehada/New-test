@@ -230,7 +230,7 @@ class Database:
         columns = list(data.keys())
         values = list(data.values())
 
-        placeholders = [f"${i+1}" for i in range(len(values))]
+        placeholders = [f"${i + 1}" for i in range(len(values))]
 
         query = f"""
         INSERT INTO {table} ({', '.join(columns)})
@@ -264,7 +264,7 @@ class Database:
         values = []
 
         for i, (column, value) in enumerate(data.items()):
-            set_parts.append(f"{column} = ${i+1}")
+            set_parts.append(f"{column} = ${i + 1}")
             values.append(value)
 
         # Добавляем аргументы условия в конец списка значений
@@ -272,7 +272,7 @@ class Database:
         condition_with_placeholders = condition.replace("$1", f"${placeholder_offset}")
         for i in range(1, len(condition_args)):
             condition_with_placeholders = condition_with_placeholders.replace(
-                f"${i+1}", f"${placeholder_offset+i}"
+                f"${i + 1}", f"${placeholder_offset + i}"
             )
 
         values.extend(condition_args)

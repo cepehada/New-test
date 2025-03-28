@@ -315,7 +315,8 @@ class VarCalculator:
         portfolio_std = np.sqrt(portfolio_variance)
 
         # Рассчитываем вклад каждого актива в риск портфеля
-        # Маржинальный вклад в риск = весь * ковариация с портфелем / стандартное отклонение портфеля
+        # Маржинальный вклад в риск = весь * ковариация с портфелем / стандартное
+        # отклонение портфеля
         marginal_contributions = {}
         for asset in weights.index:
             cov_with_portfolio = 0.0

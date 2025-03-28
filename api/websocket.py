@@ -389,7 +389,7 @@ class WebSocketServer:
         # Закрываем соединение, если оно еще открыто
         try:
             await websocket.close()
-        except:
+        except BaseException:
             pass
 
     async def _keep_alive(self) -> None:
@@ -409,7 +409,7 @@ class WebSocketServer:
                 for ws in list(self.connections):
                     try:
                         await ws.send(ping_message)
-                    except:
+                    except BaseException:
                         # Соединение, вероятно, закрыто, удаляем его
                         await self._close_connection(ws)
             except asyncio.CancelledError:
@@ -463,7 +463,7 @@ class WebSocketServer:
         for ws in list(self.subscriptions[topic]):
             try:
                 await ws.send(ws_message_json)
-            except:
+            except BaseException:
                 # Соединение, вероятно, закрыто, удаляем его
                 await self._close_connection(ws)
 
@@ -529,7 +529,7 @@ class WebSocketServer:
             try:
                 await ws.send(message_json)
                 sent_count += 1
-            except:
+            except BaseException:
                 # Соединение, вероятно, закрыто, удаляем его
                 await self._close_connection(ws)
 

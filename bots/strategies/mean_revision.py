@@ -280,7 +280,7 @@ class MeanReversionStrategy(BaseStrategy):
         if lookback <= 0:
             return False
 
-        avg_volume = sum(volumes[-lookback - 1 : -1]) / lookback
+        avg_volume = sum(volumes[-lookback - 1: -1]) / lookback
 
         # Проверяем, что текущий объем выше среднего
         min_volume = avg_volume * self.strategy_config["min_volume_multiplier"]

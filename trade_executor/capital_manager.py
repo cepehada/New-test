@@ -118,8 +118,7 @@ class CapitalManager:
         }
 
         logger.info(
-            f"Зарегистрирована новая позиция {position_id}: {symbol} {side} {amount} по {entry_price}"
-        )
+            f"Зарегистрирована новая позиция {position_id}: {symbol} {side} {amount} по {entry_price}")
 
     def close_position(self, position_id: str, exit_price: float, pnl: float) -> None:
         """Закрывает позицию и записывает результат в историю"""

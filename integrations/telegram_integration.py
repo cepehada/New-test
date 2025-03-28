@@ -129,7 +129,8 @@ class TelegramIntegration:
                             parse_mode=ParseMode.MARKDOWN,
                         )
                 except Exception as e:
-                    error_msg = f"Ошибка при выполнении команды /{command}:\n```\n{traceback.format_exc()}```"
+                    error_msg = f"Ошибка при выполнении команды /{command}:\n```\n{
+                        traceback.format_exc()}```"
                     await message.reply(error_msg, parse_mode=ParseMode.MARKDOWN)
                     logger.error(
                         f"Ошибка в обработчике команды {command}: {str(e)}",
