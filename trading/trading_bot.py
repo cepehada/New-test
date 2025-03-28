@@ -733,7 +733,8 @@ class TradingBot:
                                 order.get('id')} | {
                                 order.get('type')} | {
                                 order.get('side')} | {
-                                order.get('price')}")
+                                order.get('price')}"
+                        )
         except Exception as e:
             logger.error(f"Error checking existing orders: {str(e)}")
 
@@ -854,7 +855,8 @@ class TradingBot:
                                 f"New order detected: {order_id} | {
                                     order.get('type')} | {
                                     order.get('side')} | {
-                                    order.get('price')}")
+                                    order.get('price')}"
+                            )
 
             # Проверяем, исполнились ли какие-то ордера
             for order_id, order in list(self.open_orders.items()):
@@ -877,7 +879,8 @@ class TradingBot:
                                 f"Order executed: {order_id} | {
                                     updated_order.get('type')} | {
                                     updated_order.get('side')} | {
-                                    updated_order.get('price')}")
+                                    updated_order.get('price')}"
+                            )
                             # Удаляем из открытых ордеров
                             del self.open_orders[order_id]
                         elif status == "canceled":
@@ -1121,7 +1124,8 @@ class TradingBot:
                 logger.info(
                     f"Created closing order: {
                         order.get('id')} | {
-                        position.amount} @ {current_price}")
+                        position.amount} @ {current_price}"
+                )
 
                 # Сохраняем ордер
                 self.open_orders[order.get("id")] = order

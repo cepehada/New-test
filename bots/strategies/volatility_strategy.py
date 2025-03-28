@@ -80,7 +80,7 @@ class VolatilityStrategy(BaseStrategy):
             {}
         )  # symbol -> минимальная цена для трейлинг-стопа
 
-        logger.debug(f"Создана стратегия волатильности {self.name}" )
+        logger.debug(f"Создана стратегия волатильности {self.name}")
 
     def _update_config(self, config: Dict[str, Any]) -> None:
         """
@@ -285,7 +285,7 @@ class VolatilityStrategy(BaseStrategy):
                         )
 
             except Exception as e:
-                logger.error(f"Ошибка при расчете волатильности для {symbol}: {str(e)}" )
+                logger.error(f"Ошибка при расчете волатильности для {symbol}: {str(e)}")
 
     def _rank_symbols_by_volatility(self) -> None:
         """
@@ -312,7 +312,7 @@ class VolatilityStrategy(BaseStrategy):
             )
 
         except Exception as e:
-            logger.error(f"Ошибка при ранжировании символов по волатильности: {str(e)}" )
+            logger.error(f"Ошибка при ранжировании символов по волатильности: {str(e)}")
 
     @async_handle_error
     async def _generate_trading_signals(self) -> Dict[str, Dict[str, Any]]:
@@ -406,7 +406,7 @@ class VolatilityStrategy(BaseStrategy):
                     await self._update_trailing_stops(symbol, current_price)
 
             except Exception as e:
-                logger.error(f"Ошибка при генерации сигналов для {symbol}: {str(e)}" )
+                logger.error(f"Ошибка при генерации сигналов для {symbol}: {str(e)}")
 
         return signals
 

@@ -109,11 +109,11 @@ class BitcoinMagParser:
             # Обновляем время последнего запроса
             self.last_fetch_time = current_time
 
-            logger.debug(f"Получено {len(articles)} статей из Bitcoin Magazine" )
+            logger.debug(f"Получено {len(articles)} статей из Bitcoin Magazine")
             return articles
 
         except Exception as e:
-            logger.error(f"Ошибка при получении новостей из Bitcoin Magazine: {str(e)}" )
+            logger.error(f"Ошибка при получении новостей из Bitcoin Magazine: {str(e)}")
             return []
 
     @async_handle_error
@@ -134,7 +134,8 @@ class BitcoinMagParser:
                     if response.status != 200:
                         logger.warning(
                             f"Не удалось получить содержимое статьи {url}. Статус: {
-                                response.status}")
+                                response.status}"
+                        )
                         return
 
                     html_content = await response.text()
@@ -153,10 +154,10 @@ class BitcoinMagParser:
                 # Обновляем кэшированную статью
                 if url in self.articles_cache:
                     self.articles_cache[url]["content"] = content
-                    logger.debug(f"Обновлено содержимое статьи: {url}" )
+                    logger.debug(f"Обновлено содержимое статьи: {url}")
 
         except Exception as e:
-            logger.error(f"Ошибка при получении содержимого статьи {url}: {str(e)}" )
+            logger.error(f"Ошибка при получении содержимого статьи {url}: {str(e)}")
 
     @async_handle_error
     async def search_news(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
@@ -180,7 +181,8 @@ class BitcoinMagParser:
                     if response.status != 200:
                         logger.warning(
                             f"Не удалось выполнить поиск на Bitcoin Magazine. Статус: {
-                                response.status}")
+                                response.status}"
+                        )
                         return []
 
                     html_content = await response.text()
@@ -231,5 +233,5 @@ class BitcoinMagParser:
             return articles
 
         except Exception as e:
-            logger.error(f"Ошибка при поиске новостей на Bitcoin Magazine: {str(e)}" )
+            logger.error(f"Ошибка при поиске новостей на Bitcoin Magazine: {str(e)}")
             return []

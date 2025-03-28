@@ -349,7 +349,8 @@ class WebSocketClient:
             f"Reconnecting to WebSocket server (attempt {
                 self.reconnect_attempts}/{
                 self.max_reconnect_attempts}) after {
-                delay:.1f} seconds")
+                delay:.1f} seconds"
+        )
 
         # Ждем указанное время
         await asyncio.sleep(delay)

@@ -88,7 +88,7 @@ class SymbolManager:
             return markets
 
         except Exception as e:
-            logger.error(f"Ошибка при загрузке рынков для {exchange_id}: {str(e)}" )
+            logger.error(f"Ошибка при загрузке рынков для {exchange_id}: {str(e)}")
             raise
 
     @async_handle_error
@@ -118,7 +118,7 @@ class SymbolManager:
         if normalized_symbol in self.symbols_info.get(exchange_id, {}):
             return self.symbols_info[exchange_id][normalized_symbol]
 
-        logger.warning(f"Символ {symbol} не найден на {exchange_id}" )
+        logger.warning(f"Символ {symbol} не найден на {exchange_id}")
         return None
 
     @async_handle_error
@@ -148,7 +148,7 @@ class SymbolManager:
                 else:
                     symbols.append(symbol)
 
-        logger.debug(f"Получено {len(symbols)} активных символов на {exchange_id}" )
+        logger.debug(f"Получено {len(symbols)} активных символов на {exchange_id}")
         return symbols
 
     @async_handle_error
@@ -210,7 +210,8 @@ class SymbolManager:
 
         logger.info(
             f"Найдено {
-                len(tradable_symbols)} торгуемых символов с объемом >= {min_volume} на {exchange_id}")
+                len(tradable_symbols)} торгуемых символов с объемом >= {min_volume} на {exchange_id}"
+        )
         return tradable_symbols
 
     @async_handle_error
@@ -228,7 +229,7 @@ class SymbolManager:
         symbol_info = await self.get_symbol_info(exchange_id, symbol)
 
         if not symbol_info or "precision" not in symbol_info:
-            logger.warning(f"Нет данных о точности для {symbol} на {exchange_id}" )
+            logger.warning(f"Нет данных о точности для {symbol} на {exchange_id}")
             return {"amount": 8, "price": 8, "cost": 8}
 
         precision = symbol_info["precision"]
@@ -261,7 +262,7 @@ class SymbolManager:
         symbol_info = await self.get_symbol_info(exchange_id, symbol)
 
         if not symbol_info or "limits" not in symbol_info:
-            logger.warning(f"Нет данных о лимитах для {symbol} на {exchange_id}" )
+            logger.warning(f"Нет данных о лимитах для {symbol} на {exchange_id}")
             return {
                 "amount": {"min": 0.0, "max": float("inf")},
                 "price": {"min": 0.0, "max": float("inf")},
@@ -301,7 +302,7 @@ class SymbolManager:
         symbol_info = await self.get_symbol_info(exchange_id, symbol)
 
         if not symbol_info:
-            logger.warning(f"Нет данных о комиссиях для {symbol} на {exchange_id}" )
+            logger.warning(f"Нет данных о комиссиях для {symbol} на {exchange_id}")
             return {"maker": 0.001, "taker": 0.001}
 
         return {

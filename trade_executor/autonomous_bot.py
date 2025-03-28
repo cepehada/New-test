@@ -190,7 +190,8 @@ class AutonomousBot:
             if len(self.open_positions) >= self.max_open_positions:
                 logger.debug(
                     f"Достигнуто максимальное количество открытых позиций ({
-                        self.max_open_positions})")
+                        self.max_open_positions})"
+                )
                 return
 
             # Выбираем наиболее подходящую стратегию

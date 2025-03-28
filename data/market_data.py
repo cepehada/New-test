@@ -143,7 +143,7 @@ class MarketData:
             cache_key in self.ohlcv_cache
             and time.time() - self.ohlcv_timestamps.get(cache_key, 0) < self.ohlcv_ttl
         ):
-            logger.debug(f"Получены данные OHLCV из кэша для {symbol} на {exchange_id}" )
+            logger.debug(f"Получены данные OHLCV из кэша для {symbol} на {exchange_id}")
             return self.ohlcv_cache[cache_key]
 
         # Получаем данные с биржи
@@ -164,7 +164,7 @@ class MarketData:
             self.ohlcv_cache[cache_key] = df
             self.ohlcv_timestamps[cache_key] = time.time()
 
-            logger.debug(f"Получены данные OHLCV с биржи для {symbol} на {exchange_id}" )
+            logger.debug(f"Получены данные OHLCV с биржи для {symbol} на {exchange_id}")
             return df
         except Exception as e:
             logger.error(
@@ -271,7 +271,8 @@ class MarketData:
             self.update_tasks.append(task)
             logger.info(
                 f"Запущено автоматическое обновление тикеров для {
-                    len(symbols)} символов на {exchange_id}")
+                    len(symbols)} символов на {exchange_id}"
+            )
 
         if update_ohlcv:
             task = asyncio.create_task(
@@ -280,7 +281,8 @@ class MarketData:
             self.update_tasks.append(task)
             logger.info(
                 f"Запущено автоматическое обновление OHLCV для {
-                    len(symbols)} символов на {exchange_id}")
+                    len(symbols)} символов на {exchange_id}"
+            )
 
         if update_orderbooks:
             task = asyncio.create_task(
@@ -291,7 +293,8 @@ class MarketData:
             self.update_tasks.append(task)
             logger.info(
                 f"Запущено автоматическое обновление ордербуков для {
-                    len(symbols)} символов на {exchange_id}")
+                    len(symbols)} символов на {exchange_id}"
+            )
 
     async def stop_automatic_updates(self) -> None:
         """
@@ -380,7 +383,8 @@ class MarketData:
                     except Exception as e:
                         logger.error(
                             f"Ошибка при обновлении ордербука для {symbol} на {exchange_id}: {
-                                str(e)}")
+                                str(e)}"
+                        )
 
                 await asyncio.sleep(interval)
         except asyncio.CancelledError:

@@ -84,10 +84,12 @@ class CapitalManager:
             f"Рассчитанное распределение: {
                 allocation:.2f} (баланс: {
                 balance:.2f}, риск: {
-                max_risk:.4f}, " f"волатильность: {
+                max_risk:.4f}, "
+            f"волатильность: {
                     volatility:.2f}, слиппейдж: {
                         slippage:.2f}, позиции: {current_positions_count}/{
-                            self.max_positions})")
+                            self.max_positions})"
+        )
 
         return allocation
 
@@ -116,7 +118,8 @@ class CapitalManager:
         }
 
         logger.info(
-            f"Зарегистрирована новая позиция {position_id}: {symbol} {side} {amount} по {entry_price}")
+            f"Зарегистрирована новая позиция {position_id}: {symbol} {side} {amount} по {entry_price}"
+        )
 
     def close_position(self, position_id: str, exit_price: float, pnl: float) -> None:
         """Закрывает позицию и записывает результат в историю"""

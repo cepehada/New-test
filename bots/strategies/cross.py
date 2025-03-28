@@ -24,9 +24,14 @@ class CrossStrategy(BaseStrategy):
     Стратегия кросс-торговли между разными биржами.
     """
 
-    def __init__(self, name: str = "CrossStrategy", exchange_id: str = "binance",
-                 symbols: List[str] = None, timeframes: List[str] = None,
-                 config: Dict[str, Any] = None):
+    def __init__(
+        self,
+        name: str = "CrossStrategy",
+        exchange_id: str = "binance",
+        symbols: List[str] = None,
+        timeframes: List[str] = None,
+        config: Dict[str, Any] = None,
+    ):
         """
         Инициализирует стратегию кросс-торговли.
 
@@ -50,8 +55,12 @@ class CrossStrategy(BaseStrategy):
             "fee_margin": 0.002,  # маржа для комиссий (0.2%)
             "max_open_positions": 3,  # максимальное количество открытых позиций
             "use_triangular_arbitrage": False,  # использовать треугольный арбитраж
-            "base_currencies": ["USDT", "BTC", "ETH"],  # базовые валюты для треугольного арбитража
-            "arbitrage_threshold": 0.005  # порог для арбитража (0.5%)
+            "base_currencies": [
+                "USDT",
+                "BTC",
+                "ETH",
+            ],  # базовые валюты для треугольного арбитража
+            "arbitrage_threshold": 0.005,  # порог для арбитража (0.5%)
         }
 
         # Объединяем с пользовательской конфигурацией
@@ -66,9 +75,15 @@ class CrossStrategy(BaseStrategy):
         super().__init__(name, exchange_id, symbols, timeframes, config)
 
         # Дополнительные параметры
-        self.exchange_prices: Dict[str, Dict[str, float]] = {}  # exchange -> symbol -> price
-        self.exchange_volumes: Dict[str, Dict[str, float]] = {}  # exchange -> symbol -> volume
-        self.arbitrage_opportunities: List[Dict[str, Any]] = []  # список возможностей для арбитража
+        self.exchange_prices: Dict[str, Dict[str, float]] = (
+            {}
+        )  # exchange -> symbol -> price
+        self.exchange_volumes: Dict[str, Dict[str, float]] = (
+            {}
+        )  # exchange -> symbol -> volume
+        self.arbitrage_opportunities: List[Dict[str, Any]] = (
+            []
+        )  # список возможностей для арбитража
         self.last_check_time = 0  # время последней проверки
 
         logger.debug(f"Создана стратегия кросс-торговли {self.name}")
@@ -82,8 +97,11 @@ class CrossStrategy(BaseStrategy):
         """
         # Обновляем числовые параметры
         for param in [
-            "min_price_difference", "max_position_size_pct", "balance_threshold",
-            "fee_margin", "arbitrage_threshold"
+            "min_price_difference",
+            "max_position_size_pct",
+            "balance_threshold",
+            "fee_margin",
+            "arbitrage_threshold",
         ]:
             if param in config:
                 self.strategy_config[param] = float(config[param])
@@ -95,7 +113,8 @@ class CrossStrategy(BaseStrategy):
         # Обновляем булевы параметры
         if "use_triangular_arbitrage" in config:
             self.strategy_config["use_triangular_arbitrage"] = bool(
-                config["use_triangular_arbitrage"])
+                config["use_triangular_arbitrage"]
+            )
 
         # Обновляем списки
         if "secondary_exchanges" in config:
@@ -152,7 +171,9 @@ class CrossStrategy(BaseStrategy):
                             self.exchange_volumes[exchange][symbol] = volume
 
                 except Exception as e:
-                    logger.warning(f"Ошибка при получении данных для {symbol} на {exchange}: {str(e)}")
+                    logger.warning(
+                        f"Ошибка при получении данных для {symbol} на {exchange}: {str(e)}"
+                    )
 
         self.last_check_time = time.time()
 
@@ -189,7 +210,7 @@ class CrossStrategy(BaseStrategy):
                 max_price = symbol_prices[max_exchange]
 
                 # Рассчитываем разницу в процентах
-                price_diff_pct = (max_price / min_price - 1)
+                price_diff_pct = max_price / min_price - 1
 
                 # Учитываем комиссии
                 net_profit_pct = price_diff_pct - self.strategy_config["fee_margin"]
@@ -207,18 +228,22 @@ class CrossStrategy(BaseStrategy):
                         "net_profit_pct": net_profit_pct,
                         "buy_volume": symbol_volumes[min_exchange],
                         "sell_volume": symbol_volumes[max_exchange],
-                        "timestamp": time.time()
+                        "timestamp": time.time(),
                     }
 
                     self.arbitrage_opportunities.append(opportunity)
 
-                    logger.debug(f"Найдена возможность арбитража для {symbol}: "
-                                 f"купить на {min_exchange} по {min_price:.8f}, "
-                                 f"продать на {max_exchange} по {max_price:.8f}, "
-                                 f"прибыль: {net_profit_pct:.2%}")
+                    logger.debug(
+                        f"Найдена возможность арбитража для {symbol}: "
+                        f"купить на {min_exchange} по {min_price:.8f}, "
+                        f"продать на {max_exchange} по {max_price:.8f}, "
+                        f"прибыль: {net_profit_pct:.2%}"
+                    )
 
         # Сортируем возможности по прибыли
-        self.arbitrage_opportunities.sort(key=lambda x: x["net_profit_pct"], reverse=True)
+        self.arbitrage_opportunities.sort(
+            key=lambda x: x["net_profit_pct"], reverse=True
+        )
 
     @async_handle_error
     async def _find_triangular_arbitrage(self) -> None:
@@ -228,7 +253,9 @@ class CrossStrategy(BaseStrategy):
         if not self.strategy_config["use_triangular_arbitrage"]:
             return
 
-        for exchange in [self.exchange_id] + self.strategy_config["secondary_exchanges"]:
+        for exchange in [self.exchange_id] + self.strategy_config[
+            "secondary_exchanges"
+        ]:
             try:
                 # Получаем все цены для этой биржи
                 prices = self.exchange_prices.get(exchange, {})
@@ -243,7 +270,7 @@ class CrossStrategy(BaseStrategy):
 
                     for symbol, price in prices.items():
                         if symbol.endswith(f"/{base}"):
-                            coin = symbol.split('/')[0]
+                            coin = symbol.split("/")[0]
                             base_pairs[coin] = price
 
                     # Если найдено как минимум 2 пары
@@ -270,9 +297,14 @@ class CrossStrategy(BaseStrategy):
 
                                     # Рассчитываем чистый результат
                                     result = (1 / price_a) * direct_price * price_b
-                                    profit_pct = result - 1 - self.strategy_config["fee_margin"]
+                                    profit_pct = (
+                                        result - 1 - self.strategy_config["fee_margin"]
+                                    )
 
-                                    if profit_pct > self.strategy_config["arbitrage_threshold"]:
+                                    if (
+                                        profit_pct
+                                        > self.strategy_config["arbitrage_threshold"]
+                                    ):
                                         opportunity = {
                                             "type": "triangular",
                                             "exchange": exchange,
@@ -281,15 +313,17 @@ class CrossStrategy(BaseStrategy):
                                             "step2": f"Купить {coin_b} за {coin_a}",
                                             "step3": f"Продать {coin_b} за {base}",
                                             "profit_pct": profit_pct,
-                                            "timestamp": time.time()
+                                            "timestamp": time.time(),
                                         }
 
                                         self.arbitrage_opportunities.append(opportunity)
 
                                         logger.debug(
                                             f"Найдена возможность треугольного арбитража на {exchange}: "
-                                            f"{base} -> {coin_a} -> {coin_b} -> {base}, " f"прибыль: {
-                                                profit_pct:.2%}")
+                                            f"{base} -> {coin_a} -> {coin_b} -> {base}, "
+                                            f"прибыль: {
+                                                profit_pct:.2%}"
+                                        )
 
                                 elif reverse_price > 0:
                                     # Треугольник: base -> coin_a -> coin_b -> base
@@ -299,10 +333,17 @@ class CrossStrategy(BaseStrategy):
                                     # price_b base
 
                                     # Рассчитываем чистый результат
-                                    result = (1 / price_a) * (1 / reverse_price) * price_b
-                                    profit_pct = result - 1 - self.strategy_config["fee_margin"]
+                                    result = (
+                                        (1 / price_a) * (1 / reverse_price) * price_b
+                                    )
+                                    profit_pct = (
+                                        result - 1 - self.strategy_config["fee_margin"]
+                                    )
 
-                                    if profit_pct > self.strategy_config["arbitrage_threshold"]:
+                                    if (
+                                        profit_pct
+                                        > self.strategy_config["arbitrage_threshold"]
+                                    ):
                                         opportunity = {
                                             "type": "triangular",
                                             "exchange": exchange,
@@ -311,18 +352,22 @@ class CrossStrategy(BaseStrategy):
                                             "step2": f"Продать {coin_a} за {coin_b}",
                                             "step3": f"Продать {coin_b} за {base}",
                                             "profit_pct": profit_pct,
-                                            "timestamp": time.time()
+                                            "timestamp": time.time(),
                                         }
 
                                         self.arbitrage_opportunities.append(opportunity)
 
                                         logger.debug(
                                             f"Найдена возможность треугольного арбитража на {exchange}: "
-                                            f"{base} -> {coin_a} -> {coin_b} -> {base}, " f"прибыль: {
-                                                profit_pct:.2%}")
+                                            f"{base} -> {coin_a} -> {coin_b} -> {base}, "
+                                            f"прибыль: {
+                                                profit_pct:.2%}"
+                                        )
 
             except Exception as e:
-                logger.error(f"Ошибка при поиске треугольного арбитража на {exchange}: {str(e)}")
+                logger.error(
+                    f"Ошибка при поиске треугольного арбитража на {exchange}: {str(e)}"
+                )
 
     @async_handle_error
     async def _check_balances(self, opportunity: Dict[str, Any]) -> bool:
@@ -350,14 +395,17 @@ class CrossStrategy(BaseStrategy):
                 available = balance.get("free", {}).get(base, 0)
 
                 # Рассчитываем требуемый объем
-                required = self.strategy_config["max_position_size_pct"] * \
-                    self.strategy_config.get("account_balance", 10000)
+                required = self.strategy_config[
+                    "max_position_size_pct"
+                ] * self.strategy_config.get("account_balance", 10000)
                 minimum = required * self.strategy_config["balance_threshold"]
 
                 return available >= minimum
 
             except Exception as e:
-                logger.error(f"Ошибка при проверке баланса для треугольного арбитража: {str(e)}")
+                logger.error(
+                    f"Ошибка при проверке баланса для треугольного арбитража: {str(e)}"
+                )
                 return False
 
         else:
@@ -368,7 +416,7 @@ class CrossStrategy(BaseStrategy):
 
             try:
                 # Получаем базовую и котируемую валюты
-                base, quote = symbol.split('/')
+                base, quote = symbol.split("/")
 
                 # Получаем балансы на обеих биржах
                 buy_balance = await self.market_data.get_balance(buy_exchange)
@@ -384,8 +432,9 @@ class CrossStrategy(BaseStrategy):
                 sell_available = sell_balance.get("free", {}).get(base, 0)
 
                 # Рассчитываем требуемый объем
-                required_quote = self.strategy_config["max_position_size_pct"] * \
-                    self.strategy_config.get("account_balance", 10000)
+                required_quote = self.strategy_config[
+                    "max_position_size_pct"
+                ] * self.strategy_config.get("account_balance", 10000)
                 required_base = required_quote / opportunity["buy_price"]
 
                 # Устанавливаем минимальные пороги
@@ -416,19 +465,24 @@ class CrossStrategy(BaseStrategy):
 
         if "type" in opportunity and opportunity["type"] == "triangular":
             # Треугольный арбитраж
-            logger.info(f"Выполняем треугольный арбитраж на {opportunity['exchange']}: "
-                        f"{opportunity['step1']}, {opportunity['step2']}, {opportunity['step3']}, "
-                        f"ожидаемая прибыль: {opportunity['profit_pct']:.2%}")
+            logger.info(
+                f"Выполняем треугольный арбитраж на {opportunity['exchange']}: "
+                f"{opportunity['step1']}, {opportunity['step2']}, {opportunity['step3']}, "
+                f"ожидаемая прибыль: {opportunity['profit_pct']:.2%}"
+            )
         else:
             # Обычный арбитраж между биржами
             logger.info(
                 f"Выполняем арбитраж для {opportunity['symbol']}: "
                 f"покупка на {
                     opportunity['buy_exchange']} по {
-                    opportunity['buy_price']:.8f}, " f"продажа на {
+                    opportunity['buy_price']:.8f}, "
+                f"продажа на {
                     opportunity['sell_exchange']} по {
-                    opportunity['sell_price']:.8f}, " f"ожидаемая прибыль: {
-                        opportunity['net_profit_pct']:.2%}")
+                    opportunity['sell_price']:.8f}, "
+                f"ожидаемая прибыль: {
+                        opportunity['net_profit_pct']:.2%}"
+            )
 
         # Имитируем успешное выполнение
         return True
@@ -494,7 +548,7 @@ class CrossStrategy(BaseStrategy):
                         "buy_price": opportunity["buy_price"],
                         "sell_price": opportunity["sell_price"],
                         "price_diff_pct": opportunity["price_diff_pct"],
-                        "timestamp": time.time()
+                        "timestamp": time.time(),
                     }
 
                     # В реальной стратегии здесь должен быть код для отслеживания арбитражной позиции

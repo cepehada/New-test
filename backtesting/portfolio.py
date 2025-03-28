@@ -563,7 +563,8 @@ class Portfolio:
             logger.warning(
                 f"Cannot open position: insufficient balance ({
                     self.balance} < {
-                    position_cost + fee})")
+                    position_cost + fee})"
+            )
             return None
 
         # Обновляем баланс

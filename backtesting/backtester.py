@@ -573,7 +573,8 @@ class Backtester:
                     if settings.log_trades:
                         logger.debug(
                             f"Closed LONG position at {
-                                position.stop_loss} (STOP-LOSS) ({timestamp})")
+                                position.stop_loss} (STOP-LOSS) ({timestamp})"
+                        )
 
                 # Проверяем, был ли достигнут тейк-профит
                 elif (
@@ -590,7 +591,8 @@ class Backtester:
                     if settings.log_trades:
                         logger.debug(
                             f"Closed LONG position at {
-                                position.take_profit} (TAKE-PROFIT) ({timestamp})")
+                                position.take_profit} (TAKE-PROFIT) ({timestamp})"
+                        )
 
             # Проверяем стоп-лосс и тейк-профит для короткой позиции
             elif position.direction == "short":
@@ -609,7 +611,8 @@ class Backtester:
                     if settings.log_trades:
                         logger.debug(
                             f"Closed SHORT position at {
-                                position.stop_loss} (STOP-LOSS) ({timestamp})")
+                                position.stop_loss} (STOP-LOSS) ({timestamp})"
+                        )
 
                 # Проверяем, был ли достигнут тейк-профит
                 elif (
@@ -626,7 +629,8 @@ class Backtester:
                     if settings.log_trades:
                         logger.debug(
                             f"Closed SHORT position at {
-                                position.take_profit} (TAKE-PROFIT) ({timestamp})")
+                                position.take_profit} (TAKE-PROFIT) ({timestamp})"
+                        )
 
     async def _close_all_positions(
         self, portfolio: Portfolio, price: float, timestamp: datetime

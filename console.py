@@ -496,7 +496,8 @@ class TradingBotConsole(cmd.Cmd):
             print(
                 f"Scanning arbitrage opportunities for {
                     ', '.join(symbols)} on {
-                    ', '.join(exchanges)}...")
+                    ', '.join(exchanges)}..."
+            )
 
             # Сканируем возможности
             opportunities = self.loop.run_until_complete(

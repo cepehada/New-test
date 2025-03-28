@@ -186,7 +186,8 @@ class PositionSizer:
         logger.info(
             f"Position multiplier updated: {
                 self.current_position_multiplier:.2f}, Martingale level: {
-                self.current_martingale_level}")
+                self.current_martingale_level}"
+        )
 
     def update_equity(self, equity: float, timestamp: datetime = None):
         """
@@ -223,7 +224,7 @@ class PositionSizer:
         # Ограничиваем историю
         if len(self.volatility_history) > self.volatility_lookback:
             self.volatility_history = self.volatility_history[
-                -self.volatility_lookback:
+                -self.volatility_lookback :
             ]
 
         # Рассчитываем среднюю волатильность
@@ -286,7 +287,8 @@ class PositionSizer:
                 kelly_pct *
                 100:.2f}% (Win prob: {
                 win_probability:.2f}, Win/Loss ratio: {
-                win_loss_ratio:.2f})")
+                win_loss_ratio:.2f})"
+        )
 
         return kelly_pct
 
@@ -324,7 +326,8 @@ class PositionSizer:
                 optimal_f *
                 100:.2f}% (Worst loss: {
                 worst_loss_pct *
-                100:.2f}%)")
+                100:.2f}%)"
+        )
 
         return optimal_f
 

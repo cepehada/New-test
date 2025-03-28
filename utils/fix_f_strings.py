@@ -11,26 +11,28 @@ from pathlib import Path
 # Шаблон для поиска неправильных f-строк
 pattern = re.compile(r'(["\'])(.*?{.*?}.*?)(\1)\s*%')
 
+
 # Функция для исправления f-строк в файле
 def fix_f_strings(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
+    with open(file_path, "r", encoding="utf-8") as file:
         content = file.read()
-    
+
     # Проверяем, требуется ли исправление
     if not pattern.search(content):
         return False
-    
+
     # Исправляем все найденные строки
-    modified_content = pattern.sub(r'f\1\2\3', content)
-    
+    modified_content = pattern.sub(r"f\1\2\3", content)
+
     # Записываем изменения
-    with open(file_path, 'w', encoding='utf-8') as file:
+    with open(file_path, "w", encoding="utf-8") as file:
         file.write(modified_content)
-    
+
     return True
 
+
 # Находим все Python-файлы в проекте
-python_files = glob.glob('/workspaces/New-test/**/*.py', recursive=True)
+python_files = glob.glob("/workspaces/New-test/**/*.py", recursive=True)
 
 # Счетчики
 fixed_count = 0

@@ -699,7 +699,9 @@ class FuturesStrategy(BaseStrategy):
 
         return position_size
 
-    async def _execute_position_sizing(self, symbol, side, price, risk_amount, position_size=None):
+    async def _execute_position_sizing(
+        self, symbol, side, price, risk_amount, position_size=None
+    ):
         """
         Вычисляет размер позиции на основе риск-менеджмента
         """

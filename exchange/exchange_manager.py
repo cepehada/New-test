@@ -208,7 +208,8 @@ class ExchangeRateLimit:
                     logger.warning(
                         f"Rate limit ({effective_limit} per {
                             self.period}s) reached, waiting {
-                            remaining_time:.2f}s")
+                            remaining_time:.2f}s"
+                    )
                     await asyncio.sleep(remaining_time)
 
                     # Reset counter
@@ -1131,7 +1132,8 @@ class ExchangeManager:
         except Exception as e:
             logger.error(
                 f"Error mapping symbol {symbol} from {source_exchange} to {target_exchange}: {
-                    str(e)}")
+                    str(e)}"
+            )
             return None
 
     async def map_timeframe(self, timeframe: str, exchange_id: str) -> Optional[str]:

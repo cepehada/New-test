@@ -192,7 +192,8 @@ class HttpCache:
                     1024:.2f} MB) exceeds maximum ({
                     self.max_size_bytes /
                     1024 /
-                    1024:.2f} MB). Cleaning up...")
+                    1024:.2f} MB). Cleaning up..."
+            )
 
             # Сортируем метаданные по времени истечения
             sorted_metadata = sorted(

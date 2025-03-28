@@ -89,7 +89,7 @@ class MeanReversionStrategy(BaseStrategy):
         self.recent_lows: Dict[str, float] = {}  # symbol -> недавний минимум
         self.volume_data: Dict[str, List[float]] = {}  # symbol -> история объемов
 
-        logger.debug(f"Создана стратегия возврата к среднему {self.name}" )
+        logger.debug(f"Создана стратегия возврата к среднему {self.name}")
 
     def _update_config(self, config: Dict[str, Any]) -> None:
         """
@@ -280,7 +280,7 @@ class MeanReversionStrategy(BaseStrategy):
         if lookback <= 0:
             return False
 
-        avg_volume = sum(volumes[-lookback - 1: -1]) / lookback
+        avg_volume = sum(volumes[-lookback - 1 : -1]) / lookback
 
         # Проверяем, что текущий объем выше среднего
         min_volume = avg_volume * self.strategy_config["min_volume_multiplier"]
@@ -347,7 +347,8 @@ class MeanReversionStrategy(BaseStrategy):
             if abs(correlation) > self.strategy_config["correlation_threshold"]:
                 logger.debug(
                     f"Слишком высокая корреляция между {symbol} и {position_symbol}: {
-                        correlation:.2f}")
+                        correlation:.2f}"
+                )
                 return False
 
         return True
@@ -380,7 +381,7 @@ class MeanReversionStrategy(BaseStrategy):
                 # Проверяем объем
                 volume_ok = await self._analyze_volume(symbol)
                 if not volume_ok:
-                    logger.debug(f"Недостаточный объем для {symbol}" )
+                    logger.debug(f"Недостаточный объем для {symbol}")
                     continue
 
                 # Проверяем корреляцию
@@ -446,7 +447,7 @@ class MeanReversionStrategy(BaseStrategy):
                     signals[symbol] = signal
 
             except Exception as e:
-                logger.error(f"Ошибка при генерации сигналов для {symbol}: {str(e)}" )
+                logger.error(f"Ошибка при генерации сигналов для {symbol}: {str(e)}")
 
         return signals
 
