@@ -16,7 +16,8 @@ except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy", "pandas"])
     import pandas as pd
 
-from project.technical_analysis.indicators import calculate_indicators
+# Local imports
+from project.technical_analysis.indicators import Indicators
 from project.technical_analysis.patterns import detect_patterns
 from project.utils.error_handler import handle_error
 from project.utils.logging_utils import setup_logger

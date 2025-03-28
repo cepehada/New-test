@@ -94,7 +94,7 @@ class NotificationConfig:
         # Проверяем наличие директории с шаблонами
         templates_path = Path(self.templates_dir)
         if not templates_path.exists():
-            logger.warning("Templates directory {self.templates_dir} not found" %)
+            logger.warning(f"Templates directory {self.templates_dir} not found")
             return
 
         # Загружаем шаблоны из файлов
@@ -104,7 +104,7 @@ class NotificationConfig:
                     template_data = json.load(f)
                     self.templates[template_file.stem] = template_data
             except Exception as e:
-                logger.error("Error loading template {template_file}: {str(e)}" %)
+                logger.error(f"Error loading template {template_file}: {str(e)}")
 
 
 class NotificationService:
@@ -230,7 +230,7 @@ class NotificationService:
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                logger.error("Error processing notification: {str(e)}" %)
+                logger.error(f"Error processing notification: {str(e)}")
                 await asyncio.sleep(1)
 
     async def _send_notification(self, notification: Dict):
@@ -345,7 +345,7 @@ class NotificationService:
             title = title_template.format(**data)
             body = body_template.format(**data)
         except KeyError as e:
-            logger.warning("Missing key in notification template: {str(e)}" %)
+            logger.warning(f"Missing key in notification template: {str(e)}")
             title = notification.get("title", "Notification")
             body = notification.get("message", "")
 
@@ -407,11 +407,11 @@ class NotificationService:
 
                 # Проверяем результат
                 if response.status_code != 200:
-                    logger.error("Telegram API error: {response.text}" %)
+                    logger.error(f"Telegram API error: {response.text}")
                     return False
 
             except Exception as e:
-                logger.error("Error sending Telegram notification: {str(e)}" %)
+                logger.error(f"Error sending Telegram notification: {str(e)}")
                 return False
 
         return True
@@ -450,7 +450,7 @@ class NotificationService:
             return True
 
         except Exception as e:
-            logger.error("Error sending email notification: {str(e)}" %)
+            logger.error(f"Error sending email notification: {str(e)}")
             return False
 
     async def _send_discord(self, notification: Dict) -> bool:
@@ -500,13 +500,13 @@ class NotificationService:
 
             # Проверяем результат
             if response.status_code not in [200, 204]:
-                logger.error("Discord API error: {response.text}" %)
+                logger.error(f"Discord API error: {response.text}")
                 return False
 
             return True
 
         except Exception as e:
-            logger.error("Error sending Discord notification: {str(e)}" %)
+            logger.error(f"Error sending Discord notification: {str(e)}")
             return False
 
     async def _send_push(self, notification: Dict) -> bool:
@@ -542,7 +542,7 @@ class NotificationService:
 
                 # Проверяем результат
                 if response.status_code != 200:
-                    logger.error("Pushover API error: {response.text}" %)
+                    logger.error(f"Pushover API error: {response.text}")
                     return False
 
                 return True
@@ -567,17 +567,17 @@ class NotificationService:
 
                 # Проверяем результат
                 if response.status_code != 200:
-                    logger.error("Pushbullet API error: {response.text}" %)
+                    logger.error(f"Pushbullet API error: {response.text}")
                     return False
 
                 return True
 
             else:
-                logger.error("Unsupported push service: {self.config.push_service}" %)
+                logger.error(f"Unsupported push service: {self.config.push_service}")
                 return False
 
         except Exception as e:
-            logger.error("Error sending push notification: {str(e)}" %)
+            logger.error(f"Error sending push notification: {str(e)}")
             return False
 
     def _get_pushover_priority(self, level: str) -> int:
@@ -648,13 +648,13 @@ class NotificationService:
 
             # Проверяем результат
             if response.status_code != 200:
-                logger.error("Slack API error: {response.text}" %)
+                logger.error(f"Slack API error: {response.text}")
                 return False
 
             return True
 
         except Exception as e:
-            logger.error("Error sending Slack notification: {str(e)}" %)
+            logger.error(f"Error sending Slack notification: {str(e)}")
             return False
 
     def _add_to_history(self, notification: Dict):
@@ -773,7 +773,7 @@ class NotificationService:
             logger.warning("Notification queue is full, dropping notification")
             return False
         except Exception as e:
-            logger.error("Error adding notification to queue: {str(e)}" %)
+            logger.error(f"Error adding notification to queue: {str(e)}")
             return False
 
 
@@ -957,18 +957,18 @@ class TelegramBot:
             )
 
             if response.status_code != 200:
-                logger.error("Failed to set webhook: {response.text}" %)
+                logger.error(f"Failed to set webhook: {response.text}")
                 return False
 
             # Сохраняем данные webhook
             self.webhook_url = url
             self.webhook_secret = secret
 
-            logger.info("Webhook set to {url}" %)
+            logger.info(f"Webhook set to {url}")
             return True
 
         except Exception as e:
-            logger.error("Error setting webhook: {str(e)}" %)
+            logger.error(f"Error setting webhook: {str(e)}")
             return False
 
     async def remove_webhook(self):
@@ -982,7 +982,7 @@ class TelegramBot:
             )
 
             if response.status_code != 200:
-                logger.error("Failed to remove webhook: {response.text}" %)
+                logger.error(f"Failed to remove webhook: {response.text}")
                 return False
 
             # Сбрасываем данные webhook
@@ -993,7 +993,7 @@ class TelegramBot:
             return True
 
         except Exception as e:
-            logger.error("Error removing webhook: {str(e)}" %)
+            logger.error(f"Error removing webhook: {str(e)}")
             return False
 
     async def _polling_loop(self):
@@ -1021,7 +1021,7 @@ class TelegramBot:
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                logger.error("Error in Telegram polling loop: {str(e)}" %)
+                logger.error(f"Error in Telegram polling loop: {str(e)}")
                 await asyncio.sleep(5)
 
     async def _get_updates(self) -> List[Dict]:
@@ -1049,7 +1049,7 @@ class TelegramBot:
 
             # Проверяем результат
             if response.status_code != 200:
-                logger.error("Telegram API error: {response.text}" %)
+                logger.error(f"Telegram API error: {response.text}")
                 return []
 
             # Парсим ответ
@@ -1060,7 +1060,7 @@ class TelegramBot:
             return []
 
         except Exception as e:
-            logger.error("Error getting Telegram updates: {str(e)}" %)
+            logger.error(f"Error getting Telegram updates: {str(e)}")
             return []
 
     async def _process_update(self, update: Dict):
@@ -1078,7 +1078,7 @@ class TelegramBot:
 
             # Проверяем, разрешен ли чат
             if self.allowed_chat_ids and chat_id not in self.allowed_chat_ids:
-                logger.warning("Message from unauthorized chat {chat_id}" %)
+                logger.warning(f"Message from unauthorized chat {chat_id}")
                 return
 
             # Проверяем наличие текста
@@ -1101,7 +1101,7 @@ class TelegramBot:
 
             # Проверяем, разрешен ли чат
             if self.allowed_chat_ids and chat_id not in self.allowed_chat_ids:
-                logger.warning("Callback from unauthorized chat {chat_id}" %)
+                logger.warning(f"Callback from unauthorized chat {chat_id}")
                 return
 
             await self._handle_callback(callback_query)
@@ -1165,7 +1165,7 @@ class TelegramBot:
             handler: Функция-обработчик
         """
         self.handlers[event_type] = handler
-        logger.debug("Added handler for {event_type}" %)
+        logger.debug(f"Added handler for {event_type}")
 
     async def send_message(
         self, chat_id: str, text: str, parse_mode: str = "HTML", **kwargs
@@ -1201,13 +1201,13 @@ class TelegramBot:
 
             # Проверяем результат
             if response.status_code != 200:
-                logger.error("Telegram API error: {response.text}" %)
+                logger.error(f"Telegram API error: {response.text}")
                 return False
 
             return True
 
         except Exception as e:
-            logger.error("Error sending Telegram message: {str(e)}" %)
+            logger.error(f"Error sending Telegram message: {str(e)}")
             return False
 
     async def send_photo(
@@ -1264,13 +1264,13 @@ class TelegramBot:
 
             # Проверяем результат
             if response.status_code != 200:
-                logger.error("Telegram API error: {response.text}" %)
+                logger.error(f"Telegram API error: {response.text}")
                 return False
 
             return True
 
         except Exception as e:
-            logger.error("Error sending Telegram photo: {str(e)}" %)
+            logger.error(f"Error sending Telegram photo: {str(e)}")
             return False
 
     async def edit_message_text(
@@ -1307,13 +1307,13 @@ class TelegramBot:
 
             # Проверяем результат
             if response.status_code != 200:
-                logger.error("Telegram API error: {response.text}" %)
+                logger.error(f"Telegram API error: {response.text}")
                 return False
 
             return True
 
         except Exception as e:
-            logger.error("Error editing Telegram message: {str(e)}" %)
+            logger.error(f"Error editing Telegram message: {str(e)}")
             return False
 
     async def answer_callback_query(
@@ -1357,13 +1357,13 @@ class TelegramBot:
 
             # Проверяем результат
             if response.status_code != 200:
-                logger.error("Telegram API error: {response.text}" %)
+                logger.error(f"Telegram API error: {response.text}")
                 return False
 
             return True
 
         except Exception as e:
-            logger.error("Error answering callback query: {str(e)}" %)
+            logger.error(f"Error answering callback query: {str(e)}")
             return False
 
     async def send_invoice(
@@ -1416,13 +1416,13 @@ class TelegramBot:
 
             # Проверяем результат
             if response.status_code != 200:
-                logger.error("Telegram API error: {response.text}" %)
+                logger.error(f"Telegram API error: {response.text}")
                 return False
 
             return True
 
         except Exception as e:
-            logger.error("Error sending invoice: {str(e)}" %)
+            logger.error(f"Error sending invoice: {str(e)}")
             return False
 
 
@@ -1531,11 +1531,11 @@ class EmailService:
 
             await loop.run_in_executor(None, self._send_email_sync, msg.as_string(), to)
 
-            logger.info("Email sent to {', '.join(to)}" %)
+            logger.info(f"Email sent to {', '.join(to)}")
             return True
 
         except Exception as e:
-            logger.error("Error sending email: {str(e)}" %)
+            logger.error(f"Error sending email: {str(e)}")
             return False
 
     def _send_email_sync(self, message_string: str, recipients: List[str]):
