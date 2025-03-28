@@ -102,7 +102,7 @@ async def authenticate_ws(message, ws):
             return False
 
     except Exception as e:
-        logger.error("Authentication error: {str(e)}" %)
+        logger.error("Authentication error: {str(e)}")
         await ws.send_json(
             {"type": "error", "code": "auth_error", "message": "Authentication error"}
         )
@@ -188,7 +188,7 @@ async def websocket_handler(request):
                         }
                     )
                 except Exception as e:
-                    logger.error("WebSocket message error: {str(e)}" %)
+                    logger.error("WebSocket message error: {str(e)}")
                     await ws.send_json(
                         {
                             "type": "error",
@@ -313,7 +313,7 @@ async def broadcast_to_channel(channel: str, message: Dict[str, Any]) -> None:
         message: Сообщение для отправки
     """
     if channel not in active_clients:
-        logger.warning("Unknown channel: {channel}" %)
+        logger.warning("Unknown channel: {channel}")
         return
 
     # Добавляем тип и timestamp, если их нет
@@ -333,13 +333,13 @@ async def broadcast_to_channel(channel: str, message: Dict[str, Any]) -> None:
         try:
             await ws.send_json(message)
         except Exception as e:
-            logger.error("Error sending message to client: {str(e)}" %)
+            logger.error("Error sending message to client: {str(e)}")
             disconnected.add(ws)
 
     # Удаляем отключенные соединения
     for ws in disconnected:
         active_clients[channel].discard(ws)
-        logger.debug("Removed disconnected client from channel: {channel}" %)
+        logger.debug("Removed disconnected client from channel: {channel}")
 
 
 # Обновление рыночных данных
@@ -378,7 +378,7 @@ async def update_market_data() -> None:
             await asyncio.sleep(5)
 
     except Exception as e:
-        logger.error("Error in market data update: {str(e)}" %)
+        logger.error("Error in market data update: {str(e)}")
 
 
 # Обновление состояния ботов
@@ -426,7 +426,7 @@ async def update_bots_state() -> None:
             await asyncio.sleep(10)
 
     except Exception as e:
-        logger.error("Error in bots state update: {str(e)}" %)
+        logger.error("Error in bots state update: {str(e)}")
 
 
 # Обновление состояния стратегий
@@ -456,7 +456,7 @@ async def update_strategies_state() -> None:
             await asyncio.sleep(10)
 
     except Exception as e:
-        logger.error("Error in strategies state update: {str(e)}" %)
+        logger.error("Error in strategies state update: {str(e)}")
 
 
 # Обновление системной информации
@@ -493,7 +493,7 @@ async def update_system_info() -> None:
     except ImportError:
         logger.warning("psutil not installed, system info updates disabled")
     except Exception as e:
-        logger.error("Error in system info update: {str(e)}" %)
+        logger.error("Error in system info update: {str(e)}")
 
 
 # Запуск WebSocket-сервера
@@ -564,4 +564,4 @@ async def broadcast_updates(symbol, data_type, data):
     # Используем .items() для перебора словаря
     for client_id, subscriptions in active_subscriptions.items():
         if symbol in subscriptions and data_type in subscriptions[symbol]:
-            # ...existing code...
+            await websocket.send_json(response)

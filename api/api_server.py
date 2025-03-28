@@ -255,15 +255,15 @@ class APIServer:
                 # Получаем статистику производительности
                 stats = {
                     "cpu_usage": system_stats.get_cpu_usage(),
-                    "memory_usage": system_stats.get_memory_usage(),
+                    "memory_usage": self.get_memory_usage(),
                     "disk_usage": system_stats.get_disk_usage(),
                     "uptime": system_stats.get_uptime(),
                     "network": system_stats.get_network_stats()
-                }  # Закрытие фигурной скобки, которая ранее не была закрыта
+                }
                 
-                return json_response({"success": True, "data": stats})
+                return {"status": "success", "data": stats}
             except Exception as e:
-                logger.error("Error getting performance stats: {e}" %)
+                logger.error("Error getting performance stats: {e}")
                 return json_response({"success": False, "error": str(e)}, status=500)
 
         # Маршруты для бэктестинга
@@ -309,6 +309,11 @@ class APIServer:
             return {"message": "Trading System API"}
 
         # Добавляем обработчики событий
+
+        # Вспомогательные методы для статистики системы
+        def get_memory_usage(self):
+            import psutil
+            return psutil.virtual_memory().percent
         @self.app.on_event("startup")
         async def startup_event():
             await self._startup()
@@ -383,15 +388,15 @@ class APIServer:
                     if bot_state.get('is_active', False):
                         await bot.start()
 
-                    logger.info("Loaded bot: {bot_state.get('bot_id')}" %)
+                    logger.info("Loaded bot: {bot_state.get('bot_id')}")
 
                 except Exception as e:
-                    logger.error("Error loading bot {bot_state.get('bot_id')}: {str(e)}" %)
+                    logger.error("Error loading bot {bot_state.get('bot_id')}: {str(e)}")
 
-            logger.info("Loaded {len(self.bots)} active bots" %)
+            logger.info("Loaded {len(self.bots)} active bots")
 
         except Exception as e:
-            logger.error("Error loading active bots: {str(e)}" %)
+            logger.error("Error loading active bots: {str(e)}")
 
     async def _update_bots_task(self):
         """Задача для периодического обновления состояния ботов"""
@@ -404,7 +409,7 @@ class APIServer:
                             # Сохраняем состояние бота
                             await bot._save_state()
                     except Exception as e:
-                        logger.error("Error updating bot {bot_id}: {str(e)}" %)
+                        logger.error("Error updating bot {bot_id}: {str(e)}")
 
                 # Ждем перед следующим обновлением
                 await asyncio.sleep(60)  # Обновляем каждую минуту
@@ -413,7 +418,7 @@ class APIServer:
             logger.info("Bot update task cancelled")
             raise
         except Exception as e:
-            logger.error("Error in bot update task: {str(e)}" %)
+            logger.error("Error in bot update task: {str(e)}")
 
     async def verify_token(self, token: str = Depends(OAuth2PasswordBearer(tokenUrl="api/auth/token"))) -> Dict:
         """
@@ -1401,10 +1406,10 @@ class APIServer:
 
                 await self.database.save_backtest(result_data)
 
-                logger.info("Backtest {backtest_id} completed and saved" %)
+                logger.info("Backtest {backtest_id} completed and saved")
 
         except Exception as e:
-            logger.error("Error during backtest: {str(e)}" %)
+            logger.error("Error during backtest: {str(e)}")
             logger.error(traceback.format_exc())
 
     async def get_backtest_results(self, limit: int = 10, token: Dict = Depends(verify_token)) -> List[Dict]:
@@ -1613,11 +1618,10 @@ class APIServer:
                 progress_callback=progress_callback
             )
 
-            # Закрываем скобку, которая была открыта, но не закрыта
             response = {
                 'status': 'success',
                 'message': 'Operation completed',
-                'data': result
+                'data': optimization_result
             }
 
             # Обновляем статус задачи
@@ -1626,10 +1630,10 @@ class APIServer:
                 self.optimization_tasks[task_id]['end_time'] = datetime.now().isoformat()
                 self.optimization_tasks[task_id]['result'] = optimization_result
 
-            logger.info("Optimization {task_id} completed" %)
+            logger.info("Optimization {task_id} completed")
 
         except Exception as e:
-            logger.error("Error during optimization: {str(e)}" %)
+            logger.error("Error during optimization: {str(e)}")
             logger.error(traceback.format_exc())
 
             # Обновляем статус задачи

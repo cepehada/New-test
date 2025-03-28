@@ -51,7 +51,7 @@ class BinanceLiquidationMonitor:
         """
         if handler not in self.handlers:
             self.handlers.append(handler)
-            logger.debug("Добавлен обработчик ликвидаций: {handler.__name__}" %)
+            logger.debug("Добавлен обработчик ликвидаций: {handler.__name__}")
 
     def remove_handler(self, handler: LiquidationHandler) -> None:
         """
@@ -62,7 +62,7 @@ class BinanceLiquidationMonitor:
         """
         if handler in self.handlers:
             self.handlers.remove(handler)
-            logger.debug("Удален обработчик ликвидаций: {handler.__name__}" %)
+            logger.debug("Удален обработчик ликвидаций: {handler.__name__}")
 
     def add_symbol(self, symbol: str) -> None:
         """
@@ -136,7 +136,7 @@ class BinanceLiquidationMonitor:
         Returns:
             Установленное соединение
         """
-        logger.debug("Подключение к Binance WebSocket: {self.websocket_url}" %)
+        logger.debug("Подключение к Binance WebSocket: {self.websocket_url}")
         return await websockets.connect(self.websocket_url)
 
     async def _monitoring_task(self) -> None:
@@ -163,16 +163,16 @@ class BinanceLiquidationMonitor:
                         data = json.loads(message)
                         await self._process_liquidation(data)
                     except json.JSONDecodeError as e:
-                        logger.error("Ошибка декодирования JSON: {str(e)}" %)
+                        logger.error("Ошибка декодирования JSON: {str(e)}")
                     except Exception as e:
-                        logger.error("Ошибка обработки сообщения: {str(e)}" %)
+                        logger.error("Ошибка обработки сообщения: {str(e)}")
 
             except asyncio.CancelledError:
                 logger.info("Задача мониторинга ликвидаций отменена")
                 break
             except Exception as e:
                 retry_count += 1
-                logger.error("Ошибка соединения с Binance WebSocket: {str(e)}" %)
+                logger.error("Ошибка соединения с Binance WebSocket: {str(e)}")
 
                 if retry_count > max_retries:
                     logger.critical(
@@ -259,7 +259,7 @@ class BinanceLiquidationMonitor:
                     )
 
         except Exception as e:
-            logger.error("Ошибка обработки данных о ликвидации: {str(e)}" %)
+            logger.error("Ошибка обработки данных о ликвидации: {str(e)}")
 
     async def _store_liquidation(self, data: Dict[str, Any]) -> None:
         """
@@ -271,9 +271,9 @@ class BinanceLiquidationMonitor:
         try:
             db = Database.get_instance()
             await db.insert("liquidations", data)
-            logger.debug("Данные о ликвидации сохранены в БД: {data['symbol']}" %)
+            logger.debug("Данные о ликвидации сохранены в БД: {data['symbol']}")
         except Exception as e:
-            logger.error("Ошибка сохранения данных о ликвидации в БД: {str(e)}" %)
+            logger.error("Ошибка сохранения данных о ликвидации в БД: {str(e)}")
 
     async def _notify_liquidation(self, data: Dict[str, Any]) -> None:
         """
@@ -298,7 +298,7 @@ class BinanceLiquidationMonitor:
                 f"Отправлено уведомление о крупной ликвидации: {data['symbol']} ${data['amount_usd']:.2f}"
             )
         except Exception as e:
-            logger.error("Ошибка отправки уведомления о ликвидации: {str(e)}" %)
+            logger.error("Ошибка отправки уведомления о ликвидации: {str(e)}")
 
     async def get_recent_liquidations(
         self, symbol: Optional[str] = None, limit: int = 10
@@ -332,5 +332,5 @@ class BinanceLiquidationMonitor:
                 """
                 return await db.fetch(query, limit)
         except Exception as e:
-            logger.error("Ошибка получения данных о ликвидациях: {str(e)}" %)
+            logger.error("Ошибка получения данных о ликвидациях: {str(e)}")
             return []

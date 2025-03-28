@@ -15,4 +15,4 @@ from project.utils.logging_utils import setup_logging
 
 setup_logging()
 logger = logging.getLogger(__name__)
-logger.info("Initializing trading bot v{__version__}" %)
+logger.info("Initializing trading bot v{__version__}")

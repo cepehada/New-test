@@ -15,7 +15,19 @@ except ImportError:
     import yaml
 
 # Local imports
-from project.utils.logging_utils import setup_logger
+try:
+    from project.utils.logging_utils import setup_logger
+except ModuleNotFoundError:
+    import logging
+
+    def setup_logger(name: str):
+        logger = logging.getLogger(name)
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        logger.setLevel(logging.INFO)
+        return logger
 
 logger = setup_logger("configuration")
 
@@ -65,7 +77,7 @@ class Configuration:
         try:
             # Проверяем, существует ли путь
             if not os.path.exists(self.config_path):
-                logger.warning("Config path not found: {self.config_path}" %)
+                logger.warning("Config path not found: {self.config_path}")
                 return False
 
             # Загружаем базовую конфигурацию
@@ -85,11 +97,11 @@ class Configuration:
             # Обновляем время последнего обновления
             self.last_update = time.time()
 
-            logger.info("Configuration loaded from {self.config_path}" %)
+            logger.info("Configuration loaded from {self.config_path}")
             return True
 
         except Exception as e:
-            logger.error("Error loading configuration: {str(e)}" %)
+            logger.error("Error loading configuration: {str(e)}")
             return False
 
     def _load_file(self, file_path: str):
@@ -112,7 +124,7 @@ class Configuration:
                     # YAML формат
                     config_data = yaml.safe_load(f)
                 else:
-                    logger.warning("Unsupported file format: {file_path}" %)
+                    logger.warning("Unsupported file format: {file_path}")
                     return
 
             # Определяем секцию конфигурации на основе имени файла
@@ -127,9 +139,9 @@ class Configuration:
                 # Секция конфигурации
                 self.config[section_name] = config_data
 
-            logger.debug("Loaded configuration from {file_path}" %)
+            logger.debug("Loaded configuration from {file_path}")
         except Exception as e:
-            logger.error("Error loading configuration from {file_path}: {str(e)}" %)
+            logger.error("Error loading configuration from {file_path}: {str(e)}")
 
     def apply_environment_variables(self):
         """Применяет переменные окружения к конфигурации"""
@@ -148,7 +160,7 @@ class Configuration:
             # Применяем значение к конфигурации
             self._set_nested_value(parts, value)
 
-        logger.debug("Applied {len(env_vars)} environment variables" %)
+        logger.debug("Applied {len(env_vars)} environment variables")
 
     def _set_nested_value(self, parts: List[str], value: str, config: Dict = None):
         """
@@ -293,11 +305,11 @@ class Configuration:
             # Обновляем время последнего обновления
             self.last_update = time.time()
 
-            logger.info("Configuration saved to {file_path}" %)
+            logger.info("Configuration saved to {file_path}")
             return True
 
         except Exception as e:
-            logger.error("Error saving configuration: {str(e)}" %)
+            logger.error("Error saving configuration: {str(e)}")
             return False
 
     def reload(self) -> bool:

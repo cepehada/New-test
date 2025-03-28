@@ -71,7 +71,7 @@ class Database:
                 )
                 logger.info("Пул соединений с базой данных успешно создан")
             except Exception as e:
-                logger.error("Ошибка при инициализации пула соединений: {str(e)}" %)
+                logger.error(f"Ошибка при инициализации пула соединений: {str(e)}")
                 raise
 
     @asynccontextmanager
@@ -89,7 +89,7 @@ class Database:
             try:
                 yield conn
             except Exception as e:
-                logger.error("Ошибка при работе с соединением: {str(e)}" %)
+                logger.error(f"Ошибка при работе с соединением: {str(e)}")
                 raise
 
     @async_handle_error
@@ -109,7 +109,7 @@ class Database:
 
         async with self.connection() as conn:
             result = await conn.execute(query, *args)
-            logger.debug("Выполнен запрос: {query[:100]}..." %)
+            logger.debug(f"Выполнен запрос: {query[:100]}...")
             return result
 
     @async_handle_error
@@ -130,7 +130,7 @@ class Database:
         async with self.connection() as conn:
             rows = await conn.fetch(query, *args)
             result = [dict(row) for row in rows]
-            logger.debug("Запрос вернул {len(result)} строк: {query[:100]}..." %)
+            logger.debug(f"Запрос вернул {len(result)} строк: {query[:100]}...")
             return result
 
     @async_handle_error
@@ -173,7 +173,7 @@ class Database:
 
         async with self.connection() as conn:
             result = await conn.fetchval(query, *args)
-            logger.debug("Запрос вернул одно значение: {query[:100]}..." %)
+            logger.debug(f"Запрос вернул одно значение: {query[:100]}...")
             return result
 
     @async_handle_error
@@ -223,7 +223,7 @@ class Database:
             Словарь с вставленными данными или None при ошибке
         """
         if not data:
-            logger.warning("Попытка вставки пустых данных в таблицу {table}" %)
+            logger.warning(f"Попытка вставки пустых данных в таблицу {table}")
             return None
 
         columns = list(data.keys())
@@ -256,7 +256,7 @@ class Database:
             Словарь с обновленными данными или None при ошибке
         """
         if not data:
-            logger.warning("Попытка обновления пустыми данными в таблице {table}" %)
+            logger.warning(f"Попытка обновления пустыми данными в таблице {table}")
             return None
 
         set_parts = []

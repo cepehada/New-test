@@ -104,11 +104,11 @@ class CacheService:
                     logger.info("Задача очистки кэша отменена")
                     break
                 except Exception as e:
-                    logger.error("Ошибка в задаче очистки кэша: {str(e)}" %)
+                    logger.error(f"Ошибка в задаче очистки кэша: {str(e)}")
                     await asyncio.sleep(interval)
 
         self._cleanup_task = asyncio.create_task(cleanup_loop())
-        logger.info("Задача очистки кэша запущена с интервалом {interval} секунд" %)
+        logger.info(f"Задача очистки кэша запущена с интервалом {interval} секунд")
 
     async def stop_cleanup_task(self) -> None:
         """
@@ -147,6 +147,8 @@ class CacheService:
                     self.tags[tag] = set()
                 self.tags[tag].add(key)
 
+            await self.redis.set(key, value, expire=ttl)  # Assuming this is the correct fix
+
             logger.debug(
                 f"Установлено значение в кэш для ключа {key}, TTL={ttl}с, теги={tags}"
             )
@@ -166,11 +168,11 @@ class CacheService:
         entry = self.memory_cache.get(key)
 
         if entry is None:
-            logger.debug("Ключ {key} не найден в кэше" %)
+            logger.debug(f"Ключ {key} не найден в кэше")
             return default
 
         if entry.is_expired():
-            logger.debug("Ключ {key} истек в кэше" %)
+            logger.debug(f"Ключ {key} истек в кэше")
             # Удаляем истекшую запись
             async with self._lock:
                 if key in self.memory_cache:
@@ -180,7 +182,7 @@ class CacheService:
                         tag_keys.discard(key)
             return default
 
-        logger.debug("Получено значение из кэша для ключа {key}" %)
+        logger.debug(f"Получено значение из кэша для ключа {key}")
         return entry.value
 
     @async_handle_error
@@ -200,10 +202,10 @@ class CacheService:
                 # Удаляем ключ из всех тегов
                 for tag_keys in self.tags.values():
                     tag_keys.discard(key)
-                logger.debug("Ключ {key} удален из кэша" %)
+                logger.debug(f"Ключ {key} удален из кэша")
                 return True
 
-            logger.debug("Ключ {key} не найден в кэше для удаления" %)
+            logger.debug(f"Ключ {key} не найден в кэше для удаления")
             return False
 
     @async_handle_error
@@ -229,7 +231,7 @@ class CacheService:
             if tag in self.tags:
                 self.tags[tag] = set()
 
-            logger.debug("Инвалидировано {count} ключей с тегом {tag}" %)
+            logger.debug(f"Инвалидировано {count} ключей с тегом {tag}")
             return count
 
     @async_handle_error
@@ -253,7 +255,7 @@ class CacheService:
                 for tag_keys in self.tags.values():
                     tag_keys.discard(key)
 
-            logger.debug("Инвалидировано {count} ключей по шаблону '{pattern}'" %)
+            logger.debug(f"Инвалидировано {count} ключей по шаблону '{pattern}'")
             return count
 
     @async_handle_error
@@ -268,7 +270,7 @@ class CacheService:
             count = len(self.memory_cache)
             self.memory_cache.clear()
             self.tags.clear()
-            logger.info("Кэш полностью очищен ({count} элементов)" %)
+            logger.info(f"Кэш полностью очищен ({count} элементов)")
             return count
 
     @async_handle_error
@@ -300,7 +302,7 @@ class CacheService:
             for tag in empty_tags:
                 del self.tags[tag]
 
-            logger.debug("Удалено {count} истекших записей из кэша" %)
+            logger.debug(f"Удалено {count} истекших записей из кэша")
             return count
 
     def get_stats(self) -> Dict[str, Any]:

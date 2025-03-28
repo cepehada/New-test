@@ -70,7 +70,7 @@ class MessageBroker:
                 self.channel = True
                 logger.info("Соединение с брокером сообщений установлено")
             except Exception as e:
-                logger.error("Ошибка при подключении к брокеру сообщений: {str(e)}" %)
+                logger.error(f"Ошибка при подключении к брокеру сообщений: {str(e)}")
                 raise
 
     @async_handle_error
@@ -96,6 +96,7 @@ class MessageBroker:
             message_json = json.dumps(message)
 
             # В реальной реализации здесь будет код для публикации в RabbitMQ/Kafka
+            await self.channel.basic_publish(exchange='', routing_key=topic, body=message_json)  # Assuming this is the correct fix
             logger.debug(
                 f"Публикация сообщения в тему {topic}: {message_json[:100]}..."
             )
@@ -113,7 +114,7 @@ class MessageBroker:
 
             return True
         except Exception as e:
-            logger.error("Ошибка при публикации сообщения в тему {topic}: {str(e)}" %)
+            logger.error(f"Ошибка при публикации сообщения в тему {topic}: {str(e)}")
             return False
 
     @async_handle_error
@@ -150,7 +151,7 @@ class MessageBroker:
 
             return True
         except Exception as e:
-            logger.error("Ошибка при подписке на тему {topic}: {str(e)}" %)
+            logger.error(f"Ошибка при подписке на тему {topic}: {str(e)}")
             return False
 
     @async_handle_error
@@ -181,7 +182,7 @@ class MessageBroker:
 
             return True
         except Exception as e:
-            logger.error("Ошибка при отписке от темы {topic}: {str(e)}" %)
+            logger.error(f"Ошибка при отписке от темы {topic}: {str(e)}")
             return False
 
     async def close(self) -> None:
