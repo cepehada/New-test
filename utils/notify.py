@@ -138,10 +138,10 @@ class NotificationService:
         if self.processing_task is not None:
             logger.warning("Обработчик уведомлений уже запущен")
             return
-
+            
         # Создаем HTTP клиент для запросов
         self.http_client = httpx.AsyncClient(timeout=10.0)
-
+        
         self.processing_task = asyncio.create_task(self._process_notification_queue())
         logger.info("Обработчик уведомлений запущен")
 
@@ -150,18 +150,18 @@ class NotificationService:
         if self.processing_task is None:
             logger.warning("Обработчик уведомлений не запущен")
             return
-
+            
         self.processing_task.cancel()
         try:
             await self.processing_task
         except asyncio.CancelledError:
             pass
-
+        
         # Закрываем HTTP клиент
         if self.http_client:
             await self.http_client.aclose()
             self.http_client = None
-
+            
         self.processing_task = None
         logger.info("Обработчик уведомлений остановлен")
 
@@ -190,9 +190,7 @@ class NotificationService:
     async def _send_notification(self, notification: Dict):
         """Отправляет уведомление через все активные каналы"""
         # Применяем форматирование
-        formatted = self._format_notification(
-            notification, notification.get("template", "default")
-        )
+        formatted = self._format_notification(notification, notification.get('template', 'default'))
 
         # Добавляем системную информацию
         formatted = self._add_system_info(formatted)

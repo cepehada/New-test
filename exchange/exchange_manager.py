@@ -27,34 +27,24 @@ exchange_instances = {}
 
 # Список поддерживаемых бирж
 SUPPORTED_EXCHANGES = [
-    "binance",
-    "binanceus",
-    "bybit",
-    "kucoin",
-    "okx",
-    "huobi",
-    "mexc",
-    "bitget",
-    "gateio",
-    "kraken",
-    "bitfinex",
-    "coinbase",
+    'binance', 'binanceus', 'bybit', 'kucoin', 'okx', 'huobi',
+    'mexc', 'bitget', 'gateio', 'kraken', 'bitfinex', 'coinbase'
 ]
 
 # Словарь соответствия названий бирж между различными библиотеками
 EXCHANGE_NAME_MAP = {
-    "binance": {"ccxt": "binance", "cryptofeed": "BINANCE"},
-    "binanceus": {"ccxt": "binanceus", "cryptofeed": "BINANCE_US"},
-    "bybit": {"ccxt": "bybit", "cryptofeed": "BYBIT"},
-    "kucoin": {"ccxt": "kucoin", "cryptofeed": "KUCOIN"},
-    "okx": {"ccxt": "okx", "cryptofeed": "OKX"},
-    "huobi": {"ccxt": "huobi", "cryptofeed": "HUOBI"},
-    "mexc": {"ccxt": "mexc", "cryptofeed": "MEXC"},
-    "bitget": {"ccxt": "bitget", "cryptofeed": "BITGET"},
-    "gateio": {"ccxt": "gateio", "cryptofeed": "GATEIO"},
-    "kraken": {"ccxt": "kraken", "cryptofeed": "KRAKEN"},
-    "bitfinex": {"ccxt": "bitfinex", "cryptofeed": "BITFINEX"},
-    "coinbase": {"ccxt": "coinbase", "cryptofeed": "COINBASE"},
+    'binance': {'ccxt': 'binance', 'cryptofeed': 'BINANCE'},
+    'binanceus': {'ccxt': 'binanceus', 'cryptofeed': 'BINANCE_US'},
+    'bybit': {'ccxt': 'bybit', 'cryptofeed': 'BYBIT'},
+    'kucoin': {'ccxt': 'kucoin', 'cryptofeed': 'KUCOIN'},
+    'okx': {'ccxt': 'okx', 'cryptofeed': 'OKX'},
+    'huobi': {'ccxt': 'huobi', 'cryptofeed': 'HUOBI'},
+    'mexc': {'ccxt': 'mexc', 'cryptofeed': 'MEXC'},
+    'bitget': {'ccxt': 'bitget', 'cryptofeed': 'BITGET'},
+    'gateio': {'ccxt': 'gateio', 'cryptofeed': 'GATEIO'},
+    'kraken': {'ccxt': 'kraken', 'cryptofeed': 'KRAKEN'},
+    'bitfinex': {'ccxt': 'bitfinex', 'cryptofeed': 'BITFINEX'},
+    'coinbase': {'ccxt': 'coinbase', 'cryptofeed': 'COINBASE'}
 }
 
 
@@ -73,27 +63,27 @@ class ExchangeConfig:
         self.config = config or {}
 
         # API ключи
-        self.api_key = self.config.get("api_key", "")
-        self.api_secret = self.config.get("api_secret", "")
-        self.api_password = self.config.get("api_password", "")
+        self.api_key = self.config.get('api_key', '')
+        self.api_secret = self.config.get('api_secret', '')
+        self.api_password = self.config.get('api_password', '')
 
         # Настройки подключения
-        self.timeout = self.config.get("timeout", 30000)
-        self.enable_rate_limit = self.config.get("enable_rate_limit", True)
-        self.verbose = self.config.get("verbose", False)
+        self.timeout = self.config.get('timeout', 30000)
+        self.enable_rate_limit = self.config.get('enable_rate_limit', True)
+        self.verbose = self.config.get('verbose', False)
 
         # Настройки торговли
-        self.sandbox = self.config.get("sandbox", False)
-        self.default_type = self.config.get("default_type", "spot")
+        self.sandbox = self.config.get('sandbox', False)
+        self.default_type = self.config.get('default_type', 'spot')
 
         # WebSocket настройки
-        self.use_websocket = self.config.get("use_websocket", True)
-        self.ws_type = self.config.get("ws_type", "public")
+        self.use_websocket = self.config.get('use_websocket', True)
+        self.ws_type = self.config.get('ws_type', 'public')
 
         # Прокси настройки
-        self.proxy = self.config.get("proxy", "")
-        self.proxy_username = self.config.get("proxy_username", "")
-        self.proxy_password = self.config.get("proxy_password", "")
+        self.proxy = self.config.get('proxy', '')
+        self.proxy_username = self.config.get('proxy_username', '')
+        self.proxy_password = self.config.get('proxy_password', '')
 
     def to_ccxt_config(self) -> Dict:
         """
@@ -103,42 +93,46 @@ class ExchangeConfig:
             Dict: Конфигурация для CCXT
         """
         ccxt_config = {
-            "apiKey": self.api_key,
-            "secret": self.api_secret,
-            "timeout": self.timeout,
-            "enableRateLimit": self.enable_rate_limit,
-            "verbose": self.verbose,
-            "options": {"defaultType": self.default_type},
+            'apiKey': self.api_key,
+            'secret': self.api_secret,
+            'timeout': self.timeout,
+            'enableRateLimit': self.enable_rate_limit,
+            'verbose': self.verbose,
+            'options': {
+                'defaultType': self.default_type
+            }
         }
 
         # Добавляем пароль, если он есть
         if self.api_password:
-            ccxt_config["password"] = self.api_password
+            ccxt_config['password'] = self.api_password
 
         # Добавляем прокси, если он есть
         if self.proxy:
-            ccxt_config["proxy"] = self.proxy
+            ccxt_config['proxy'] = self.proxy
             if self.proxy_username and self.proxy_password:
-                ccxt_config["proxy_username"] = self.proxy_username
-                ccxt_config["proxy_password"] = self.proxy_password
+                ccxt_config['proxy_username'] = self.proxy_username
+                ccxt_config['proxy_password'] = self.proxy_password
 
         # Дополнительные специфичные настройки для отдельных бирж
-        if self.exchange_id == "binance":
+        if self.exchange_id == 'binance':
             if self.sandbox:
-                ccxt_config["options"]["defaultType"] = "future"
-                ccxt_config["urls"] = {
-                    "api": {
-                        "public": "https://testnet.binancefuture.com/fapi/v1",
-                        "private": "https://testnet.binancefuture.com/fapi/v1",
+                ccxt_config['options']['defaultType'] = 'future'
+                ccxt_config['urls'] = {
+                    'api': {
+                        'public': 'https://testnet.binancefuture.com/fapi/v1',
+                        'private': 'https://testnet.binancefuture.com/fapi/v1',
                     }
                 }
-        elif self.exchange_id == "bybit":
+        elif self.exchange_id == 'bybit':
             if self.sandbox:
-                ccxt_config["urls"] = {"api": "https://api-testnet.bybit.com"}
+                ccxt_config['urls'] = {
+                    'api': 'https://api-testnet.bybit.com'
+                }
 
         # Настройки для margin/futures
-        if self.default_type in ["margin", "future", "swap", "delivery"]:
-            ccxt_config["options"]["defaultType"] = self.default_type
+        if self.default_type in ['margin', 'future', 'swap', 'delivery']:
+            ccxt_config['options']['defaultType'] = self.default_type
 
         return ccxt_config
 
@@ -146,7 +140,7 @@ class ExchangeConfig:
 class ExchangeRateLimit:
     """
     Class to manage rate limits for exchange API requests.
-
+    
     Handles limiting the number of requests according to exchange requirements
     and implements backoff strategies when limits are reached.
     """
@@ -161,16 +155,16 @@ class ExchangeRateLimit:
         self.rate_limit = rate_limit or {}
 
         # Максимальное количество запросов
-        self.max_requests = self.rate_limit.get("max_requests", 1200)
+        self.max_requests = self.rate_limit.get('max_requests', 1200)
 
         # Период в секундах
-        self.period = self.rate_limit.get("period", 60)
+        self.period = self.rate_limit.get('period', 60)
 
         # Штраф за превышение лимита
-        self.penalty = self.rate_limit.get("penalty", 2.0)
+        self.penalty = self.rate_limit.get('penalty', 2.0)
 
         # Буфер запасных запросов (%)
-        self.buffer = self.rate_limit.get("buffer", 5)
+        self.buffer = self.rate_limit.get('buffer', 5)
 
         # Счетчик запросов
         self.request_count = 0
@@ -187,7 +181,7 @@ class ExchangeRateLimit:
     async def acquire(self):
         """
         Acquire permission to make a request, waiting if necessary to respect rate limits.
-
+        
         Blocks until a request can be made according to the configured rate limits.
         Updates internal counters when a request is permitted.
         """
@@ -206,10 +200,7 @@ class ExchangeRateLimit:
 
                 if remaining_time > 0:
                     logger.warning(
-                        f"Rate limit ({effective_limit} per {
-                            self.period}s) reached, waiting {
-                            remaining_time:.2f}s"
-                    )
+                        f"Rate limit ({effective_limit} per {self.period}s) reached, waiting {remaining_time:.2f}s")
                     await asyncio.sleep(remaining_time)
 
                     # Reset counter
@@ -233,10 +224,10 @@ class ExchangeRateLimit:
         async with self.lock:
             # Update settings
             self.rate_limit = rate_limit
-            self.max_requests = rate_limit.get("max_requests", self.max_requests)
-            self.period = rate_limit.get("period", self.period)
-            self.penalty = rate_limit.get("penalty", self.penalty)
-            self.buffer = rate_limit.get("buffer", self.buffer)
+            self.max_requests = rate_limit.get('max_requests', self.max_requests)
+            self.period = rate_limit.get('period', self.period)
+            self.penalty = rate_limit.get('penalty', self.penalty)
+            self.buffer = rate_limit.get('buffer', self.buffer)
 
     def get_usage(self) -> Dict:
         """
@@ -255,24 +246,24 @@ class ExchangeRateLimit:
         # Check if period has expired
         if elapsed >= self.period:
             return {
-                "used": 0,
-                "limit": self.max_requests,
-                "remaining": self.max_requests,
-                "reset_in": 0,
+                'used': 0,
+                'limit': self.max_requests,
+                'remaining': self.max_requests,
+                'reset_in': 0
             }
 
         return {
-            "used": self.request_count,
-            "limit": self.max_requests,
-            "remaining": self.max_requests - self.request_count,
-            "reset_in": self.period - elapsed,
+            'used': self.request_count,
+            'limit': self.max_requests,
+            'remaining': self.max_requests - self.request_count,
+            'reset_in': self.period - elapsed
         }
 
 
 class ExchangeCache:
     """
     Class for caching data from exchanges.
-
+    
     Provides methods to store and retrieve exchange data with configurable TTL (time-to-live)
     to minimize redundant API calls.
     """
@@ -285,14 +276,14 @@ class ExchangeCache:
             cache_ttl: Dictionary with TTL values for different data types (in seconds)
         """
         self.cache_ttl = cache_ttl or {
-            "markets": 3600,  # 1 hour
-            "tickers": 10,  # 10 seconds
-            "orderbooks": 5,  # 5 seconds
-            "ohlcv": 60,  # 1 minute
-            "trades": 10,  # 10 seconds
-            "balance": 10,  # 10 seconds
-            "orders": 10,  # 10 seconds
-            "my_trades": 60,  # 1 minute
+            'markets': 3600,    # 1 hour
+            'tickers': 10,      # 10 seconds
+            'orderbooks': 5,    # 5 seconds
+            'ohlcv': 60,        # 1 minute
+            'trades': 10,       # 10 seconds
+            'balance': 10,      # 10 seconds
+            'orders': 10,       # 10 seconds
+            'my_trades': 60     # 1 minute
         }
 
         # Данные кеша
@@ -400,17 +391,21 @@ class ExchangeCache:
         Returns:
             Dict: Статистика кеша
         """
-        stats = {"size": len(self.cache), "types": {}, "hit_ratio": 0.0}
+        stats = {
+            'size': len(self.cache),
+            'types': {},
+            'hit_ratio': 0.0
+        }
 
         # Собираем статистику по типам данных
         for full_key in self.cache:
-            key_parts = full_key.split("_", 1)
+            key_parts = full_key.split('_', 1)
             key = key_parts[0]
 
-            if key not in stats["types"]:
-                stats["types"][key] = 0
+            if key not in stats['types']:
+                stats['types'][key] = 0
 
-            stats["types"][key] += 1
+            stats['types'][key] += 1
 
         return stats
 
@@ -434,7 +429,7 @@ class ExchangeManager:
         self.rate_limits = {}
 
         # Кеш данных
-        self.cache = ExchangeCache(self.config.get("cache_ttl", {}))
+        self.cache = ExchangeCache(self.config.get('cache_ttl', {}))
 
         # WebSocket соединения
         self.websocket_clients = {}
@@ -446,7 +441,7 @@ class ExchangeManager:
         self.timeframe_mapping = {}
 
         # Настройки для автоматического выбора биржи
-        self.exchange_priorities = self.config.get("exchange_priorities", {})
+        self.exchange_priorities = self.config.get('exchange_priorities', {})
         self.exchange_scores = {}
 
         # Счетчики ошибок
@@ -459,11 +454,9 @@ class ExchangeManager:
         self.lock = asyncio.Lock()
 
         # Загружаем конфигурации бирж
-        for exchange_id, exchange_config in self.config.get("exchanges", {}).items():
+        for exchange_id, exchange_config in self.config.get('exchanges', {}).items():
             if exchange_id in SUPPORTED_EXCHANGES:
-                self.exchange_configs[exchange_id] = ExchangeConfig(
-                    exchange_id, exchange_config
-                )
+                self.exchange_configs[exchange_id] = ExchangeConfig(exchange_id, exchange_config)
 
         # Инициализируем соответствия символов
         self._init_symbol_mappings()
@@ -471,9 +464,7 @@ class ExchangeManager:
         # Инициализируем соответствия временных интервалов
         self._init_timeframe_mappings()
 
-        logger.info(
-            f"Exchange manager initialized with {len(self.exchange_configs)} exchanges"
-        )
+        logger.info(f"Exchange manager initialized with {len(self.exchange_configs)} exchanges")
 
     async def start(self):
         """Запускает менеджер бирж"""
@@ -485,20 +476,18 @@ class ExchangeManager:
             # Инициализируем экземпляры бирж
             for exchange_id, exchange_config in self.exchange_configs.items():
                 # Инициализируем ограничения частоты запросов
-                rate_limit_config = self.config.get("rate_limits", {}).get(
-                    exchange_id, {}
-                )
+                rate_limit_config = self.config.get('rate_limits', {}).get(exchange_id, {})
                 self.rate_limits[exchange_id] = ExchangeRateLimit(rate_limit_config)
 
                 # Инициализируем счетчики ошибок
                 self.error_counters[exchange_id] = {
-                    "total": 0,
-                    "connection": 0,
-                    "auth": 0,
-                    "rate_limit": 0,
-                    "insufficient_funds": 0,
-                    "order_not_found": 0,
-                    "other": 0,
+                    'total': 0,
+                    'connection': 0,
+                    'auth': 0,
+                    'rate_limit': 0,
+                    'insufficient_funds': 0,
+                    'order_not_found': 0,
+                    'other': 0
                 }
 
                 # Инициализируем WebSocket соединения, если настроены
@@ -526,9 +515,7 @@ class ExchangeManager:
                 try:
                     await ws_client.disconnect()
                 except Exception as e:
-                    logger.error(
-                        f"Error disconnecting WebSocket for {exchange_id}: {str(e)}"
-                    )
+                    logger.error(f"Error disconnecting WebSocket for {exchange_id}: {str(e)}")
 
             self.websocket_clients = {}
             self.initialized = False
@@ -572,19 +559,15 @@ class ExchangeManager:
                     processor = get_message_processor()
                     await processor.process_message(message)
                 except Exception as e:
-                    logger.error(
-                        f"Error processing WebSocket message from {exchange_id}: {str(e)}"
-                    )
+                    logger.error(f"Error processing WebSocket message from {exchange_id}: {str(e)}")
 
             # Создаем обработчик подключения
             async def on_ws_connect():
                 logger.info(f"Connected to {exchange_id} WebSocket")
 
                 # Отправляем сообщения авторизации, если необходимо
-                if exchange_config.ws_type == "private":
-                    auth_message = self._get_websocket_auth(
-                        exchange_id, exchange_config
-                    )
+                if exchange_config.ws_type == 'private':
+                    auth_message = self._get_websocket_auth(exchange_id, exchange_config)
                     if auth_message:
                         await self.websocket_clients[exchange_id].send(auth_message)
 
@@ -597,8 +580,8 @@ class ExchangeManager:
                 logger.error(f"WebSocket error for {exchange_id}: {error}")
 
                 # Увеличиваем счетчик ошибок
-                self.error_counters[exchange_id]["connection"] += 1
-                self.error_counters[exchange_id]["total"] += 1
+                self.error_counters[exchange_id]['connection'] += 1
+                self.error_counters[exchange_id]['total'] += 1
 
             # Создаем WebSocket клиент
             conn_id, client = await ws_pool.create_connection(
@@ -610,16 +593,16 @@ class ExchangeManager:
                 auto_reconnect=True,
                 max_reconnect_attempts=5,
                 reconnect_delay=5.0,
-                ping_interval=30.0,
+                ping_interval=30.0
             )
 
             # Добавляем провайдер авторизации, если необходимо
-            if exchange_config.ws_type == "private":
+            if exchange_config.ws_type == 'private':
                 auth_provider = self._get_websocket_auth_provider(exchange_id)
                 auth_params = {
-                    "api_key": exchange_config.api_key,
-                    "api_secret": exchange_config.api_secret,
-                    "api_password": exchange_config.api_password,
+                    'api_key': exchange_config.api_key,
+                    'api_secret': exchange_config.api_secret,
+                    'api_password': exchange_config.api_password
                 }
                 client.set_auth_provider(auth_provider, auth_params)
 
@@ -634,9 +617,7 @@ class ExchangeManager:
         except Exception as e:
             logger.error(f"Error initializing WebSocket for {exchange_id}: {str(e)}")
 
-    def _get_websocket_url(
-        self, exchange_id: str, exchange_config: ExchangeConfig
-    ) -> Optional[str]:
+    def _get_websocket_url(self, exchange_id: str, exchange_config: ExchangeConfig) -> Optional[str]:
         """
         Возвращает URL для WebSocket соединения
 
@@ -649,81 +630,75 @@ class ExchangeManager:
         """
         # URL WebSocket для разных бирж
         ws_urls = {
-            "binance": {
-                "public": "wss://stream.binance.com:9443/ws",
-                "private": "wss://stream.binance.com:9443/ws",
+            'binance': {
+                'public': 'wss://stream.binance.com:9443/ws',
+                'private': 'wss://stream.binance.com:9443/ws'
             },
-            "binanceus": {
-                "public": "wss://stream.binance.us:9443/ws",
-                "private": "wss://stream.binance.us:9443/ws",
+            'binanceus': {
+                'public': 'wss://stream.binance.us:9443/ws',
+                'private': 'wss://stream.binance.us:9443/ws'
             },
-            "bybit": {
-                "public": "wss://stream.bybit.com/v5/public",
-                "private": "wss://stream.bybit.com/v5/private",
+            'bybit': {
+                'public': 'wss://stream.bybit.com/v5/public',
+                'private': 'wss://stream.bybit.com/v5/private'
             },
-            "kucoin": {
-                "public": "wss://ws-api.kucoin.com/endpoint",
-                "private": "wss://ws-api.kucoin.com/endpoint",
+            'kucoin': {
+                'public': 'wss://ws-api.kucoin.com/endpoint',
+                'private': 'wss://ws-api.kucoin.com/endpoint'
             },
-            "okx": {
-                "public": "wss://ws.okx.com:8443/ws/v5/public",
-                "private": "wss://ws.okx.com:8443/ws/v5/private",
+            'okx': {
+                'public': 'wss://ws.okx.com:8443/ws/v5/public',
+                'private': 'wss://ws.okx.com:8443/ws/v5/private'
             },
-            "huobi": {
-                "public": "wss://api.huobi.pro/ws",
-                "private": "wss://api.huobi.pro/ws/v2",
+            'huobi': {
+                'public': 'wss://api.huobi.pro/ws',
+                'private': 'wss://api.huobi.pro/ws/v2'
             },
-            "mexc": {
-                "public": "wss://wbs.mexc.com/ws",
-                "private": "wss://wbs.mexc.com/ws",
+            'mexc': {
+                'public': 'wss://wbs.mexc.com/ws',
+                'private': 'wss://wbs.mexc.com/ws'
             },
-            "bitget": {
-                "public": "wss://ws.bitget.com/spot/v1/stream",
-                "private": "wss://ws.bitget.com/spot/v1/stream",
+            'bitget': {
+                'public': 'wss://ws.bitget.com/spot/v1/stream',
+                'private': 'wss://ws.bitget.com/spot/v1/stream'
             },
-            "gateio": {
-                "public": "wss://api.gateio.ws/ws/v4/",
-                "private": "wss://api.gateio.ws/ws/v4/",
+            'gateio': {
+                'public': 'wss://api.gateio.ws/ws/v4/',
+                'private': 'wss://api.gateio.ws/ws/v4/'
             },
-            "kraken": {
-                "public": "wss://ws.kraken.com",
-                "private": "wss://ws-auth.kraken.com",
+            'kraken': {
+                'public': 'wss://ws.kraken.com',
+                'private': 'wss://ws-auth.kraken.com'
             },
-            "bitfinex": {
-                "public": "wss://api-pub.bitfinex.com/ws/2",
-                "private": "wss://api.bitfinex.com/ws/2",
+            'bitfinex': {
+                'public': 'wss://api-pub.bitfinex.com/ws/2',
+                'private': 'wss://api.bitfinex.com/ws/2'
             },
-            "coinbase": {
-                "public": "wss://ws-feed.exchange.coinbase.com",
-                "private": "wss://ws-feed.exchange.coinbase.com",
-            },
+            'coinbase': {
+                'public': 'wss://ws-feed.exchange.coinbase.com',
+                'private': 'wss://ws-feed.exchange.coinbase.com'
+            }
         }
 
         # URL для тестнета, если включен sandbox режим
         sandbox_ws_urls = {
-            "binance": {
-                "public": "wss://stream.binancefuture.com/ws",
-                "private": "wss://stream.binancefuture.com/ws",
+            'binance': {
+                'public': 'wss://stream.binancefuture.com/ws',
+                'private': 'wss://stream.binancefuture.com/ws'
             },
-            "bybit": {
-                "public": "wss://stream-testnet.bybit.com/v5/public",
-                "private": "wss://stream-testnet.bybit.com/v5/private",
-            },
+            'bybit': {
+                'public': 'wss://stream-testnet.bybit.com/v5/public',
+                'private': 'wss://stream-testnet.bybit.com/v5/private'
+            }
         }
 
         # Выбираем URL
-        urls = (
-            sandbox_ws_urls.get(exchange_id, {})
-            if exchange_config.sandbox
-            else ws_urls.get(exchange_id, {})
-        )
+        urls = sandbox_ws_urls.get(exchange_id, {}) if exchange_config.sandbox else ws_urls.get(exchange_id, {})
         ws_type = exchange_config.ws_type
 
         return urls.get(ws_type)
 
-    def _get_websocket_auth(
-        self, exchange_id: str, exchange_config: ExchangeConfig
-    ) -> Optional[Dict]:
+    def _get_websocket_auth(self, exchange_id: str, exchange_config: ExchangeConfig) -> Optional[Dict]:
         """
         Возвращает сообщение авторизации для WebSocket
 
@@ -736,67 +711,63 @@ class ExchangeManager:
         """
         # Проверяем наличие ключей
         if not exchange_config.api_key or not exchange_config.api_secret:
-            logger.warning(
-                f"Missing API keys for {exchange_id} WebSocket authentication"
-            )
+            logger.warning(f"Missing API keys for {exchange_id} WebSocket authentication")
             return None
 
         # Генерируем сообщение авторизации для разных бирж
-        if exchange_id == "binance":
+        if exchange_id == 'binance':
             # Для Binance
             timestamp = int(time.time() * 1000)
             signature = hmac.new(
-                exchange_config.api_secret.encode("utf-8"),
-                f"timestamp={timestamp}".encode("utf-8"),
-                hashlib.sha256,
+                exchange_config.api_secret.encode('utf-8'),
+                f"timestamp={timestamp}".encode('utf-8'),
+                hashlib.sha256
             ).hexdigest()
 
             return {
-                "method": "AUTHENTICATE",
-                "params": {
-                    "apiKey": exchange_config.api_key,
-                    "timestamp": timestamp,
-                    "signature": signature,
+                'method': 'AUTHENTICATE',
+                'params': {
+                    'apiKey': exchange_config.api_key,
+                    'timestamp': timestamp,
+                    'signature': signature
                 },
-                "id": int(time.time()),
+                'id': int(time.time())
             }
 
-        elif exchange_id == "bybit":
+        elif exchange_id == 'bybit':
             # Для Bybit
             timestamp = int(time.time() * 1000)
             signature = hmac.new(
-                exchange_config.api_secret.encode("utf-8"),
-                f"GET/realtime{timestamp}".encode("utf-8"),
-                hashlib.sha256,
+                exchange_config.api_secret.encode('utf-8'),
+                f"GET/realtime{timestamp}".encode('utf-8'),
+                hashlib.sha256
             ).hexdigest()
 
             return {
-                "op": "auth",
-                "args": [exchange_config.api_key, timestamp, signature],
+                'op': 'auth',
+                'args': [exchange_config.api_key, timestamp, signature]
             }
 
-        elif exchange_id == "okx":
+        elif exchange_id == 'okx':
             # Для OKX
-            timestamp = datetime.utcnow().isoformat()[:-3] + "Z"
-            message = timestamp + "GET" + "/users/self/verify"
+            timestamp = datetime.utcnow().isoformat()[:-3] + 'Z'
+            message = timestamp + 'GET' + '/users/self/verify'
             signature = base64.b64encode(
                 hmac.new(
-                    exchange_config.api_secret.encode("utf-8"),
-                    message.encode("utf-8"),
-                    hashlib.sha256,
+                    exchange_config.api_secret.encode('utf-8'),
+                    message.encode('utf-8'),
+                    hashlib.sha256
                 ).digest()
-            ).decode("utf-8")
+            ).decode('utf-8')
 
             return {
-                "op": "login",
-                "args": [
-                    {
-                        "apiKey": exchange_config.api_key,
-                        "passphrase": exchange_config.api_password,
-                        "timestamp": timestamp,
-                        "sign": signature,
-                    }
-                ],
+                'op': 'login',
+                'args': [{
+                    'apiKey': exchange_config.api_key,
+                    'passphrase': exchange_config.api_password,
+                    'timestamp': timestamp,
+                    'sign': signature
+                }]
             }
 
         # Добавить другие биржи по необходимости
@@ -815,24 +786,22 @@ class ExchangeManager:
             Optional[Callable]: Провайдер авторизации или None
         """
         # Провайдер авторизации для разных бирж
-        if exchange_id == "binance":
-
+        if exchange_id == 'binance':
             async def binance_auth_provider(auth_params, url):
-                api_key = auth_params.get("api_key")
-                api_secret = auth_params.get("api_secret")
+                api_key = auth_params.get('api_key')
+                api_secret = auth_params.get('api_secret')
 
                 if not api_key or not api_secret:
                     return {}
 
-                return {"X-MBX-APIKEY": api_key}
+                return {'X-MBX-APIKEY': api_key}
 
             return binance_auth_provider
 
-        elif exchange_id == "bybit":
-
+        elif exchange_id == 'bybit':
             async def bybit_auth_provider(auth_params, url):
-                api_key = auth_params.get("api_key")
-                api_secret = auth_params.get("api_secret")
+                api_key = auth_params.get('api_key')
+                api_secret = auth_params.get('api_secret')
 
                 if not api_key or not api_secret:
                     return {}
@@ -848,54 +817,84 @@ class ExchangeManager:
     def _init_symbol_mappings(self):
         """Инициализирует соответствия символов между биржами"""
         # Загружаем соответствия из конфигурации
-        self.symbol_mapping = self.config.get("symbol_mapping", {})
+        self.symbol_mapping = self.config.get('symbol_mapping', {})
 
         # Добавляем базовые соответствия
         if not self.symbol_mapping:
             # Пример базовых соответствий
             self.symbol_mapping = {
-                "BTC/USDT": {
-                    "binance": "BTC/USDT",
-                    "bybit": "BTCUSDT",
-                    "okx": "BTC-USDT",
-                    "kucoin": "BTC-USDT",
+                'BTC/USDT': {
+                    'binance': 'BTC/USDT',
+                    'bybit': 'BTCUSDT',
+                    'okx': 'BTC-USDT',
+                    'kucoin': 'BTC-USDT'
                 },
-                "ETH/USDT": {
-                    "binance": "ETH/USDT",
-                    "bybit": "ETHUSDT",
-                    "okx": "ETH-USDT",
-                    "kucoin": "ETH-USDT",
-                },
+                'ETH/USDT': {
+                    'binance': 'ETH/USDT',
+                    'bybit': 'ETHUSDT',
+                    'okx': 'ETH-USDT',
+                    'kucoin': 'ETH-USDT'
+                }
                 # Добавить другие символы по необходимости
             }
 
     def _init_timeframe_mappings(self):
         """Инициализирует соответствия временных интервалов между биржами"""
         # Загружаем соответствия из конфигурации
-        self.timeframe_mapping = self.config.get("timeframe_mapping", {})
+        self.timeframe_mapping = self.config.get('timeframe_mapping', {})
 
         # Добавляем базовые соответствия
         if not self.timeframe_mapping:
             # Пример базовых соответствий
             self.timeframe_mapping = {
-                "1m": {"binance": "1m", "bybit": "1", "okx": "1m", "kucoin": "1min"},
-                "5m": {"binance": "5m", "bybit": "5", "okx": "5m", "kucoin": "5min"},
-                "15m": {
-                    "binance": "15m",
-                    "bybit": "15",
-                    "okx": "15m",
-                    "kucoin": "15min",
+                '1m': {
+                    'binance': '1m',
+                    'bybit': '1',
+                    'okx': '1m',
+                    'kucoin': '1min'
                 },
-                "30m": {
-                    "binance": "30m",
-                    "bybit": "30",
-                    "okx": "30m",
-                    "kucoin": "30min",
+                '5m': {
+                    'binance': '5m',
+                    'bybit': '5',
+                    'okx': '5m',
+                    'kucoin': '5min'
                 },
-                "1h": {"binance": "1h", "bybit": "60", "okx": "1H", "kucoin": "1hour"},
-                "4h": {"binance": "4h", "bybit": "240", "okx": "4H", "kucoin": "4hour"},
-                "1d": {"binance": "1d", "bybit": "D", "okx": "1D", "kucoin": "1day"},
-                "1w": {"binance": "1w", "bybit": "W", "okx": "1W", "kucoin": "1week"},
+                '15m': {
+                    'binance': '15m',
+                    'bybit': '15',
+                    'okx': '15m',
+                    'kucoin': '15min'
+                },
+                '30m': {
+                    'binance': '30m',
+                    'bybit': '30',
+                    'okx': '30m',
+                    'kucoin': '30min'
+                },
+                '1h': {
+                    'binance': '1h',
+                    'bybit': '60',
+                    'okx': '1H',
+                    'kucoin': '1hour'
+                },
+                '4h': {
+                    'binance': '4h',
+                    'bybit': '240',
+                    'okx': '4H',
+                    'kucoin': '4hour'
+                },
+                '1d': {
+                    'binance': '1d',
+                    'bybit': 'D',
+                    'okx': '1D',
+                    'kucoin': '1day'
+                },
+                '1w': {
+                    'binance': '1w',
+                    'bybit': 'W',
+                    'okx': '1W',
+                    'kucoin': '1week'
+                }
                 # Добавить другие интервалы по необходимости
             }
 
@@ -907,7 +906,7 @@ class ExchangeManager:
                 base_score = self.exchange_priorities.get(exchange_id, 50)
 
                 # Снижаем оценку на основе счетчиков ошибок
-                error_penalty = min(50, self.error_counters[exchange_id]["total"])
+                error_penalty = min(50, self.error_counters[exchange_id]['total'])
 
                 # Вычисляем итоговую оценку
                 final_score = max(0, base_score - error_penalty)
@@ -960,9 +959,7 @@ class ExchangeManager:
             logger.error(f"Error creating exchange {exchange_id}: {str(e)}")
             raise
 
-    async def select_best_exchange(
-        self, symbol: str, required_features: List[str] = None
-    ) -> Tuple[str, float]:
+    async def select_best_exchange(self, symbol: str, required_features: List[str] = None) -> Tuple[str, float]:
         """
         Выбирает лучшую биржу для работы с указанным символом
 
@@ -979,9 +976,7 @@ class ExchangeManager:
         # Обновляем рейтинг бирж
         await self._update_exchange_scores()
 
-        for exchange_id, score in sorted(
-            self.exchange_scores.items(), key=lambda x: x[1], reverse=True
-        ):
+        for exchange_id, score in sorted(self.exchange_scores.items(), key=lambda x: x[1], reverse=True):
             try:
                 # Проверяем, поддерживает ли биржа символ
                 mapped_symbol = await self.map_symbol(symbol, exchange_id)
@@ -1063,12 +1058,10 @@ class ExchangeManager:
             str: Нормализованный символ
         """
         # Удаляем все специальные символы
-        normalized = symbol.replace("/", "").replace("-", "").replace("_", "")
+        normalized = symbol.replace('/', '').replace('-', '').replace('_', '')
         return normalized.upper()
 
-    async def map_symbol_across_exchanges(
-        self, symbol: str, source_exchange: str, target_exchange: str
-    ) -> Optional[str]:
+    async def map_symbol_across_exchanges(self, symbol: str, source_exchange: str, target_exchange: str) -> Optional[str]:
         """
         Преобразует символ с одной биржи для другой
 
@@ -1089,10 +1082,10 @@ class ExchangeManager:
             parts = None
 
             # Пробуем разделить символ
-            if "/" in symbol:
-                parts = symbol.split("/")
-            elif "-" in symbol:
-                parts = symbol.split("-")
+            if '/' in symbol:
+                parts = symbol.split('/')
+            elif '-' in symbol:
+                parts = symbol.split('-')
             else:
                 # Для символов без разделителя пробуем найти в маркетах исходной биржи
                 exchange = await self.get_exchange(source_exchange)
@@ -1103,7 +1096,7 @@ class ExchangeManager:
 
                 if symbol in exchange.markets:
                     market = exchange.markets[symbol]
-                    parts = [market["base"], market["quote"]]
+                    parts = [market['base'], market['quote']]
                 else:
                     # Не удалось разделить символ
                     return None
@@ -1123,17 +1116,14 @@ class ExchangeManager:
 
             # Ищем соответствующий символ на целевой бирже
             for market_symbol, market in target_exchange_obj.markets.items():
-                if market["base"].upper() == base and market["quote"].upper() == quote:
+                if market['base'].upper() == base and market['quote'].upper() == quote:
                     return market_symbol
 
             # Если не нашли, возвращаем None
             return None
 
         except Exception as e:
-            logger.error(
-                f"Error mapping symbol {symbol} from {source_exchange} to {target_exchange}: {
-                    str(e)}"
-            )
+            logger.error(f"Error mapping symbol {symbol} from {source_exchange} to {target_exchange}: {str(e)}")
             return None
 
     async def map_timeframe(self, timeframe: str, exchange_id: str) -> Optional[str]:
@@ -1148,10 +1138,7 @@ class ExchangeManager:
             Optional[str]: Преобразованный временной интервал или None
         """
         # Проверяем в словаре соответствий
-        if (
-            timeframe in self.timeframe_mapping
-            and exchange_id in self.timeframe_mapping[timeframe]
-        ):
+        if timeframe in self.timeframe_mapping and exchange_id in self.timeframe_mapping[timeframe]:
             return self.timeframe_mapping[timeframe][exchange_id]
 
         try:
@@ -1159,20 +1146,14 @@ class ExchangeManager:
             exchange = await self.get_exchange(exchange_id)
 
             # Проверяем, поддерживает ли биржа временной интервал
-            if (
-                hasattr(exchange, "timeframes")
-                and exchange.timeframes
-                and timeframe in exchange.timeframes
-            ):
+            if hasattr(exchange, 'timeframes') and exchange.timeframes and timeframe in exchange.timeframes:
                 return timeframe
 
             # Если не нашли, возвращаем None
             return None
 
         except Exception as e:
-            logger.error(
-                f"Error mapping timeframe {timeframe} for {exchange_id}: {str(e)}"
-            )
+            logger.error(f"Error mapping timeframe {timeframe} for {exchange_id}: {str(e)}")
             return None
 
     async def fetch_ticker(self, symbol: str, exchange_id: str) -> Optional[Dict]:
@@ -1187,7 +1168,7 @@ class ExchangeManager:
             Optional[Dict]: Тикер или None
         """
         # Проверяем в кеше
-        cached_ticker = await self.cache.get("tickers", f"{exchange_id}_{symbol}")
+        cached_ticker = await self.cache.get('tickers', f"{exchange_id}_{symbol}")
         if cached_ticker:
             return cached_ticker
 
@@ -1208,7 +1189,7 @@ class ExchangeManager:
             ticker = await exchange.fetch_ticker(mapped_symbol)
 
             # Сохраняем в кеш
-            await self.cache.set("tickers", ticker, f"{exchange_id}_{symbol}")
+            await self.cache.set('tickers', ticker, f"{exchange_id}_{symbol}")
 
             return ticker
 
@@ -1216,14 +1197,10 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(
-                f"Error fetching ticker for {symbol} on {exchange_id}: {str(e)}"
-            )
+            logger.error(f"Error fetching ticker for {symbol} on {exchange_id}: {str(e)}")
             return None
 
-    async def fetch_order_book(
-        self, symbol: str, exchange_id: str, limit: int = 20
-    ) -> Optional[Dict]:
+    async def fetch_order_book(self, symbol: str, exchange_id: str, limit: int = 20) -> Optional[Dict]:
         """
         Получает книгу ордеров для указанного символа
 
@@ -1236,9 +1213,7 @@ class ExchangeManager:
             Optional[Dict]: Книга ордеров или None
         """
         # Проверяем в кеше
-        cached_orderbook = await self.cache.get(
-            "orderbooks", f"{exchange_id}_{symbol}_{limit}"
-        )
+        cached_orderbook = await self.cache.get('orderbooks', f"{exchange_id}_{symbol}_{limit}")
         if cached_orderbook:
             return cached_orderbook
 
@@ -1259,9 +1234,7 @@ class ExchangeManager:
             orderbook = await exchange.fetch_order_book(mapped_symbol, limit)
 
             # Сохраняем в кеш
-            await self.cache.set(
-                "orderbooks", orderbook, f"{exchange_id}_{symbol}_{limit}"
-            )
+            await self.cache.set('orderbooks', orderbook, f"{exchange_id}_{symbol}_{limit}")
 
             return orderbook
 
@@ -1269,19 +1242,10 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(
-                f"Error fetching order book for {symbol} on {exchange_id}: {str(e)}"
-            )
+            logger.error(f"Error fetching order book for {symbol} on {exchange_id}: {str(e)}")
             return None
 
-    async def fetch_ohlcv(
-        self,
-        symbol: str,
-        exchange_id: str,
-        timeframe: str = "1h",
-        limit: int = 100,
-        since: int = None,
-    ) -> Optional[List]:
+    async def fetch_ohlcv(self, symbol: str, exchange_id: str, timeframe: str = '1h', limit: int = 100, since: int = None) -> Optional[List]:
         """
         Получает OHLCV данные для указанного символа
 
@@ -1297,7 +1261,7 @@ class ExchangeManager:
         """
         # Проверяем в кеше
         cache_key = f"{exchange_id}_{symbol}_{timeframe}_{limit}_{since}"
-        cached_ohlcv = await self.cache.get("ohlcv", cache_key)
+        cached_ohlcv = await self.cache.get('ohlcv', cache_key)
         if cached_ohlcv:
             return cached_ohlcv
 
@@ -1320,12 +1284,10 @@ class ExchangeManager:
             exchange = await self.get_exchange(exchange_id)
 
             # Получаем OHLCV данные
-            ohlcv = await exchange.fetch_ohlcv(
-                mapped_symbol, mapped_timeframe, since, limit
-            )
+            ohlcv = await exchange.fetch_ohlcv(mapped_symbol, mapped_timeframe, since, limit)
 
             # Сохраняем в кеш
-            await self.cache.set("ohlcv", ohlcv, cache_key)
+            await self.cache.set('ohlcv', ohlcv, cache_key)
 
             return ohlcv
 
@@ -1333,14 +1295,10 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(
-                f"Error fetching OHLCV for {symbol} on {exchange_id}: {str(e)}"
-            )
+            logger.error(f"Error fetching OHLCV for {symbol} on {exchange_id}: {str(e)}")
             return None
 
-    async def fetch_trades(
-        self, symbol: str, exchange_id: str, limit: int = 100, since: int = None
-    ) -> Optional[List]:
+    async def fetch_trades(self, symbol: str, exchange_id: str, limit: int = 100, since: int = None) -> Optional[List]:
         """
         Получает историю сделок для указанного символа
 
@@ -1355,7 +1313,7 @@ class ExchangeManager:
         """
         # Проверяем в кеше
         cache_key = f"{exchange_id}_{symbol}_{limit}_{since}"
-        cached_trades = await self.cache.get("trades", cache_key)
+        cached_trades = await self.cache.get('trades', cache_key)
         if cached_trades:
             return cached_trades
 
@@ -1376,7 +1334,7 @@ class ExchangeManager:
             trades = await exchange.fetch_trades(mapped_symbol, since, limit)
 
             # Сохраняем в кеш
-            await self.cache.set("trades", trades, cache_key)
+            await self.cache.set('trades', trades, cache_key)
 
             return trades
 
@@ -1384,9 +1342,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(
-                f"Error fetching trades for {symbol} on {exchange_id}: {str(e)}"
-            )
+            logger.error(f"Error fetching trades for {symbol} on {exchange_id}: {str(e)}")
             return None
 
     async def fetch_balance(self, exchange_id: str) -> Optional[Dict]:
@@ -1400,7 +1356,7 @@ class ExchangeManager:
             Optional[Dict]: Баланс или None
         """
         # Проверяем в кеше
-        cached_balance = await self.cache.get("balance", exchange_id)
+        cached_balance = await self.cache.get('balance', exchange_id)
         if cached_balance:
             return cached_balance
 
@@ -1415,7 +1371,7 @@ class ExchangeManager:
             balance = await exchange.fetch_balance()
 
             # Сохраняем в кеш
-            await self.cache.set("balance", balance, exchange_id)
+            await self.cache.set('balance', balance, exchange_id)
 
             return balance
 
@@ -1426,16 +1382,7 @@ class ExchangeManager:
             logger.error(f"Error fetching balance on {exchange_id}: {str(e)}")
             return None
 
-    async def create_order(
-        self,
-        symbol: str,
-        order_type: str,
-        side: str,
-        amount: float,
-        price: float = None,
-        exchange_id: str = None,
-        params: Dict = None,
-    ) -> Optional[Dict]:
+    async def create_order(self, symbol: str, order_type: str, side: str, amount: float, price: float = None, exchange_id: str = None, params: Dict = None) -> Optional[Dict]:
         """
         Создает ордер
 
@@ -1453,7 +1400,7 @@ class ExchangeManager:
         """
         # Если биржа не указана, выбираем лучшую
         if not exchange_id:
-            exchange_id, _ = await self.select_best_exchange(symbol, ["createOrder"])
+            exchange_id, _ = await self.select_best_exchange(symbol, ['createOrder'])
             if not exchange_id:
                 logger.error(f"No suitable exchange found for {symbol}")
                 return None
@@ -1473,12 +1420,10 @@ class ExchangeManager:
 
             # Создаем ордер
             params = params or {}
-            order = await exchange.create_order(
-                mapped_symbol, order_type, side, amount, price, params
-            )
+            order = await exchange.create_order(mapped_symbol, order_type, side, amount, price, params)
 
             # Инвалидируем кеш баланса
-            await self.cache.invalidate("balance", exchange_id)
+            await self.cache.invalidate('balance', exchange_id)
 
             return order
 
@@ -1486,14 +1431,10 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(
-                f"Error creating order for {symbol} on {exchange_id}: {str(e)}"
-            )
+            logger.error(f"Error creating order for {symbol} on {exchange_id}: {str(e)}")
             return None
 
-    async def cancel_order(
-        self, order_id: str, symbol: str, exchange_id: str
-    ) -> Optional[Dict]:
+    async def cancel_order(self, order_id: str, symbol: str, exchange_id: str) -> Optional[Dict]:
         """
         Отменяет ордер
 
@@ -1522,7 +1463,7 @@ class ExchangeManager:
             order = await exchange.cancel_order(order_id, mapped_symbol)
 
             # Инвалидируем кеш баланса
-            await self.cache.invalidate("balance", exchange_id)
+            await self.cache.invalidate('balance', exchange_id)
 
             return order
 
@@ -1530,14 +1471,10 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(
-                f"Error canceling order {order_id} for {symbol} on {exchange_id}: {str(e)}"
-            )
+            logger.error(f"Error canceling order {order_id} for {symbol} on {exchange_id}: {str(e)}")
             return None
 
-    async def fetch_order(
-        self, order_id: str, symbol: str, exchange_id: str
-    ) -> Optional[Dict]:
+    async def fetch_order(self, order_id: str, symbol: str, exchange_id: str) -> Optional[Dict]:
         """
         Получает информацию об ордере
 
@@ -1571,14 +1508,10 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(
-                f"Error fetching order {order_id} for {symbol} on {exchange_id}: {str(e)}"
-            )
+            logger.error(f"Error fetching order {order_id} for {symbol} on {exchange_id}: {str(e)}")
             return None
 
-    async def fetch_orders(
-        self, symbol: str, exchange_id: str, since: int = None, limit: int = None
-    ) -> Optional[List]:
+    async def fetch_orders(self, symbol: str, exchange_id: str, since: int = None, limit: int = None) -> Optional[List]:
         """
         Получает список ордеров
 
@@ -1613,14 +1546,10 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(
-                f"Error fetching orders for {symbol} on {exchange_id}: {str(e)}"
-            )
+            logger.error(f"Error fetching orders for {symbol} on {exchange_id}: {str(e)}")
             return None
 
-    async def fetch_open_orders(
-        self, symbol: str = None, exchange_id: str = None
-    ) -> Optional[List]:
+    async def fetch_open_orders(self, symbol: str = None, exchange_id: str = None) -> Optional[List]:
         """
         Получает список открытых ордеров
 
@@ -1634,9 +1563,7 @@ class ExchangeManager:
         # Если биржа не указана, выбираем лучшую
         if not exchange_id:
             if symbol:
-                exchange_id, _ = await self.select_best_exchange(
-                    symbol, ["fetchOpenOrders"]
-                )
+                exchange_id, _ = await self.select_best_exchange(symbol, ['fetchOpenOrders'])
             else:
                 # Если символ не указан, выбираем первую доступную биржу
                 exchange_id = next(iter(self.exchange_configs.keys()), None)
@@ -1672,9 +1599,7 @@ class ExchangeManager:
             logger.error(f"Error fetching open orders on {exchange_id}: {str(e)}")
             return None
 
-    async def fetch_my_trades(
-        self, symbol: str, exchange_id: str, since: int = None, limit: int = None
-    ) -> Optional[List]:
+    async def fetch_my_trades(self, symbol: str, exchange_id: str, since: int = None, limit: int = None) -> Optional[List]:
         """
         Получает список сделок пользователя
 
@@ -1689,7 +1614,7 @@ class ExchangeManager:
         """
         # Проверяем в кеше
         cache_key = f"{exchange_id}_{symbol}_{limit}_{since}"
-        cached_trades = await self.cache.get("my_trades", cache_key)
+        cached_trades = await self.cache.get('my_trades', cache_key)
         if cached_trades:
             return cached_trades
 
@@ -1710,7 +1635,7 @@ class ExchangeManager:
             trades = await exchange.fetch_my_trades(mapped_symbol, since, limit)
 
             # Сохраняем в кеш
-            await self.cache.set("my_trades", trades, cache_key)
+            await self.cache.set('my_trades', trades, cache_key)
 
             return trades
 
@@ -1718,9 +1643,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(
-                f"Error fetching my trades for {symbol} on {exchange_id}: {str(e)}"
-            )
+            logger.error(f"Error fetching my trades for {symbol} on {exchange_id}: {str(e)}")
             return None
 
     def _increment_error_counter(self, exchange_id: str, error: Exception):
@@ -1735,27 +1658,23 @@ class ExchangeManager:
             return
 
         # Увеличиваем общий счетчик
-        self.error_counters[exchange_id]["total"] += 1
+        self.error_counters[exchange_id]['total'] += 1
 
         # Определяем тип ошибки
         error_str = str(error).lower()
 
-        if (
-            "connection" in error_str
-            or "timeout" in error_str
-            or "network" in error_str
-        ):
-            self.error_counters[exchange_id]["connection"] += 1
-        elif "auth" in error_str or "api key" in error_str or "signature" in error_str:
-            self.error_counters[exchange_id]["auth"] += 1
-        elif "rate limit" in error_str or "too many requests" in error_str:
-            self.error_counters[exchange_id]["rate_limit"] += 1
-        elif "insufficient" in error_str or "balance" in error_str:
-            self.error_counters[exchange_id]["insufficient_funds"] += 1
-        elif "order not found" in error_str or "no such order" in error_str:
-            self.error_counters[exchange_id]["order_not_found"] += 1
+        if 'connection' in error_str or 'timeout' in error_str or 'network' in error_str:
+            self.error_counters[exchange_id]['connection'] += 1
+        elif 'auth' in error_str or 'api key' in error_str or 'signature' in error_str:
+            self.error_counters[exchange_id]['auth'] += 1
+        elif 'rate limit' in error_str or 'too many requests' in error_str:
+            self.error_counters[exchange_id]['rate_limit'] += 1
+        elif 'insufficient' in error_str or 'balance' in error_str:
+            self.error_counters[exchange_id]['insufficient_funds'] += 1
+        elif 'order not found' in error_str or 'no such order' in error_str:
+            self.error_counters[exchange_id]['order_not_found'] += 1
         else:
-            self.error_counters[exchange_id]["other"] += 1
+            self.error_counters[exchange_id]['other'] += 1
 
     async def get_error_stats(self, exchange_id: str = None) -> Dict:
         """
@@ -1785,10 +1704,7 @@ class ExchangeManager:
         if exchange_id:
             return self.rate_limits.get(exchange_id, ExchangeRateLimit()).get_usage()
         else:
-            return {
-                ex_id: limiter.get_usage()
-                for ex_id, limiter in self.rate_limits.items()
-            }
+            return {ex_id: limiter.get_usage() for ex_id, limiter in self.rate_limits.items()}
 
     async def get_cache_stats(self) -> Dict:
         """
@@ -1809,9 +1725,7 @@ class ExchangeManager:
         """
         await self.cache.invalidate(key, subkey)
 
-    async def subscribe_to_ticker(
-        self, symbol: str, exchange_id: str, callback: Callable = None
-    ) -> bool:
+    async def subscribe_to_ticker(self, symbol: str, exchange_id: str, callback: Callable = None) -> bool:
         """
         Подписывается на обновления тикера
 
@@ -1853,9 +1767,7 @@ class ExchangeManager:
             return True
 
         except Exception as e:
-            logger.error(
-                f"Error subscribing to ticker for {symbol} on {exchange_id}: {str(e)}"
-            )
+            logger.error(f"Error subscribing to ticker for {symbol} on {exchange_id}: {str(e)}")
             return False
 
     def _get_ticker_subscription(self, exchange_id: str, symbol: str) -> Optional[Dict]:
@@ -1870,19 +1782,25 @@ class ExchangeManager:
             Optional[Dict]: Сообщение подписки или None
         """
         # Сообщения подписки для разных бирж
-        if exchange_id == "binance":
+        if exchange_id == 'binance':
             return {
-                "method": "SUBSCRIBE",
-                "params": [f"{symbol.lower()}@ticker"],
-                "id": int(time.time()),
+                'method': 'SUBSCRIBE',
+                'params': [f"{symbol.lower()}@ticker"],
+                'id': int(time.time())
             }
-        elif exchange_id == "bybit":
-            return {"op": "subscribe", "args": [f"tickers.{symbol}"]}
-        elif exchange_id == "okx":
-            instrument_type = "SPOT"  # или 'SWAP', 'FUTURES'
+        elif exchange_id == 'bybit':
             return {
-                "op": "subscribe",
-                "args": [{"channel": "tickers", "instId": symbol}],
+                'op': 'subscribe',
+                'args': [f"tickers.{symbol}"]
+            }
+        elif exchange_id == 'okx':
+            instrument_type = 'SPOT'  # или 'SWAP', 'FUTURES'
+            return {
+                'op': 'subscribe',
+                'args': [{
+                    'channel': 'tickers',
+                    'instId': symbol
+                }]
             }
 
         # Добавить другие биржи по необходимости
@@ -1900,12 +1818,12 @@ class ExchangeManager:
             Optional[str]: Тип сообщения или None
         """
         # Типы сообщений для разных бирж
-        if exchange_id == "binance":
-            return "24hrTicker"
-        elif exchange_id == "bybit":
-            return "tickers"
-        elif exchange_id == "okx":
-            return "tickers"
+        if exchange_id == 'binance':
+            return '24hrTicker'
+        elif exchange_id == 'bybit':
+            return 'tickers'
+        elif exchange_id == 'okx':
+            return 'tickers'
 
         # Добавить другие биржи по необходимости
 
@@ -1950,14 +1868,10 @@ class ExchangeManager:
             return True
 
         except Exception as e:
-            logger.error(
-                f"Error unsubscribing from ticker for {symbol} on {exchange_id}: {str(e)}"
-            )
+            logger.error(f"Error unsubscribing from ticker for {symbol} on {exchange_id}: {str(e)}")
             return False
 
-    def _get_ticker_unsubscription(
-        self, exchange_id: str, symbol: str
-    ) -> Optional[Dict]:
+    def _get_ticker_unsubscription(self, exchange_id: str, symbol: str) -> Optional[Dict]:
         """
         Возвращает сообщение отписки от тикера
 
@@ -1969,27 +1883,31 @@ class ExchangeManager:
             Optional[Dict]: Сообщение отписки или None
         """
         # Сообщения отписки для разных бирж
-        if exchange_id == "binance":
+        if exchange_id == 'binance':
             return {
-                "method": "UNSUBSCRIBE",
-                "params": [f"{symbol.lower()}@ticker"],
-                "id": int(time.time()),
+                'method': 'UNSUBSCRIBE',
+                'params': [f"{symbol.lower()}@ticker"],
+                'id': int(time.time())
             }
-        elif exchange_id == "bybit":
-            return {"op": "unsubscribe", "args": [f"tickers.{symbol}"]}
-        elif exchange_id == "okx":
+        elif exchange_id == 'bybit':
             return {
-                "op": "unsubscribe",
-                "args": [{"channel": "tickers", "instId": symbol}],
+                'op': 'unsubscribe',
+                'args': [f"tickers.{symbol}"]
+            }
+        elif exchange_id == 'okx':
+            return {
+                'op': 'unsubscribe',
+                'args': [{
+                    'channel': 'tickers',
+                    'instId': symbol
+                }]
             }
 
         # Добавить другие биржи по необходимости
 
         return None
 
-    async def subscribe_to_order_book(
-        self, symbol: str, exchange_id: str, depth: int = 20, callback: Callable = None
-    ) -> bool:
+    async def subscribe_to_order_book(self, symbol: str, exchange_id: str, depth: int = 20, callback: Callable = None) -> bool:
         """
         Подписывается на обновления книги ордеров
 
@@ -2014,13 +1932,9 @@ class ExchangeManager:
                 return False
 
             # Формируем сообщение подписки
-            subscription = self._get_orderbook_subscription(
-                exchange_id, mapped_symbol, depth
-            )
+            subscription = self._get_orderbook_subscription(exchange_id, mapped_symbol, depth)
             if not subscription:
-                logger.warning(
-                    f"Order book subscription not supported for {exchange_id}"
-                )
+                logger.warning(f"Order book subscription not supported for {exchange_id}")
                 return False
 
             # Добавляем подписку
@@ -2036,14 +1950,10 @@ class ExchangeManager:
             return True
 
         except Exception as e:
-            logger.error(
-                f"Error subscribing to order book for {symbol} on {exchange_id}: {str(e)}"
-            )
+            logger.error(f"Error subscribing to order book for {symbol} on {exchange_id}: {str(e)}")
             return False
 
-    def _get_orderbook_subscription(
-        self, exchange_id: str, symbol: str, depth: int = 20
-    ) -> Optional[Dict]:
+    def _get_orderbook_subscription(self, exchange_id: str, symbol: str, depth: int = 20) -> Optional[Dict]:
         """
         Возвращает сообщение подписки на книгу ордеров
 
@@ -2056,18 +1966,25 @@ class ExchangeManager:
             Optional[Dict]: Сообщение подписки или None
         """
         # Сообщения подписки для разных бирж
-        if exchange_id == "binance":
+        if exchange_id == 'binance':
             return {
-                "method": "SUBSCRIBE",
-                "params": [f"{symbol.lower()}@depth{depth}"],
-                "id": int(time.time()),
+                'method': 'SUBSCRIBE',
+                'params': [f"{symbol.lower()}@depth{depth}"],
+                'id': int(time.time())
             }
-        elif exchange_id == "bybit":
-            return {"op": "subscribe", "args": [f"orderbook.{depth}.{symbol}"]}
-        elif exchange_id == "okx":
+        elif exchange_id == 'bybit':
             return {
-                "op": "subscribe",
-                "args": [{"channel": "books", "instId": symbol, "depth": depth}],
+                'op': 'subscribe',
+                'args': [f"orderbook.{depth}.{symbol}"]
+            }
+        elif exchange_id == 'okx':
+            return {
+                'op': 'subscribe',
+                'args': [{
+                    'channel': 'books',
+                    'instId': symbol,
+                    'depth': depth
+                }]
             }
 
         # Добавить другие биржи по необходимости
@@ -2085,20 +2002,18 @@ class ExchangeManager:
             Optional[str]: Тип сообщения или None
         """
         # Типы сообщений для разных бирж
-        if exchange_id == "binance":
-            return "depthUpdate"
-        elif exchange_id == "bybit":
-            return "orderbook"
-        elif exchange_id == "okx":
-            return "books"
+        if exchange_id == 'binance':
+            return 'depthUpdate'
+        elif exchange_id == 'bybit':
+            return 'orderbook'
+        elif exchange_id == 'okx':
+            return 'books'
 
         # Добавить другие биржи по необходимости
 
         return None
 
-    async def get_deposit_address(
-        self, currency: str, exchange_id: str
-    ) -> Optional[Dict]:
+    async def get_deposit_address(self, currency: str, exchange_id: str) -> Optional[Dict]:
         """
         Получает адрес для пополнения баланса
 
@@ -2117,10 +2032,8 @@ class ExchangeManager:
             exchange = await self.get_exchange(exchange_id)
 
             # Проверяем, поддерживает ли биржа эту функцию
-            if not exchange.has.get("fetchDepositAddress", False):
-                logger.warning(
-                    f"Exchange {exchange_id} does not support deposit addresses"
-                )
+            if not exchange.has.get('fetchDepositAddress', False):
+                logger.warning(f"Exchange {exchange_id} does not support deposit addresses")
                 return None
 
             # Получаем адрес
@@ -2132,20 +2045,10 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(
-                f"Error fetching deposit address for {currency} on {exchange_id}: {str(e)}"
-            )
+            logger.error(f"Error fetching deposit address for {currency} on {exchange_id}: {str(e)}")
             return None
 
-    async def withdraw(
-        self,
-        currency: str,
-        amount: float,
-        address: str,
-        exchange_id: str,
-        tag: str = None,
-        params: Dict = None,
-    ) -> Optional[Dict]:
+    async def withdraw(self, currency: str, amount: float, address: str, exchange_id: str, tag: str = None, params: Dict = None) -> Optional[Dict]:
         """
         Выводит средства
 
@@ -2168,22 +2071,20 @@ class ExchangeManager:
             exchange = await self.get_exchange(exchange_id)
 
             # Проверяем, поддерживает ли биржа эту функцию
-            if not exchange.has.get("withdraw", False):
+            if not exchange.has.get('withdraw', False):
                 logger.warning(f"Exchange {exchange_id} does not support withdrawals")
                 return None
 
             # Формируем параметры
             withdraw_params = params or {}
             if tag:
-                withdraw_params["tag"] = tag
+                withdraw_params['tag'] = tag
 
             # Выполняем вывод
-            withdrawal = await exchange.withdraw(
-                currency, amount, address, tag, withdraw_params
-            )
+            withdrawal = await exchange.withdraw(currency, amount, address, tag, withdraw_params)
 
             # Инвалидируем кеш баланса
-            await self.cache.invalidate("balance", exchange_id)
+            await self.cache.invalidate('balance', exchange_id)
 
             return withdrawal
 
@@ -2191,9 +2092,7 @@ class ExchangeManager:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(
-                f"Error withdrawing {amount} {currency} to {address} on {exchange_id}: {str(e)}"
-            )
+            logger.error(f"Error withdrawing {amount} {currency} to {address} on {exchange_id}: {str(e)}")
             return None
 
     async def get_transfer_fee(self, currency: str, exchange_id: str) -> Optional[Dict]:
@@ -2225,24 +2124,18 @@ class ExchangeManager:
             currency_info = currencies[currency]
 
             return {
-                "currency": currency,
-                "withdraw_fee": currency_info.get("fee"),
-                "withdraw_min": currency_info.get("limits", {})
-                .get("withdraw", {})
-                .get("min"),
-                "withdraw_max": currency_info.get("limits", {})
-                .get("withdraw", {})
-                .get("max"),
-                "networks": currency_info.get("networks", {}),
+                'currency': currency,
+                'withdraw_fee': currency_info.get('fee'),
+                'withdraw_min': currency_info.get('limits', {}).get('withdraw', {}).get('min'),
+                'withdraw_max': currency_info.get('limits', {}).get('withdraw', {}).get('max'),
+                'networks': currency_info.get('networks', {})
             }
 
         except Exception as e:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error(
-                f"Error fetching transfer fee for {currency} on {exchange_id}: {str(e)}"
-            )
+            logger.error(f"Error fetching transfer fee for {currency} on {exchange_id}: {str(e)}")
             return None
 
     async def get_exchange_info(self, exchange_id: str) -> Optional[Dict]:
@@ -2261,24 +2154,20 @@ class ExchangeManager:
 
             # Формируем информацию
             info = {
-                "id": exchange_id,
-                "name": exchange.name,
-                "countries": exchange.countries,
-                "urls": exchange.urls,
-                "version": exchange.version,
-                "api_docs": exchange.urls.get("api") or exchange.urls.get("apiDocs"),
-                "has": exchange.has,
-                "timeframes": exchange.timeframes,
-                "timeout": exchange.timeout,
-                "rate_limit": exchange.rate_limit,
-                "user_agent": exchange.userAgent,
-                "rate_limit_usage": (
-                    self.rate_limits[exchange_id].get_usage()
-                    if exchange_id in self.rate_limits
-                    else None
-                ),
-                "error_stats": self.error_counters.get(exchange_id, {}),
-                "score": self.exchange_scores.get(exchange_id, 0),
+                'id': exchange_id,
+                'name': exchange.name,
+                'countries': exchange.countries,
+                'urls': exchange.urls,
+                'version': exchange.version,
+                'api_docs': exchange.urls.get('api') or exchange.urls.get('apiDocs'),
+                'has': exchange.has,
+                'timeframes': exchange.timeframes,
+                'timeout': exchange.timeout,
+                'rate_limit': exchange.rate_limit,
+                'user_agent': exchange.userAgent,
+                'rate_limit_usage': self.rate_limits[exchange_id].get_usage() if exchange_id in self.rate_limits else None,
+                'error_stats': self.error_counters.get(exchange_id, {}),
+                'score': self.exchange_scores.get(exchange_id, 0)
             }
 
             return info
@@ -2287,9 +2176,7 @@ class ExchangeManager:
             logger.error(f"Error fetching exchange info for {exchange_id}: {str(e)}")
             return None
 
-    async def get_markets(
-        self, exchange_id: str, reload: bool = False
-    ) -> Optional[Dict]:
+    async def get_markets(self, exchange_id: str, reload: bool = False) -> Optional[Dict]:
         """
         Получает список рынков
 
@@ -2301,7 +2188,7 @@ class ExchangeManager:
             Optional[Dict]: Список рынков или None
         """
         # Проверяем в кеше
-        cached_markets = await self.cache.get("markets", exchange_id)
+        cached_markets = await self.cache.get('markets', exchange_id)
         if cached_markets and not reload:
             return cached_markets
 
@@ -2316,7 +2203,7 @@ class ExchangeManager:
             markets = await exchange.load_markets()
 
             # Сохраняем в кеш
-            await self.cache.set("markets", markets, exchange_id)
+            await self.cache.set('markets', markets, exchange_id)
 
             return markets
 
