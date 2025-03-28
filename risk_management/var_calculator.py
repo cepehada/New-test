@@ -342,7 +342,7 @@ class VarCalculator:
                 contribution * z_score * np.sqrt(self.time_horizon) * portfolio_value
             )
 
-        logger.debug("Рассчитаны вклады в VaR портфеля: {var_contributions}" %)
+        logger.debug("Рассчитаны вклады в VaR портфеля: {var_contributions}")
 
         return var_contributions
 

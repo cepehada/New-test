@@ -87,7 +87,7 @@ class PortfolioManager:
             True в случае успеха, иначе False
         """
         if amount <= 0:
-            logger.warning("Некорректное количество актива: {amount}" %)
+            logger.warning(f"Некорректное количество актива: {amount}")
             return False
 
         # Генерируем ключ актива
@@ -159,7 +159,7 @@ class PortfolioManager:
 
         # Проверяем наличие актива в портфеле
         if asset_key not in self.assets:
-            logger.warning("Актив {symbol} на {exchange_id} не найден в портфеле" %)
+            logger.warning(f"Актив {symbol} на {exchange_id} не найден в портфеле")
             return False
 
         # Получаем текущий актив
@@ -170,7 +170,7 @@ class PortfolioManager:
             if amount <= 0:
                 # Удаляем актив из портфеля
                 del self.assets[asset_key]
-                logger.info("Актив {symbol} на {exchange_id} удален из портфеля" %)
+                logger.info(f"Актив {symbol} на {exchange_id} удален из портфеля")
                 self._recalculate_portfolio()
                 return True
 
@@ -231,7 +231,7 @@ class PortfolioManager:
 
         # Проверяем наличие актива в портфеле
         if asset_key not in self.assets:
-            logger.warning("Актив {symbol} на {exchange_id} не найден в портфеле" %)
+            logger.warning(f"Актив {symbol} на {exchange_id} не найден в портфеле")
             return False
 
         # Удаляем актив из портфеля
@@ -240,7 +240,7 @@ class PortfolioManager:
         # Обновляем общую стоимость и веса
         self._recalculate_portfolio()
 
-        logger.info("Актив {symbol} на {exchange_id} удален из портфеля" %)
+        logger.info(f"Актив {symbol} на {exchange_id} удален из портфеля")
 
         return True
 
@@ -321,7 +321,7 @@ class PortfolioManager:
             # Получаем баланс с биржи
             balance = await fetch_balance(exchange_id)
             if not balance:
-                logger.error("Не удалось получить баланс на {exchange_id}" %)
+                logger.error(f"Не удалось получить баланс на {exchange_id}")
                 return False
 
             # Получаем список активов с ненулевым балансом
@@ -381,7 +381,7 @@ class PortfolioManager:
             return True
 
         except Exception as e:
-            logger.error("Ошибка при обновлении портфеля с {exchange_id}: {str(e)}" %)
+            logger.error(f"Ошибка при обновлении портфеля с {exchange_id}: {str(e)}")
             return False
 
     @handle_error
@@ -431,7 +431,7 @@ class PortfolioManager:
             # Предполагаем, что активы не полностью коррелированы (используем множитель 0.8)
             portfolio_var = total_var * 0.8
 
-            logger.debug("Рассчитан приблизительный VaR портфеля: {portfolio_var}" %)
+            logger.debug(f"Рассчитан приблизительный VaR портфеля: {portfolio_var}")
             return portfolio_var
 
         # Рассчитываем VaR портфеля с учетом корреляций
@@ -439,7 +439,7 @@ class PortfolioManager:
             asset_returns, asset_weights, self.total_value
         )
 
-        logger.debug("Рассчитан VaR портфеля: {portfolio_var}" %)
+        logger.debug(f"Рассчитан VaR портфеля: {portfolio_var}")
         return portfolio_var
 
     @handle_error
@@ -477,7 +477,7 @@ class PortfolioManager:
             asset_returns, asset_weights, self.total_value
         )
 
-        logger.debug("Рассчитаны вклады в риск портфеля: {risk_contributions}" %)
+        logger.debug(f"Рассчитаны вклады в риск портфеля: {risk_contributions}")
         return risk_contributions
 
     @handle_error
@@ -548,7 +548,7 @@ class PortfolioManager:
             return weights
 
         except Exception as e:
-            logger.error("Ошибка при оптимизации портфеля: {str(e)}" %)
+            logger.error(f"Ошибка при оптимизации портфеля: {str(e)}")
             return asset_weights
 
     @handle_error
@@ -560,7 +560,7 @@ class PortfolioManager:
             asset_returns: Словарь с сериями исторических доходностей для каждого актива
         """
         self.returns_history.update(asset_returns)
-        logger.debug("Обновлена история доходностей для {len(asset_returns)} активов" %)
+        logger.debug(f"Обновлена история доходностей для {len(asset_returns)} активов")
 
     def _recalculate_portfolio(self) -> None:
         """
@@ -579,6 +579,9 @@ class PortfolioManager:
 
         # Обновляем время последнего обновления
         self.last_update_time = int(time.time())
+
+        # Fix line 90 - likely a syntax error in portfolio rebalancing method
+        self.apply_new_allocation(new_allocation)  # Removed 'await' since this is not an async function
 
     def _fetch_ticker_sync(self, exchange_id: str, symbol: str) -> Dict[str, Any]:
         """

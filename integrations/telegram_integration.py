@@ -4,7 +4,7 @@
 """
 
 import traceback
-from typing import Awaitable, Callable, Dict, List, Optional
+from typing import Awaitable, Callable, Dict, List, Optional, Union
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InputFile, ParseMode
@@ -123,7 +123,11 @@ class TelegramIntegration:
                     handler = self.command_handlers[command]
                     result = await handler(message, args)
                     if result:
-                        await message.reply(result, parse_mode=ParseMode.MARKDOWN)
+                        await self.bot.send_message(
+                            chat_id=message.chat.id,
+                            text=result,
+                            parse_mode=ParseMode.MARKDOWN,
+                        )
                 except Exception as e:
                     error_msg = f"Ошибка при выполнении команды /{command}:\n```\n{traceback.format_exc()}```"
                     await message.reply(error_msg, parse_mode=ParseMode.MARKDOWN)
@@ -141,7 +145,7 @@ class TelegramIntegration:
             handler: Асинхронная функция-обработчик команды
         """
         self.command_handlers[command] = handler
-        logger.debug("Зарегистрирован обработчик для команды /{command}" %)
+        logger.debug(f"Зарегистрирован обработчик для команды /{command}")
 
     @async_handle_error
     async def start_polling(self) -> None:
@@ -188,7 +192,7 @@ class TelegramIntegration:
                 parse_mode=parse_mode,
                 disable_notification=disable_notification,
             )
-            logger.debug("Сообщение отправлено в чат {chat_id}" %)
+            logger.debug("Сообщение отправлено в чат {chat_id}".format(chat_id=chat_id))
             return True
         except TelegramAPIError as e:
             logger.error(
@@ -196,7 +200,7 @@ class TelegramIntegration:
             )
             return False
         except Exception as e:
-            logger.error("Ошибка при отправке сообщения в чат {chat_id}: {str(e)}" %)
+            logger.error(f"Ошибка при отправке сообщения в чат {chat_id}: {str(e)}")
             return False
 
     @async_handle_error
@@ -281,10 +285,10 @@ class TelegramIntegration:
                 caption=caption,
                 parse_mode=parse_mode,
             )
-            logger.debug("Фото отправлено в чат {chat_id}" %)
+            logger.debug("Фото отправлено в чат {chat_id}".format(chat_id=chat_id))
             return True
         except Exception as e:
-            logger.error("Ошибка при отправке фото в чат {chat_id}: {str(e)}" %)
+            logger.error("Ошибка при отправке фото в чат {chat_id}: {error}".format(chat_id=chat_id, error=str(e)))
             return False
 
     @async_handle_error
@@ -326,10 +330,10 @@ class TelegramIntegration:
                 caption=caption,
                 parse_mode=parse_mode,
             )
-            logger.debug("Документ отправлен в чат {chat_id}" %)
+            logger.debug("Документ отправлен в чат {chat_id}".format(chat_id=chat_id))
             return True
         except Exception as e:
-            logger.error("Ошибка при отправке документа в чат {chat_id}: {str(e)}" %)
+            logger.error("Ошибка при отправке документа в чат {chat_id}: {error}".format(chat_id=chat_id, error=str(e)))
             return False
 
     async def close(self) -> None:

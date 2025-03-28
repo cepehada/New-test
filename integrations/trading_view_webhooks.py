@@ -53,7 +53,7 @@ class TradingViewWebhooks:
         # Словарь для хранения обработчиков вебхуков
         self.handlers: Dict[str, List[WebhookHandler]] = {}
 
-        logger.debug("TradingView вебхуки настроены на {host}:{port}" %)
+        logger.debug(f"TradingView вебхуки настроены на {self.host}:{self.port}")
 
     def register_handler(self, alert_name: str, handler: WebhookHandler) -> None:
         """
@@ -68,7 +68,7 @@ class TradingViewWebhooks:
 
         if handler not in self.handlers[alert_name]:
             self.handlers[alert_name].append(handler)
-            logger.debug("Зарегистрирован обработчик для оповещения {alert_name}" %)
+            logger.debug(f"Зарегистрирован обработчик для оповещения {alert_name}")
 
     def unregister_handler(self, alert_name: str, handler: WebhookHandler) -> None:
         """
@@ -80,7 +80,7 @@ class TradingViewWebhooks:
         """
         if alert_name in self.handlers and handler in self.handlers[alert_name]:
             self.handlers[alert_name].remove(handler)
-            logger.debug("Удален обработчик для оповещения {alert_name}" %)
+            logger.debug(f"Удален обработчик для оповещения {alert_name}")
 
             # Удаляем ключ, если больше нет обработчиков
             if not self.handlers[alert_name]:
@@ -154,11 +154,11 @@ class TradingViewWebhooks:
                 data = json.loads(data_str)
                 return data
             except json.JSONDecodeError:
-                logger.error("Невалидный JSON: {data_str}" %)
+                logger.error(f"Невалидный JSON: {data_str}")
                 return None
 
         except Exception as e:
-            logger.error("Ошибка при проверке вебхука: {str(e)}" %)
+            logger.error(f"Ошибка при проверке вебхука: {str(e)}")
             return None
 
     async def handle_webhook(self, request: web.Request) -> web.Response:
@@ -214,7 +214,7 @@ class TradingViewWebhooks:
             return web.json_response({"status": "success"})
 
         except Exception as e:
-            logger.error("Ошибка при обработке вебхука: {str(e)}" %)
+            logger.error(f"Ошибка при обработке вебхука: {str(e)}")
             return web.json_response(
                 {"error": "Internal server error", "message": str(e)}, status=500
             )
@@ -273,11 +273,11 @@ class TradingViewWebhooks:
                 }
 
                 # Отправляем сигнал всем активным стратегиям
-                await strategy_manager.process_signal(signal)
+                await self.router.process_signal(signal)
 
                 logger.info(
                     f"Сигнал от TradingView отправлен стратегиям: {action} {ticker}"
                 )
 
             except Exception as e:
-                logger.error("Ошибка при обработке торгового сигнала: {str(e)}" %)
+                logger.error(f"Ошибка при обработке торгового сигнала: {str(e)}")

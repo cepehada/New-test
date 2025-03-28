@@ -94,13 +94,13 @@ class SlackIntegration:
                 thread_ts=thread_ts,
             )
 
-            logger.debug("Сообщение отправлено в Slack канал {channel}" %)
+            logger.debug("Сообщение отправлено в Slack канал {channel}")
             return response
         except SlackApiError as e:
-            logger.error("Ошибка Slack API при отправке сообщения: {str(e)}" %)
+            logger.error("Ошибка Slack API при отправке сообщения: {str(e)}")
             return {"ok": False, "error": str(e)}
         except Exception as e:
-            logger.error("Ошибка при отправке сообщения в Slack: {str(e)}" %)
+            logger.error("Ошибка при отправке сообщения в Slack: {str(e)}")
             return {"ok": False, "error": str(e)}
 
     @async_handle_error
@@ -134,13 +134,13 @@ class SlackIntegration:
                 file=file_path, title=title, initial_comment=comment, channels=channel
             )
 
-            logger.debug("Файл {file_path} отправлен в Slack канал {channel}" %)
+            logger.debug("Файл {file_path} отправлен в Slack канал {channel}")
             return response
         except SlackApiError as e:
-            logger.error("Ошибка Slack API при отправке файла: {str(e)}" %)
+            logger.error("Ошибка Slack API при отправке файла: {str(e)}")
             return {"ok": False, "error": str(e)}
         except Exception as e:
-            logger.error("Ошибка при отправке файла в Slack: {str(e)}" %)
+            logger.error("Ошибка при отправке файла в Slack: {str(e)}")
             return {"ok": False, "error": str(e)}
 
     @async_handle_error
@@ -182,13 +182,13 @@ class SlackIntegration:
         try:
             response = await self.client.conversations_create(name=name)
 
-            logger.info("Создан Slack канал {name}" %)
+            logger.info("Создан Slack канал {name}")
             return response
         except SlackApiError as e:
-            logger.error("Ошибка Slack API при создании канала: {str(e)}" %)
+            logger.error("Ошибка Slack API при создании канала: {str(e)}")
             return {"ok": False, "error": str(e)}
         except Exception as e:
-            logger.error("Ошибка при создании канала в Slack: {str(e)}" %)
+            logger.error("Ошибка при создании канала в Slack: {str(e)}")
             return {"ok": False, "error": str(e)}
 
     @async_handle_error
@@ -216,13 +216,13 @@ class SlackIntegration:
                 channel=channel, limit=limit
             )
 
-            logger.debug("Получена история Slack канала {channel}" %)
+            logger.debug("Получена история Slack канала {channel}")
             return response.get("messages", [])
         except SlackApiError as e:
-            logger.error("Ошибка Slack API при получении истории: {str(e)}" %)
+            logger.error("Ошибка Slack API при получении истории: {str(e)}")
             return []
         except Exception as e:
-            logger.error("Ошибка при получении истории Slack: {str(e)}" %)
+            logger.error("Ошибка при получении истории Slack: {str(e)}")
             return []
 
     @async_handle_error

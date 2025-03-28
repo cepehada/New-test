@@ -72,7 +72,7 @@ class EmailSender:
                 "Email-отправитель не настроен - письма не будут отправляться"
             )
         else:
-            logger.info("Email-отправитель инициализирован для {self.username}" %)
+            logger.info(f"Email-отправитель инициализирован для {self.username}")
 
     @async_handle_error
     async def send_email(
@@ -158,12 +158,12 @@ class EmailSender:
             with smtplib.SMTP(self.smtp_server, self.port) as server:
                 server.starttls(context=context)
                 server.login(self.username, self.password)
-                server.sendmail(self.username, to_email, msg.as_string())
+                server.send_message(msg)
 
-            logger.info("Письмо отправлено на {', '.join(to_email)}" %)
+            logger.info(f"Письмо отправлено на {', '.join(to_email)}")
             return True
         except Exception as e:
-            logger.error("Ошибка при отправке письма: {str(e)}" %)
+            logger.error(f"Ошибка при отправке письма: {str(e)}")
             return False
 
     @async_handle_error
