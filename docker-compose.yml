@@ -1,89 +1,91 @@
 version: '3.8'
 
 services:
-  app:
-    build: .
+  trading_bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: trading_bot
-    restart: unless-stopped
+    volumes:
+      - .:/app
+      - ./data:/app/data
+      - ./logs:/app/logs
     env_file:
       - .env
-    volumes:
-      - ./:/app
-      - ./logs:/var/log/trading_bot
-    networks:
-      - trading_network
-    depends_on:
-      - db
-      - redis
-      - rabbitmq
-    command: python -m project.main.application
-
-  db:
-    image: postgres:15-alpine
-    container_name: trading_db
     restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${DATABASE_USER:-user}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-password}
-      POSTGRES_DB: ${DATABASE_NAME:-trading_db}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init-scripts:/docker-entrypoint-initdb.d
+    depends_on:
+      - redis
+      - postgres
+      - influxdb
     ports:
-      - "5432:5432"
+      - "8000:8000"  # API
+      - "8888:8888"  # Jupyter
     networks:
       - trading_network
 
   redis:
     image: redis:7-alpine
     container_name: trading_redis
-    restart: unless-stopped
-    command: redis-server --requirepass ${REDIS_PASSWORD:-redispassword}
-    volumes:
-      - redis_data:/data
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --save 60 1 --loglevel warning
     networks:
       - trading_network
 
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: trading_rabbitmq
-    restart: unless-stopped
+  postgres:
+    image: postgres:14-alpine
+    container_name: trading_postgres
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
+      POSTGRES_USER: trading
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-trading_password}
+      POSTGRES_DB: trading
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - trading_network
+
+  influxdb:
+    image: influxdb:2.6-alpine
+    container_name: trading_influxdb
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_USERNAME:-admin}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD:-influxdb_password}
+      - DOCKER_INFLUXDB_INIT_ORG=trading
+      - DOCKER_INFLUXDB_INIT_BUCKET=trading_data
     networks:
       - trading_network
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:9.4.7
     container_name: trading_grafana
-    restart: unless-stopped
-    environment:
-      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+    ports:
+      - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
-    ports:
-      - "3000:3000"
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-grafana_password}
+    depends_on:
+      - influxdb
     networks:
       - trading_network
-    depends_on:
-      - db
+
+volumes:
+  redis_data:
+  postgres_data:
+  influxdb_data:
+  grafana_data:
 
 networks:
   trading_network:
-    driver: bridge
-
-volumes:
-  postgres_data:
-  redis_data:
-  rabbitmq_data:
-  grafana_data:

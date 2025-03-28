@@ -1,248 +1,300 @@
 """
-Модуль конфигурации для торгового бота.
-Загружает настройки из переменных окружения и .env файла.
+Модуль с конфигурацией для торгового бота.
+Загружает настройки из файла .env и конфигурационных файлов.
 """
 
+import os
+import sys
 import logging
-from typing import Dict, Any, Set, Optional
-from pydantic import BaseModel, validator
-from pydantic_settings import BaseSettings
+import json
+import yaml
+from typing import Any, Dict, List, Optional, Union
+from dataclasses import dataclass, field
+from pathlib import Path
 from dotenv import load_dotenv
 
-# Загрузка переменных окружения из .env файла
+# Загружаем переменные окружения из .env файла
 load_dotenv()
 
-logger = logging.getLogger(__name__)
 
-# ----------------------------
-# Классы настроек отдельных подсистем
-# ----------------------------
-
-
-class DatabaseSettings(BaseModel):
-    """Настройки базы данных"""
-
-    URI: str
-    POOL_SIZE: int = 10
-    MAX_OVERFLOW: int = 20
-    POOL_TIMEOUT: int = 30
+@dataclass
+class DatabaseConfig:
+    """Конфигурация базы данных"""
+    host: str = field(default_factory=lambda: os.getenv("POSTGRES_HOST", "localhost"))
+    port: int = field(default_factory=lambda: int(os.getenv("POSTGRES_PORT", "5432")))
+    username: str = field(default_factory=lambda: os.getenv("POSTGRES_USER", "trading"))
+    password: str = field(default_factory=lambda: os.getenv("POSTGRES_PASSWORD", "trading_password"))
+    database: str = field(default_factory=lambda: os.getenv("POSTGRES_DB", "trading"))
+    connection_pool_size: int = 10
+    connection_timeout: int = 30
+    enable_ssl: bool = False
 
 
-class ExchangeSettings(BaseModel):
-    """Настройки биржи"""
-
-    API_KEY: str
-    API_SECRET: str
-    TESTNET: bool = False
-    RATE_LIMIT_MARGIN: float = 0.9
-
-
-class TelegramSettings(BaseModel):
-    """Настройки Telegram"""
-
-    BOT_TOKEN: str
-    CHAT_ID: str
-    ALLOWED_USERS: Set[str]
-
-    @validator("ALLOWED_USERS", pre=True)
-    def parse_allowed_users(cls, v: Any) -> Set[str]:
-        """Преобразует строку с пользователями в множество"""
-        if isinstance(v, str):
-            return set(u.strip() for u in v.split(",") if u.strip())
-        return v
+@dataclass
+class RedisConfig:
+    """Конфигурация Redis"""
+    host: str = field(default_factory=lambda: os.getenv("REDIS_HOST", "localhost"))
+    port: int = field(default_factory=lambda: int(os.getenv("REDIS_PORT", "6379")))
+    password: str = field(default_factory=lambda: os.getenv("REDIS_PASSWORD", ""))
+    db: int = 0
+    connection_pool_size: int = 10
+    enable_ssl: bool = False
 
 
-class LoggingSettings(BaseModel):
-    """Настройки логирования"""
-
-    LEVEL: str = "INFO"
-    FILE_PATH: Optional[str] = None
-    CONSOLE_FORMAT: str = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
-    FILE_FORMAT: str = (
-        "%(asctime)s [%(levelname)s] %(name)s (%(filename)s:%(lineno)d): %(message)s"
-    )
-
-
-class SystemSettings(BaseModel):
-    """Системные настройки"""
-
-    ENABLE_BACKTESTING: bool = False
-    ENABLE_PAPER_TRADING: bool = True
-    TRADING_CONCURRENCY: int = 5
-    DEFAULT_RISK_PERCENTAGE: float = 1.0
+@dataclass
+class InfluxDBConfig:
+    """Конфигурация InfluxDB"""
+    url: str = field(default_factory=lambda: os.getenv("INFLUXDB_URL", "http://localhost:8086"))
+    token: str = field(default_factory=lambda: os.getenv("INFLUXDB_TOKEN", ""))
+    org: str = field(default_factory=lambda: os.getenv("INFLUXDB_ORG", "trading"))
+    bucket: str = field(default_factory=lambda: os.getenv("INFLUXDB_BUCKET", "trading_data"))
+    username: str = field(default_factory=lambda: os.getenv("INFLUXDB_USERNAME", "admin"))
+    password: str = field(default_factory=lambda: os.getenv("INFLUXDB_PASSWORD", "influxdb_password"))
 
 
-class PositionSizingSettings(BaseModel):
-    """Настройки адаптивного размера позиции"""
-
-    adaptive_sizing: bool = True
-    base_position_size: float = 0.02
-    min_position_size: float = 0.01
-    max_position_size: float = 0.1
-    win_multiplier: float = 1.1
-    loss_multiplier: float = 0.9
-    volatility_sizing: bool = True
-    signal_sizing: bool = True
-    martingale: bool = False
-    risk_per_trade: float = 0.01
+@dataclass
+class TelegramConfig:
+    """Конфигурация уведомлений Telegram"""
+    enabled: bool = True
+    bot_token: str = field(default_factory=lambda: os.getenv("TELEGRAM_BOT_TOKEN", ""))
+    chat_id: str = field(default_factory=lambda: os.getenv("TELEGRAM_CHAT_ID", ""))
 
 
-# ----------------------------
-# Новые настройки для модулей
-# ----------------------------
+@dataclass
+class EmailConfig:
+    """Конфигурация уведомлений по электронной почте"""
+    enabled: bool = True
+    server: str = field(default_factory=lambda: os.getenv("EMAIL_SERVER", ""))
+    port: int = field(default_factory=lambda: int(os.getenv("EMAIL_PORT", "587")))
+    username: str = field(default_factory=lambda: os.getenv("EMAIL_USERNAME", ""))
+    password: str = field(default_factory=lambda: os.getenv("EMAIL_PASSWORD", ""))
+    recipients: List[str] = field(default_factory=lambda: os.getenv("EMAIL_RECIPIENTS", "").split(","))
+    use_tls: bool = True
 
 
-class GeneticOptimizerSettings(BaseModel):
+@dataclass
+class DiscordConfig:
+    """Конфигурация уведомлений Discord"""
+    enabled: bool = True
+    webhook_url: str = field(default_factory=lambda: os.getenv("DISCORD_WEBHOOK_URL", ""))
+
+
+@dataclass
+class LoggingConfig:
+    """Конфигурация журналирования"""
+    level: str = field(default_factory=lambda: os.getenv("LOG_LEVEL", "INFO"))
+    file_path: str = field(default_factory=lambda: os.getenv("LOG_FILE_PATH", "logs/trading_bot.log"))
+    rotation_size: int = 10 * 1024 * 1024  # 10 MB
+    backup_count: int = 5
+    format: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+
+@dataclass
+class ApiConfig:
+    """Конфигурация API"""
+    host: str = "0.0.0.0"
+    port: int = 8000
+    enable_cors: bool = True
+    allowed_origins: List[str] = field(default_factory=lambda: ["*"])
+    jwt_secret: str = field(default_factory=lambda: os.getenv("JWT_SECRET", "your-jwt-secret"))
+    jwt_expiration: int = 86400  # 24 hours
+    rate_limit: int = 100  # requests per minute
+    enable_docs: bool = True
+
+
+@dataclass
+class ExchangeConfig:
+    """Конфигурация биржи"""
+    name: str = "binance"
+    api_key: str = field(default_factory=lambda: os.getenv("BINANCE_API_KEY", ""))
+    api_secret: str = field(default_factory=lambda: os.getenv("BINANCE_API_SECRET", ""))
+    testnet: bool = True
+    request_timeout: int = 30
+    rate_limit: Dict[str, int] = field(default_factory=lambda: {"max_requests": 20, "time_window": 1})
+    auto_adjust_leverage: bool = True
+    default_leverage: int = 3
+
+
+@dataclass
+class GeneticOptimizerSettings:
     """Настройки генетического оптимизатора"""
-
     POPULATION_SIZE: int = 50
-    GENERATIONS: int = 10
-    CROSSOVER_RATE: float = 0.7
+    GENERATIONS: int = 30
+    CROSSOVER_RATE: float = 0.8
     MUTATION_RATE: float = 0.2
     ELITISM_RATE: float = 0.1
     TOURNAMENT_SIZE: int = 3
-    MAX_WORKERS: int = 4
+    MAX_WORKERS: int = 8
     BACKTEST_INITIAL_BALANCE: float = 10000.0
     BACKTEST_COMMISSION: float = 0.001
-    BACKTEST_SLIPPAGE: float = 0.0001
-    FITNESS_METRICS: Dict = {
-        "total_return": 1.0,
+    BACKTEST_SLIPPAGE: float = 0.0005
+    FITNESS_METRICS: Dict[str, float] = field(default_factory=lambda: {
+        "net_profit": 1.0,
+        "win_rate": 1.0,
+        "profit_factor": 1.0,
+        "max_drawdown": -1.0,
         "sharpe_ratio": 1.0,
-        "max_drawdown": -0.5,
-        "win_rate": 0.3,
-    }
+        "num_trades": 0.5
+    })
 
 
-class DataVisualizerSettings(BaseModel):
-    """Настройки визуализации данных"""
-
-    THEME: str = "dark"  # или "light"
+@dataclass
+class DataVisualizerSettings:
+    """Настройки визуализатора данных"""
+    THEME: str = "dark"
     FIGSIZE: tuple = (14, 8)
 
 
-# ----------------------------
-# Основной класс конфигурации
-# ----------------------------
+@dataclass
+class TradingConfig:
+    """Конфигурация торговли"""
+    mode: str = field(default_factory=lambda: os.getenv("TRADING_MODE", "paper"))
+    initial_balance: float = field(default_factory=lambda: float(os.getenv("INITIAL_BALANCE", "10000")))
+    max_drawdown_percent: float = field(default_factory=lambda: float(os.getenv("MAX_DRAWDOWN_PERCENT", "20")))
+    max_risk_per_trade_percent: float = field(default_factory=lambda: float(os.getenv("MAX_RISK_PER_TRADE_PERCENT", "1")))
+    enable_auto_strategy_rotation: bool = field(default_factory=lambda: os.getenv("ENABLE_AUTO_STRATEGY_ROTATION", "false").lower() == "true")
+    enable_dynamic_position_sizing: bool = field(default_factory=lambda: os.getenv("ENABLE_DYNAMIC_POSITION_SIZING", "false").lower() == "true")
+    default_timeframe: str = field(default_factory=lambda: os.getenv("DEFAULT_TIMEFRAME", "1h"))
+    default_trade_duration: str = field(default_factory=lambda: os.getenv("DEFAULT_TRADE_DURATION", "24h"))
+    enable_gpu_acceleration: bool = field(default_factory=lambda: os.getenv("ENABLE_GPU_ACCELERATION", "false").lower() == "true")
+    default_symbols: List[str] = field(default_factory=list)
+    default_strategies: List[str] = field(default_factory=list)
 
 
-class Config(BaseSettings):
-    """Основной класс конфигурации приложения"""
+@dataclass
+class Config:
+    """Главная конфигурация приложения"""
+    DATABASE: DatabaseConfig = field(default_factory=DatabaseConfig)
+    REDIS: RedisConfig = field(default_factory=RedisConfig)
+    INFLUXDB: InfluxDBConfig = field(default_factory=InfluxDBConfig)
+    TELEGRAM: TelegramConfig = field(default_factory=TelegramConfig)
+    EMAIL: EmailConfig = field(default_factory=EmailConfig)
+    DISCORD: DiscordConfig = field(default_factory=DiscordConfig)
+    LOGGING: LoggingConfig = field(default_factory=LoggingConfig)
+    API: ApiConfig = field(default_factory=ApiConfig)
+    EXCHANGE: ExchangeConfig = field(default_factory=ExchangeConfig)
+    TRADING: TradingConfig = field(default_factory=TradingConfig)
+    GENETIC_OPTIMIZER_SETTINGS: GeneticOptimizerSettings = field(default_factory=GeneticOptimizerSettings)
+    DATA_VISUALIZER_SETTINGS: DataVisualizerSettings = field(default_factory=DataVisualizerSettings)
+    
+    def load_from_file(self, file_path: str) -> bool:
+        """
+        Загружает конфигурацию из файла
 
-    # Существующие настройки
-    DATABASE_URI: str
-    BINANCE_API_KEY: str
-    BINANCE_API_SECRET: str
-    BYBIT_API_KEY: str = ""
-    BYBIT_API_SECRET: str = ""
-    TELEGRAM_BOT_TOKEN: str
-    TELEGRAM_CHAT_ID: str
-    TELEGRAM_ALLOWED_USERS: str
-    LOG_LEVEL: str = "INFO"
-    LOG_FILE_PATH: Optional[str] = None
-    ENABLE_BACKTESTING: bool = False
-    ENABLE_PAPER_TRADING: bool = True
-    TRADING_CONCURRENCY: int = 5
-    DEFAULT_RISK_PERCENTAGE: float = 1.0
-    MESSAGE_BROKER_URI: str = "amqp://guest:guest@localhost:5672/"
-    ENCRYPTION_KEY: str
-    POSITION_SIZING_ADAPTIVE: bool = True
-    POSITION_SIZING_BASE_SIZE: float = 0.02
-    POSITION_SIZING_MIN_SIZE: float = 0.01
-    POSITION_SIZING_MAX_SIZE: float = 0.1
-    POSITION_SIZING_WIN_MULTIPLIER: float = 1.1
-    POSITION_SIZING_LOSS_MULTIPLIER: float = 0.9
-    POSITION_SIZING_VOLATILITY: bool = True
-    POSITION_SIZING_SIGNAL: bool = True
-    POSITION_SIZING_MARTINGALE: bool = False
-    POSITION_SIZING_RISK_PER_TRADE: float = 0.01
+        Args:
+            file_path: Путь к файлу конфигурации
 
-    # Новые настройки
-    GENETIC_OPTIMIZER_SETTINGS: GeneticOptimizerSettings = GeneticOptimizerSettings()
-    DATA_VISUALIZER_SETTINGS: DataVisualizerSettings = DataVisualizerSettings()
+        Returns:
+            bool: True, если загрузка успешна, иначе False
+        """
+        try:
+            path = Path(file_path)
+            
+            if not path.exists():
+                logging.warning(f"Config file not found: {file_path}")
+                return False
+                
+            if path.suffix == '.json':
+                with open(file_path, 'r') as f:
+                    config_data = json.load(f)
+            elif path.suffix in ('.yaml', '.yml'):
+                with open(file_path, 'r') as f:
+                    config_data = yaml.safe_load(f)
+            else:
+                logging.error(f"Unsupported config file format: {path.suffix}")
+                return False
+                
+            # Обновляем конфигурацию
+            self._update_from_dict(config_data)
+            
+            logging.info(f"Configuration loaded from {file_path}")
+            return True
+        except Exception as e:
+            logging.error(f"Error loading config from {file_path}: {str(e)}")
+            return False
+            
+    def _update_from_dict(self, config_data: Dict[str, Any]) -> None:
+        """
+        Обновляет конфигурацию из словаря
 
-    class Config:
-        """Настройки pydantic модели"""
+        Args:
+            config_data: Словарь с конфигурацией
+        """
+        for section_name, section_data in config_data.items():
+            if hasattr(self, section_name):
+                section = getattr(self, section_name)
+                
+                if isinstance(section_data, dict):
+                    for key, value in section_data.items():
+                        if hasattr(section, key):
+                            setattr(section, key, value)
+                            
+    def get_bot_config(self, symbol: str, strategy_id: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Возвращает конфигурацию для торгового бота
 
-        env_file = ".env"
-        case_sensitive = True
+        Args:
+            symbol: Торговая пара
+            strategy_id: ID стратегии
 
-    def get_database_settings(self) -> DatabaseSettings:
-        """Возвращает настройки базы данных"""
-        return DatabaseSettings(
-            URI=self.DATABASE_URI, POOL_SIZE=10, MAX_OVERFLOW=20, POOL_TIMEOUT=30
-        )
-
-    def get_exchange_settings(self, exchange_name: str) -> ExchangeSettings:
-        """Возвращает настройки указанной биржи"""
-        if exchange_name.lower() == "binance":
-            return ExchangeSettings(
-                API_KEY=self.BINANCE_API_KEY,
-                API_SECRET=self.BINANCE_API_SECRET,
-                TESTNET=self.ENABLE_PAPER_TRADING,
-            )
-        elif exchange_name.lower() == "bybit":
-            return ExchangeSettings(
-                API_KEY=self.BYBIT_API_KEY,
-                API_SECRET=self.BYBIT_API_SECRET,
-                TESTNET=self.ENABLE_PAPER_TRADING,
-            )
-        else:
-            raise ValueError(f"Неизвестная биржа: {exchange_name}")
-
-    def get_telegram_settings(self) -> TelegramSettings:
-        """Возвращает настройки Telegram"""
-        return TelegramSettings(
-            BOT_TOKEN=self.TELEGRAM_BOT_TOKEN,
-            CHAT_ID=self.TELEGRAM_CHAT_ID,
-            ALLOWED_USERS=self.TELEGRAM_ALLOWED_USERS,
-        )
-
-    def get_logging_settings(self) -> LoggingSettings:
-        """Возвращает настройки логирования"""
-        return LoggingSettings(LEVEL=self.LOG_LEVEL, FILE_PATH=self.LOG_FILE_PATH)
-
-    def get_system_settings(self) -> SystemSettings:
-        """Возвращает системные настройки"""
-        return SystemSettings(
-            ENABLE_BACKTESTING=self.ENABLE_BACKTESTING,
-            ENABLE_PAPER_TRADING=self.ENABLE_PAPER_TRADING,
-            TRADING_CONCURRENCY=self.TRADING_CONCURRENCY,
-            DEFAULT_RISK_PERCENTAGE=self.DEFAULT_RISK_PERCENTAGE,
-        )
-
-    def get_position_sizing_settings(self) -> PositionSizingSettings:
-        """Возвращает настройки размера позиции"""
-        return PositionSizingSettings(
-            adaptive_sizing=self.POSITION_SIZING_ADAPTIVE,
-            base_position_size=self.POSITION_SIZING_BASE_SIZE,
-            min_position_size=self.POSITION_SIZING_MIN_SIZE,
-            max_position_size=self.POSITION_SIZING_MAX_SIZE,
-            win_multiplier=self.POSITION_SIZING_WIN_MULTIPLIER,
-            loss_multiplier=self.POSITION_SIZING_LOSS_MULTIPLIER,
-            volatility_sizing=self.POSITION_SIZING_VOLATILITY,
-            signal_sizing=self.POSITION_SIZING_SIGNAL,
-            martingale=self.POSITION_SIZING_MARTINGALE,
-            risk_per_trade=self.POSITION_SIZING_RISK_PER_TRADE,
-        )
+        Returns:
+            Dict[str, Any]: Конфигурация для бота
+        """
+        # Базовая конфигурация
+        bot_config = {
+            "symbol": symbol,
+            "exchange_id": self.EXCHANGE.name,
+            "timeframe": self.TRADING.default_timeframe,
+            "strategy_id": strategy_id,
+            "leverage": self.EXCHANGE.default_leverage,
+            "position_size": self.TRADING.max_risk_per_trade_percent / 100,
+            "is_position_size_percentage": True,
+            "max_positions": 1,
+            "paper_trading": self.TRADING.mode == "paper",
+            "backtest_mode": False,
+        }
+        
+        # Если есть дополнительные настройки для символа или стратегии, добавляем их
+        # Здесь можно добавить загрузку специфических настроек из БД или файла
+        
+        return bot_config
 
 
-_config_instance = None
+# Создаем глобальный экземпляр конфигурации
+_config = None
 
 
 def get_config() -> Config:
     """
-    Получить экземпляр конфигурации.
-    Использует паттерн Singleton для предотвращения многократной загрузки.
+    Возвращает глобальный экземпляр конфигурации
 
     Returns:
-        Config: Экземпляр класса Config
+        Config: Экземпляр конфигурации
     """
-    global _config_instance
-    if _config_instance is None:
-        try:
-            _config_instance = Config()
-            logger.info("Конфигурация успешно загружена")
-        except Exception as e:
-            logger.error("Ошибка загрузки конфигурации: %s", str(e))
-            raise
-    return _config_instance
+    global _config
+    
+    if _config is None:
+        _config = Config()
+        
+        # Пытаемся загрузить конфигурацию из файла
+        config_file = os.getenv("CONFIG_FILE")
+        if config_file:
+            _config.load_from_file(config_file)
+        
+        # Добавляем значения по умолчанию для trading
+        _config.TRADING.default_symbols = ["BTC/USDT", "ETH/USDT", "BNB/USDT"]
+        _config.TRADING.default_strategies = ["moving_average_cross", "rsi_strategy", "macd_strategy"]
+            
+    return _config
+
+
+def reload_config() -> Config:
+    """
+    Перезагружает конфигурацию
+
+    Returns:
+        Config: Обновленный экземпляр конфигурации
+    """
+    global _config
+    _config = None
+    return get_config()

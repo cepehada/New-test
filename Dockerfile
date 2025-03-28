@@ -1,6 +1,6 @@
-FROM python:3.11-slim
+FROM python:3.10-slim
 
-# Установка базовых инструментов и зависимостей
+# Установка системных зависимостей
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
@@ -10,30 +10,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Установка ta-lib
-RUN curl -L -o /tmp/ta-lib-0.4.0-src.tar.gz http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
-    tar -xzf /tmp/ta-lib-0.4.0-src.tar.gz -C /tmp && \
-    cd /tmp/ta-lib && \
-    ./configure --prefix=/usr && \
-    make && \
-    make install && \
-    rm -rf /tmp/ta-lib /tmp/ta-lib-0.4.0-src.tar.gz
-
-# Создание каталога приложения
+# Установка рабочей директории
 WORKDIR /app
 
-# Копирование файлов зависимостей
+# Установка зависимостей Python
 COPY requirements.txt .
-
-# Установка Python-зависимостей
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копирование кода приложения
+# Копирование проекта
 COPY . .
 
-# Создание пользователя без прав root
-RUN adduser --disabled-password --gecos '' appuser
-USER appuser
+# Порты
+EXPOSE 8000 8888
 
-# Команда запуска приложения
-CMD ["python", "-m", "project.main.application"]
+# Переменные среды
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app
+
+# Команда запуска (можно переопределить в docker-compose)
+CMD ["python", "main/main.py"]

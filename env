@@ -1,29 +1,54 @@
-# Конфигурация базы данных
-DATABASE_URI=postgresql://user:password@localhost:5432/trading_db
+# API и доступ
+BINANCE_API_KEY=your_binance_api_key_here
+BINANCE_API_SECRET=your_binance_api_secret_here
 
-# API ключи бирж
-BINANCE_API_KEY=your_api_key_here
-BINANCE_API_SECRET=your_api_secret_here
-BYBIT_API_KEY=your_api_key_here
-BYBIT_API_SECRET=your_api_secret_here
+# Параметры базы данных
+POSTGRES_USER=trading
+POSTGRES_PASSWORD=trading_password
+POSTGRES_DB=trading
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
 
-# Настройки уведомлений
+# Redis
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PASSWORD=
+
+# InfluxDB
+INFLUXDB_URL=http://influxdb:8086
+INFLUXDB_TOKEN=your_influxdb_token_here
+INFLUXDB_USERNAME=admin
+INFLUXDB_PASSWORD=influxdb_password
+INFLUXDB_ORG=trading
+INFLUXDB_BUCKET=trading_data
+
+# Grafana
+GRAFANA_USERNAME=admin
+GRAFANA_PASSWORD=grafana_password
+
+# Параметры уведомлений
 TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
-TELEGRAM_CHAT_ID=your_chat_id_here
-TELEGRAM_ALLOWED_USERS=12345678,87654321
+TELEGRAM_CHAT_ID=your_telegram_chat_id_here
+DISCORD_WEBHOOK_URL=your_discord_webhook_url_here
+EMAIL_SERVER=smtp.example.com
+EMAIL_PORT=587
+EMAIL_USERNAME=your_email@example.com
+EMAIL_PASSWORD=your_email_password
+EMAIL_RECIPIENTS=recipient1@example.com,recipient2@example.com
 
-# Настройки логирования
+# Параметры журналирования
 LOG_LEVEL=INFO
-LOG_FILE_PATH=/var/log/trading_bot/app.log
+LOG_FILE_PATH=logs/trading_bot.log
 
-# Настройки системы
-ENABLE_BACKTESTING=false
-ENABLE_PAPER_TRADING=true
-TRADING_CONCURRENCY=5
-DEFAULT_RISK_PERCENTAGE=1.0
+# Параметры торговли
+TRADING_MODE=paper  # paper, live
+INITIAL_BALANCE=10000
+MAX_DRAWDOWN_PERCENT=20
+MAX_RISK_PER_TRADE_PERCENT=1
+ENABLE_AUTO_STRATEGY_ROTATION=true
+ENABLE_DYNAMIC_POSITION_SIZING=true
 
-# Настройки брокера сообщений
-MESSAGE_BROKER_URI=amqp://guest:guest@localhost:5672/
-
-# Настройки безопасности
-ENCRYPTION_KEY=your_secure_encryption_key_here
+# Параметры стратегий
+DEFAULT_TIMEFRAME=1h
+DEFAULT_TRADE_DURATION=24h
+ENABLE_GPU_ACCELERATION=false
