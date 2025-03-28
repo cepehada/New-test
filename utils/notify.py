@@ -129,6 +129,7 @@ class NotificationService:
         self.notification_count = 0
         self.last_reset_time = time.time()
         self.processing_task = None
+        self.http_client = None  # HTTP клиент для запросов
         self._initialized = True
         logger.info("Сервис уведомлений инициализирован")
 
@@ -137,7 +138,10 @@ class NotificationService:
         if self.processing_task is not None:
             logger.warning("Обработчик уведомлений уже запущен")
             return
-
+            
+        # Создаем HTTP клиент для запросов
+        self.http_client = httpx.AsyncClient(timeout=10.0)
+        
         self.processing_task = asyncio.create_task(self._process_notification_queue())
         logger.info("Обработчик уведомлений запущен")
 
@@ -146,12 +150,18 @@ class NotificationService:
         if self.processing_task is None:
             logger.warning("Обработчик уведомлений не запущен")
             return
-
+            
         self.processing_task.cancel()
         try:
             await self.processing_task
         except asyncio.CancelledError:
             pass
+        
+        # Закрываем HTTP клиент
+        if self.http_client:
+            await self.http_client.aclose()
+            self.http_client = None
+            
         self.processing_task = None
         logger.info("Обработчик уведомлений остановлен")
 
