@@ -94,7 +94,7 @@ class SlackIntegration:
                 thread_ts=thread_ts,
             )
 
-            logger.debug("Сообщение отправлено в Slack канал {channel}")
+            logger.debug(f"Сообщение отправлено в Slack канал {channel}")
             return response
         except SlackApiError as e:
             logger.error("Ошибка Slack API при отправке сообщения: {str(e)}")

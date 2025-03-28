@@ -1,0 +1,81 @@
+************* Module project.api.websocket
+api/websocket.py:105:0: E0001: Parsing failed: 'invalid syntax' (syntax-error)
+************* Module project.api.api_server
+api/api_server.py:266:0: E0001: Parsing failed: 'invalid syntax' (syntax-error)
+************* Module project.infrastructure.database
+infrastructure/database.py:74:0: E0001: Parsing failed: 'invalid syntax' (syntax-error)
+************* Module project.infrastructure.message_broker
+infrastructure/message_broker.py:73:0: E0001: Parsing failed: 'invalid syntax' (syntax-error)
+************* Module project.infrastructure.cache_service
+infrastructure/cache_service.py:107:0: E0001: Parsing failed: 'invalid syntax' (syntax-error)
+************* Module project.technical_analysis.patterns
+technical_analysis/patterns.py:538:0: E0001: Expected an indented block (syntax-error)
+************* Module project.integrations.binance_liquidations
+integrations/binance_liquidations.py:54:0: E0001: Parsing failed: 'invalid syntax' (syntax-error)
+************* Module project.utils.constants
+utils/constants.py:15:0: E0001: Parsing failed: 'invalid syntax' (syntax-error)
+************* Module project.integrations.email_sender
+integrations/email_sender.py:75:0: E0001: Parsing failed: 'invalid syntax' (syntax-error)
+************* Module project.integrations.rest_api
+integrations/rest_api.py:42:0: E0001: 'f-string: empty expression not allowed' (syntax-error)
+************* Module project.integrations.slack_integration
+integrations/slack_integration.py:97:0: E0001: Parsing failed: 'invalid syntax' (syntax-error)
+************* Module project.integrations.trading_view_webhooks
+integrations/trading_view_webhooks.py:56:0: E0001: Parsing failed: 'invalid syntax' (syntax-error)
+************* Module project.integrations.telegram_integration
+integrations/telegram_integration.py:144:0: E0001: Parsing failed: 'invalid syntax' (syntax-error)
+************* Module project.risk_management.var_calculator
+risk_management/var_calculator.py:345:0: E0001: Parsing failed: 'invalid syntax' (syntax-error)
+************* Module project.risk_management.portfolio_manager
+risk_management/portfolio_manager.py:90:0: E0001: Parsing failed: 'invalid syntax' (syntax-error)
+************* Module project.optimization.genetic_optimizer
+optimization/genetic_optimizer.py:320:0: E0001: Parsing failed: 'invalid syntax' (syntax-error)
+
+************* Module project.bots.strategies.mean_reversion
+bots/strategies/mean_reversion.py:52:0: C0111: Missing module docstring (missing-docstring)
+bots/strategies/mean_reversion.py:128:4: C0103: Variable name "df" doesn't conform to snake_case naming style (invalid-name)
+bots/strategies/mean_reversion.py:156:12: W0612: Unused variable 'price' (unused-variable)
+bots/strategies/mean_reversion.py:192:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+bots/strategies/mean_reversion.py:215:4: R0912: Too many branches (14/12) (too-many-branches)
+bots/strategies/mean_reversion.py:45:0: R0902: Too many instance attributes (12/7) (too-many-instance-attributes)
+
+************* Module project.data.market_data
+data/market_data.py:15:0: E0611: No name 'ccxt' in module 'project.utils' (no-name-in-module)
+data/market_data.py:105:4: W0702: No exception type(s) specified (bare-except)
+data/market_data.py:180:0: C0103: Function name "get_OHLCV" doesn't conform to snake_case naming style (invalid-name)
+data/market_data.py:256:12: W0612: Unused variable 'timestamp' (unused-variable)
+data/market_data.py:312:0: C0111: Missing function docstring (missing-docstring)
+data/market_data.py:329:4: W1201: Specify string format arguments as logging function parameters (logging-not-lazy)
+data/market_data.py:400:0: W0511: TODO: Implement proper error handling (fixme)
+data/market_data.py:10:0: C0411: standard import "import time" should be placed before "import numpy as np" (wrong-import-order)
+
+************* Module project.backtesting.backtester
+backtesting/backtester.py:288:4: C0103: Variable name "ts" doesn't conform to snake_case naming style (invalid-name)
+backtesting/backtester.py:290:4: W0612: Unused variable 'idx' (unused-variable)
+backtesting/backtester.py:293:8: R1705: Unnecessary "else" after "return" (no-else-return)
+backtesting/backtester.py:350:0: C0111: Missing function docstring (missing-docstring)
+backtesting/backtester.py:376:8: W0212: Access to a protected member _calculate_metrics of a client class (protected-access)
+backtesting/backtester.py:425:8: C0103: Variable name "df" doesn't conform to snake_case naming style (invalid-name)
+backtesting/backtester.py:520:4: W1201: Specify string format arguments as logging function parameters (logging-not-lazy)
+backtesting/backtester.py:573:8: W0622: Redefining built-in 'format' (redefined-builtin)
+backtesting/backtester.py:582:16: C0121: Comparison to None should be 'if cond is None:' (singleton-comparison)
+backtesting/backtester.py:600:0: R0914: Too many local variables (21/15) (too-many-locals)
+backtesting/backtester.py:14:0: R0902: Too many instance attributes (18/7) (too-many-instance-attributes)
+
+************* Module project.utils.logging_utils
+utils/logging_utils.py:42:0: W0621: Redefining name 'logger' from outer scope (line 10) (redefined-outer-name)
+utils/logging_utils.py:48:4: W0212: Access to a protected member _srcfile of a client class (protected-access)
+utils/logging_utils.py:52:4: W0702: No exception type(s) specified (bare-except)
+utils/logging_utils.py:65:4: C0103: Variable name "fh" doesn't conform to snake_case naming style (invalid-name)
+utils/logging_utils.py:70:4: C0103: Variable name "ch" doesn't conform to snake_case naming style (invalid-name)
+utils/logging_utils.py:121:0: C0111: Missing function docstring (missing-docstring)
+
+************* Module project.utils.ccxt_exchanges
+utils/ccxt_exchanges.py:128:4: E0602: Undefined variable 'exchange_id' (undefined-variable)
+utils/ccxt_exchanges.py:172:0: W0613: Unused argument 'retry_count' (unused-argument)
+utils/ccxt_exchanges.py:93:4: C0103: Variable name "e" doesn't conform to snake_case naming style (invalid-name)
+utils/ccxt_exchanges.py:98:16: C0121: Comparison to True should be 'if cond is True:' (singleton-comparison)
+utils/ccxt_exchanges.py:234:0: R0914: Too many local variables (22/15) (too-many-locals)
+
+-----------------------------------
+Your code has been rated at 5.42/10

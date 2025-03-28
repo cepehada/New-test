@@ -370,23 +370,23 @@ class VarCalculator:
         # Рассчитываем среднее и стандартное отклонение доходностей
         mean_return = returns.mean()
         std_return = returns.std() * stress_factor  # Увеличиваем волатильность
-
+        
         # Определяем Z-значение для заданного уровня доверия
         z_score = stats.norm.ppf(1 - self.confidence_level)
-
+        
         # Рассчитываем VaR
         var_return = mean_return + z_score * std_return
-
+        
         # Масштабируем на горизонт времени
         var_return_scaled = var_return * np.sqrt(self.time_horizon)
-
+        
         # Переводим в абсолютные единицы
         var_absolute = portfolio_value * abs(var_return_scaled)
-
+        
         logger.debug(
             f"Рассчитан стресс-тестовый VaR: {var_absolute} "
             f"(confidence={self.confidence_level}, horizon={self.time_horizon}, "
             f"stress_factor={stress_factor})"
         )
-
+        
         return var_absolute

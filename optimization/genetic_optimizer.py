@@ -393,7 +393,7 @@ class GeneticOptimizer:
 
             # Формируем результаты
             results = {
-                'best_individual': best_individual,
+                'best_individual': best_individual.to_dict(),
                 'best_fitness': best_individual.fitness,
                 'history': [ind.to_dict() for ind in population]
             }

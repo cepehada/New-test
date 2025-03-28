@@ -579,9 +579,11 @@ class PortfolioManager:
 
         # Обновляем время последнего обновления
         self.last_update_time = int(time.time())
-
-        # Fix line 90 - likely a syntax error in portfolio rebalancing method
-        self.apply_new_allocation(new_allocation)  # Removed 'await' since this is not an async function
+        
+        # Убираем await перед вызовом, так как метод не асинхронный
+        # или заменяем на правильную версию кода
+        if hasattr(self, 'new_allocation'):
+            self.apply_new_allocation(self.new_allocation)
 
     def _fetch_ticker_sync(self, exchange_id: str, symbol: str) -> Dict[str, Any]:
         """

@@ -39,7 +39,7 @@ class RestAPI:
 
         # Настраиваем маршруты
         self._setup_routes()
-        logger.debug("REST API настроен на {host}:{port}" %)
+        logger.debug(f"REST API настроен на {self.host}:{self.port}")
 
     def _setup_routes(self) -> None:
         """
@@ -147,7 +147,7 @@ class RestAPI:
         self.site = web.TCPSite(self.runner, self.host, self.port)
         await self.site.start()
 
-        logger.info("REST API запущен на http://{self.host}:{self.port}" %)
+        logger.info(f"REST API запущен на http://{self.host}:{self.port}")
 
     async def stop(self) -> None:
         """
@@ -271,7 +271,7 @@ class RestAPI:
                 {"error": "Bad request", "message": "Invalid JSON"}, status=400
             )
         except Exception as e:
-            logger.error("Error creating strategy: {str(e)}" %)
+            logger.error(f"Error creating strategy: {str(e)}")
             return web.json_response(
                 {"error": "Internal server error", "message": str(e)}, status=500
             )
@@ -304,7 +304,7 @@ class RestAPI:
             )
 
         except Exception as e:
-            logger.error("Error stopping strategy {strategy_id}: {str(e)}" %)
+            logger.error(f"Error stopping strategy {strategy_id}: {str(e)}")
             return web.json_response(
                 {"error": "Internal server error", "message": str(e)}, status=500
             )
@@ -338,7 +338,7 @@ class RestAPI:
             return web.json_response({"orders": orders})
 
         except Exception as e:
-            logger.error("Error getting orders: {str(e)}" %)
+            logger.error(f"Error getting orders: {str(e)}")
             return web.json_response(
                 {"error": "Internal server error", "message": str(e)}, status=500
             )
@@ -405,7 +405,7 @@ class RestAPI:
                 {"error": "Bad request", "message": "Invalid JSON"}, status=400
             )
         except Exception as e:
-            logger.error("Error creating order: {str(e)}" %)
+            logger.error(f"Error creating order: {str(e)}")
             return web.json_response(
                 {"error": "Internal server error", "message": str(e)}, status=500
             )
@@ -433,7 +433,7 @@ class RestAPI:
             )
 
         except Exception as e:
-            logger.error("Error cancelling order: {str(e)}" %)
+            logger.error(f"Error cancelling order: {str(e)}")
             return web.json_response(
                 {"error": "Internal server error", "message": str(e)}, status=500
             )
@@ -452,7 +452,7 @@ class RestAPI:
             return web.json_response(ticker)
 
         except Exception as e:
-            logger.error("Error getting ticker: {str(e)}" %)
+            logger.error(f"Error getting ticker: {str(e)}")
             return web.json_response(
                 {"error": "Internal server error", "message": str(e)}, status=500
             )
@@ -487,7 +487,7 @@ class RestAPI:
             return web.json_response({"ohlcv": formatted_ohlcv})
 
         except Exception as e:
-            logger.error("Error getting OHLCV data: {str(e)}" %)
+            logger.error(f"Error getting OHLCV data: {str(e)}")
             return web.json_response(
                 {"error": "Internal server error", "message": str(e)}, status=500
             )

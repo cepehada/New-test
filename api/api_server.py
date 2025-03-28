@@ -232,6 +232,29 @@ class APIServer:
         market_router.get("/{exchange_id}/{symbol}/trades")(self.get_recent_trades)
         market_router.get("/{exchange_id}/{symbol}/ohlcv")(self.get_ohlcv)
 
+        # Исправляем ошибку в строке 266
+        @market_router.get("/ticker/{symbol}")
+        async def get_ticker(symbol: str, exchange: str = "binance"):
+            """
+            Получает текущие данные тикера для указанного символа.
+            
+            Args:
+                symbol: Торговая пара (например, BTC/USDT)
+                exchange: Идентификатор биржи
+                
+            Returns:
+                Данные тикера
+            """
+            try:
+                ticker = await market_data.get_ticker(exchange, symbol)
+                return {"status": "success", "data": ticker}
+            except Exception as e:
+                logger.error(f"Ошибка при получении тикера: {str(e)}")
+                raise HTTPException(
+                    status_code=500, 
+                    detail="Ошибка при получении данных тикера"
+                )
+
         # Маршруты для работы со стратегиями
         strategy_router.get("/")(self.get_strategies)
         strategy_router.get("/{strategy_id}/info")(self.get_strategy_info)
