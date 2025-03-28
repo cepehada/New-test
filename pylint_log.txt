@@ -563,3 +563,1891 @@ integrations/trading_view_webhooks.py:12:0: E0401: Unable to import 'aiohttp' (i
 integrations/trading_view_webhooks.py:13:0: E0401: Unable to import 'project.bots.strategies.strategy_manager' (import-error)
 integrations/trading_view_webhooks.py:14:0: E0401: Unable to import 'project.config' (import-error)
 integrations/trading_view_webhooks.py:15:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+integrations/trading_view_webhooks.py:16:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+integrations/trading_view_webhooks.py:17:0: E0401: Unable to import 'project.utils.notify' (import-error)
+integrations/trading_view_webhooks.py:25:0: R0902: Too many instance attributes (8/7) (too-many-instance-attributes)
+integrations/trading_view_webhooks.py:160:15: W0718: Catching too general exception Exception (broad-exception-caught)
+integrations/trading_view_webhooks.py:216:15: W0718: Catching too general exception Exception (broad-exception-caught)
+integrations/trading_view_webhooks.py:206:27: W0718: Catching too general exception Exception (broad-exception-caught)
+integrations/trading_view_webhooks.py:222:27: W0613: Unused argument 'request' (unused-argument)
+integrations/trading_view_webhooks.py:282:19: W0718: Catching too general exception Exception (broad-exception-caught)
+integrations/trading_view_webhooks.py:276:22: E1101: Instance of 'TradingViewWebhooks' has no 'router' member (no-member)
+integrations/trading_view_webhooks.py:263:16: W0612: Unused variable 'strategy_manager' (unused-variable)
+************* Module New-test.integrations.telegram_integration
+integrations/telegram_integration.py:72:0: C0301: Line too long (107/100) (line-too-long)
+integrations/telegram_integration.py:246:0: C0301: Line too long (101/100) (line-too-long)
+integrations/telegram_integration.py:9:0: E0401: Unable to import 'aiogram' (import-error)
+integrations/telegram_integration.py:10:0: E0401: Unable to import 'aiogram.types' (import-error)
+integrations/telegram_integration.py:11:0: E0401: Unable to import 'aiogram.utils.exceptions' (import-error)
+integrations/telegram_integration.py:12:0: E0401: Unable to import 'project.config' (import-error)
+integrations/telegram_integration.py:13:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+integrations/telegram_integration.py:14:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+integrations/telegram_integration.py:131:23: W0718: Catching too general exception Exception (broad-exception-caught)
+integrations/telegram_integration.py:203:15: W0718: Catching too general exception Exception (broad-exception-caught)
+integrations/telegram_integration.py:196:25: C0209: Formatting a regular string which could be an f-string (consider-using-f-string)
+integrations/telegram_integration.py:240:19: W0718: Catching too general exception Exception (broad-exception-caught)
+integrations/telegram_integration.py:291:15: W0718: Catching too general exception Exception (broad-exception-caught)
+integrations/telegram_integration.py:289:25: C0209: Formatting a regular string which could be an f-string (consider-using-f-string)
+integrations/telegram_integration.py:293:16: C0209: Formatting a regular string which could be an f-string (consider-using-f-string)
+integrations/telegram_integration.py:340:15: W0718: Catching too general exception Exception (broad-exception-caught)
+integrations/telegram_integration.py:338:25: C0209: Formatting a regular string which could be an f-string (consider-using-f-string)
+integrations/telegram_integration.py:342:16: C0209: Formatting a regular string which could be an f-string (consider-using-f-string)
+************* Module New-test.risk_management.position_sizer
+risk_management/position_sizer.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+risk_management/position_sizer.py:5:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+risk_management/position_sizer.py:10:0: R0902: Too many instance attributes (23/7) (too-many-instance-attributes)
+risk_management/position_sizer.py:74:4: R0913: Too many arguments (6/5) (too-many-arguments)
+risk_management/position_sizer.py:74:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+risk_management/position_sizer.py:219:12: W0201: Attribute 'volatility_history' defined outside __init__ (attribute-defined-outside-init)
+risk_management/position_sizer.py:226:12: W0201: Attribute 'volatility_history' defined outside __init__ (attribute-defined-outside-init)
+risk_management/position_sizer.py:341:12: W0201: Attribute 'volatility_history' defined outside __init__ (attribute-defined-outside-init)
+risk_management/position_sizer.py:231:8: W0201: Attribute 'avg_volatility' defined outside __init__ (attribute-defined-outside-init)
+risk_management/position_sizer.py:342:12: W0201: Attribute 'avg_volatility' defined outside __init__ (attribute-defined-outside-init)
+risk_management/position_sizer.py:380:12: W0201: Attribute 'avg_volatility' defined outside __init__ (attribute-defined-outside-init)
+************* Module New-test.risk_management.var_calculator
+risk_management/var_calculator.py:35:0: C0301: Line too long (112/100) (line-too-long)
+risk_management/var_calculator.py:10:0: R0402: Use 'from scipy import stats' instead (consider-using-from-import)
+risk_management/var_calculator.py:11:0: E0401: Unable to import 'project.config' (import-error)
+risk_management/var_calculator.py:12:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+risk_management/var_calculator.py:13:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+risk_management/var_calculator.py:205:4: R0914: Too many local variables (16/15) (too-many-locals)
+risk_management/var_calculator.py:271:4: R0914: Too many local variables (20/15) (too-many-locals)
+risk_management/var_calculator.py:335:8: W0612: Unused variable 'portfolio_var' (unused-variable)
+************* Module New-test.risk_management.portfolio_manager
+risk_management/portfolio_manager.py:349:0: C0301: Line too long (101/100) (line-too-long)
+risk_management/portfolio_manager.py:12:0: E0401: Unable to import 'project.config' (import-error)
+risk_management/portfolio_manager.py:13:0: E0401: Unable to import 'project.risk_management.position_sizer' (import-error)
+risk_management/portfolio_manager.py:14:0: E0401: Unable to import 'project.risk_management.var_calculator' (import-error)
+risk_management/portfolio_manager.py:15:0: E0401: Unable to import 'project.utils.ccxt_exchanges' (import-error)
+risk_management/portfolio_manager.py:16:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+risk_management/portfolio_manager.py:17:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+risk_management/portfolio_manager.py:107:19: W0718: Catching too general exception Exception (broad-exception-caught)
+risk_management/portfolio_manager.py:193:23: W0718: Catching too general exception Exception (broad-exception-caught)
+risk_management/portfolio_manager.py:383:15: W0718: Catching too general exception Exception (broad-exception-caught)
+risk_management/portfolio_manager.py:347:35: W0718: Catching too general exception Exception (broad-exception-caught)
+risk_management/portfolio_manager.py:361:31: W0718: Catching too general exception Exception (broad-exception-caught)
+risk_management/portfolio_manager.py:320:8: R1702: Too many nested blocks (7/5) (too-many-nested-blocks)
+risk_management/portfolio_manager.py:320:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+risk_management/portfolio_manager.py:307:4: R0912: Too many branches (15/12) (too-many-branches)
+risk_management/portfolio_manager.py:550:15: W0718: Catching too general exception Exception (broad-exception-caught)
+risk_management/portfolio_manager.py:484:4: R0912: Too many branches (14/12) (too-many-branches)
+risk_management/portfolio_manager.py:599:8: C0415: Import outside toplevel (ccxt) (import-outside-toplevel)
+risk_management/portfolio_manager.py:599:8: E0401: Unable to import 'ccxt' (import-error)
+risk_management/portfolio_manager.py:608:4: R0912: Too many branches (15/12) (too-many-branches)
+risk_management/portfolio_manager.py:670:4: R0912: Too many branches (15/12) (too-many-branches)
+risk_management/portfolio_manager.py:732:4: R0912: Too many branches (15/12) (too-many-branches)
+************* Module New-test.optimization.genetic_optimizer
+optimization/genetic_optimizer.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+optimization/genetic_optimizer.py:12:0: E0401: Unable to import 'project.backtesting.backtester' (import-error)
+optimization/genetic_optimizer.py:13:0: E0401: Unable to import 'project.data.database' (import-error)
+optimization/genetic_optimizer.py:14:0: E0401: Unable to import 'project.trading.strategy_base' (import-error)
+optimization/genetic_optimizer.py:15:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+optimization/genetic_optimizer.py:104:0: R0902: Too many instance attributes (13/7) (too-many-instance-attributes)
+optimization/genetic_optimizer.py:225:0: R0902: Too many instance attributes (16/7) (too-many-instance-attributes)
+optimization/genetic_optimizer.py:283:4: R0913: Too many arguments (7/5) (too-many-arguments)
+optimization/genetic_optimizer.py:283:4: R0917: Too many positional arguments (7/5) (too-many-positional-arguments)
+optimization/genetic_optimizer.py:411:15: W0718: Catching too general exception Exception (broad-exception-caught)
+optimization/genetic_optimizer.py:431:8: W0613: Unused argument 'strategy_class' (unused-argument)
+optimization/genetic_optimizer.py:557:12: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+optimization/genetic_optimizer.py:541:4: R1710: Either all return statements in a function should return an expression, or none of them should. (inconsistent-return-statements)
+optimization/genetic_optimizer.py:541:41: W0613: Unused argument 'param_name' (unused-argument)
+optimization/genetic_optimizer.py:639:12: W0621: Redefining name 'BacktestResult' from outer scope (line 12) (redefined-outer-name)
+optimization/genetic_optimizer.py:650:15: W0718: Catching too general exception Exception (broad-exception-caught)
+optimization/genetic_optimizer.py:639:12: E0401: Unable to import 'project.backtesting.backtester' (import-error)
+optimization/genetic_optimizer.py:639:12: W0404: Reimport 'BacktestResult' (imported line 12) (reimported)
+optimization/genetic_optimizer.py:639:12: C0415: Import outside toplevel (project.backtesting.backtester.BacktestResult) (import-outside-toplevel)
+optimization/genetic_optimizer.py:818:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+optimization/genetic_optimizer.py:818:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+optimization/genetic_optimizer.py:803:4: R0912: Too many branches (17/12) (too-many-branches)
+optimization/genetic_optimizer.py:917:15: W0718: Catching too general exception Exception (broad-exception-caught)
+optimization/genetic_optimizer.py:940:19: W0718: Catching too general exception Exception (broad-exception-caught)
+optimization/genetic_optimizer.py:971:19: W0718: Catching too general exception Exception (broad-exception-caught)
+optimization/genetic_optimizer.py:943:48: W0613: Unused argument 'progress' (unused-argument)
+optimization/genetic_optimizer.py:943:65: W0613: Unused argument 'info' (unused-argument)
+************* Module New-test.trade_executor.advanced_order_manager
+trade_executor/advanced_order_manager.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+trade_executor/advanced_order_manager.py:13:0: E0401: Unable to import 'project.data.database' (import-error)
+trade_executor/advanced_order_manager.py:14:0: E0401: Unable to import 'project.data.market_data' (import-error)
+trade_executor/advanced_order_manager.py:15:0: E0401: Unable to import 'project.exchange.exchange_manager' (import-error)
+trade_executor/advanced_order_manager.py:16:0: E0401: Unable to import 'project.risk_management.position_sizer' (import-error)
+trade_executor/advanced_order_manager.py:17:0: E0401: Unable to import 'project.trade_executor.order_executor' (import-error)
+trade_executor/advanced_order_manager.py:18:0: E0401: Unable to import 'project.trade_executor.order_tracker' (import-error)
+trade_executor/advanced_order_manager.py:19:0: E0401: Unable to import 'project.utils.ccxt_exchanges' (import-error)
+trade_executor/advanced_order_manager.py:20:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+trade_executor/advanced_order_manager.py:21:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+trade_executor/advanced_order_manager.py:22:0: E0401: Unable to import 'project.utils.notify' (import-error)
+trade_executor/advanced_order_manager.py:23:0: E0401: Unable to import 'project.trade_executor.strategy_manager' (import-error)
+trade_executor/advanced_order_manager.py:24:0: E0401: Unable to import 'project.trade_executor.capital_manager' (import-error)
+trade_executor/advanced_order_manager.py:89:0: R0902: Too many instance attributes (31/7) (too-many-instance-attributes)
+trade_executor/advanced_order_manager.py:92:4: R0913: Too many arguments (26/5) (too-many-arguments)
+trade_executor/advanced_order_manager.py:92:4: R0917: Too many positional arguments (26/5) (too-many-positional-arguments)
+trade_executor/advanced_order_manager.py:92:4: R0914: Too many local variables (26/15) (too-many-locals)
+trade_executor/advanced_order_manager.py:313:4: R0913: Too many arguments (8/5) (too-many-arguments)
+trade_executor/advanced_order_manager.py:313:4: R0917: Too many positional arguments (8/5) (too-many-positional-arguments)
+trade_executor/advanced_order_manager.py:313:4: R0914: Too many local variables (16/15) (too-many-locals)
+trade_executor/advanced_order_manager.py:360:12: W0612: Unused variable 'ccxt_order_type' (unused-variable)
+trade_executor/advanced_order_manager.py:435:4: R0913: Too many arguments (9/5) (too-many-arguments)
+trade_executor/advanced_order_manager.py:435:4: R0917: Too many positional arguments (9/5) (too-many-positional-arguments)
+trade_executor/advanced_order_manager.py:439:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+trade_executor/advanced_order_manager.py:524:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/advanced_order_manager.py:1:0: W0611: Unused import asyncio (unused-import)
+trade_executor/advanced_order_manager.py:2:0: W0611: Unused import json (unused-import)
+trade_executor/advanced_order_manager.py:3:0: W0611: Unused import logging (unused-import)
+trade_executor/advanced_order_manager.py:4:0: W0611: Unused import math (unused-import)
+trade_executor/advanced_order_manager.py:5:0: W0611: Unused import random (unused-import)
+trade_executor/advanced_order_manager.py:6:0: W0611: Unused import time (unused-import)
+trade_executor/advanced_order_manager.py:8:0: W0611: Unused timedelta imported from datetime (unused-import)
+trade_executor/advanced_order_manager.py:9:0: W0611: Unused ROUND_DOWN imported from decimal (unused-import)
+trade_executor/advanced_order_manager.py:9:0: W0611: Unused ROUND_UP imported from decimal (unused-import)
+trade_executor/advanced_order_manager.py:9:0: W0611: Unused Decimal imported from decimal (unused-import)
+trade_executor/advanced_order_manager.py:11:0: W0611: Unused Callable imported from typing (unused-import)
+trade_executor/advanced_order_manager.py:11:0: W0611: Unused Set imported from typing (unused-import)
+trade_executor/advanced_order_manager.py:11:0: W0611: Unused Tuple imported from typing (unused-import)
+trade_executor/advanced_order_manager.py:11:0: W0611: Unused Union imported from typing (unused-import)
+trade_executor/advanced_order_manager.py:13:0: W0611: Unused Database imported from project.data.database (unused-import)
+trade_executor/advanced_order_manager.py:14:0: W0611: Unused MarketDataProvider imported from project.data.market_data (unused-import)
+trade_executor/advanced_order_manager.py:15:0: W0611: Unused ExchangeManager imported from project.exchange.exchange_manager (unused-import)
+trade_executor/advanced_order_manager.py:16:0: W0611: Unused PositionSizer imported from project.risk_management.position_sizer (unused-import)
+trade_executor/advanced_order_manager.py:17:0: W0611: Unused OrderExecutor imported from project.trade_executor.order_executor (unused-import)
+trade_executor/advanced_order_manager.py:18:0: W0611: Unused OrderTracker imported from project.trade_executor.order_tracker (unused-import)
+trade_executor/advanced_order_manager.py:20:0: W0611: Unused handle_exchange_errors imported from project.utils.error_handler (unused-import)
+trade_executor/advanced_order_manager.py:22:0: W0611: Unused send_notification imported from project.utils.notify (unused-import)
+trade_executor/advanced_order_manager.py:23:0: W0611: Unused StrategyManager imported from project.trade_executor.strategy_manager (unused-import)
+trade_executor/advanced_order_manager.py:24:0: W0611: Unused CapitalManager imported from project.trade_executor.capital_manager (unused-import)
+************* Module New-test.trade_executor.strategy_manager
+trade_executor/strategy_manager.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+trade_executor/strategy_manager.py:28:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+trade_executor/strategy_manager.py:4:0: R0903: Too few public methods (1/2) (too-few-public-methods)
+************* Module New-test.trade_executor.symbols_updater
+trade_executor/symbols_updater.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+trade_executor/symbols_updater.py:6:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+trade_executor/symbols_updater.py:7:0: E0401: Unable to import 'project.utils.ccxt_exchanges' (import-error)
+trade_executor/symbols_updater.py:8:0: E0401: Unable to import 'project.data.market_data' (import-error)
+trade_executor/symbols_updater.py:9:0: E0401: Unable to import 'project.config' (import-error)
+trade_executor/symbols_updater.py:14:0: R0902: Too many instance attributes (9/7) (too-many-instance-attributes)
+trade_executor/symbols_updater.py:73:19: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/symbols_updater.py:77:4: R0914: Too many local variables (20/15) (too-many-locals)
+trade_executor/symbols_updater.py:155:19: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/symbols_updater.py:143:27: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/symbols_updater.py:84:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+trade_executor/symbols_updater.py:84:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+trade_executor/symbols_updater.py:191:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/symbols_updater.py:189:17: W1514: Using open without explicitly specifying an encoding (unspecified-encoding)
+trade_executor/symbols_updater.py:2:0: W0611: Unused timedelta imported from datetime (unused-import)
+************* Module New-test.trade_executor.capital_manager
+trade_executor/capital_manager.py:121:0: C0301: Line too long (103/100) (line-too-long)
+trade_executor/capital_manager.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+trade_executor/capital_manager.py:7:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+trade_executor/capital_manager.py:8:0: E0401: Unable to import 'project.config' (import-error)
+trade_executor/capital_manager.py:13:0: R0902: Too many instance attributes (8/7) (too-many-instance-attributes)
+trade_executor/capital_manager.py:96:4: R0913: Too many arguments (7/5) (too-many-arguments)
+trade_executor/capital_manager.py:96:4: R0917: Too many positional arguments (7/5) (too-many-positional-arguments)
+trade_executor/capital_manager.py:155:41: W0613: Unused argument 'balance' (unused-argument)
+trade_executor/capital_manager.py:231:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/capital_manager.py:229:17: W1514: Using open without explicitly specifying an encoding (unspecified-encoding)
+trade_executor/capital_manager.py:248:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/capital_manager.py:237:17: W1514: Using open without explicitly specifying an encoding (unspecified-encoding)
+trade_executor/capital_manager.py:1:0: W0611: Unused List imported from typing (unused-import)
+trade_executor/capital_manager.py:3:0: W0611: Unused timedelta imported from datetime (unused-import)
+trade_executor/capital_manager.py:4:0: W0611: Unused import math (unused-import)
+trade_executor/capital_manager.py:5:0: W0611: Unused import logging (unused-import)
+************* Module New-test.trade_executor.autonomous_bot
+trade_executor/autonomous_bot.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+trade_executor/autonomous_bot.py:8:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+trade_executor/autonomous_bot.py:9:0: E0401: Unable to import 'project.config' (import-error)
+trade_executor/autonomous_bot.py:10:0: E0401: Unable to import 'project.data.market_data' (import-error)
+trade_executor/autonomous_bot.py:11:0: E0401: Unable to import 'project.exchange.exchange_manager' (import-error)
+trade_executor/autonomous_bot.py:12:0: E0401: Unable to import 'project.trade_executor.advanced_order_manager' (import-error)
+trade_executor/autonomous_bot.py:17:0: E0401: Unable to import 'project.trade_executor.capital_manager' (import-error)
+trade_executor/autonomous_bot.py:18:0: E0401: Unable to import 'project.trade_executor.strategy_manager' (import-error)
+trade_executor/autonomous_bot.py:19:0: E0401: Unable to import 'project.trade_executor.symbols_updater' (import-error)
+trade_executor/autonomous_bot.py:20:0: E0401: Unable to import 'project.trade_executor.dynamic_sl_tp' (import-error)
+trade_executor/autonomous_bot.py:21:0: E0401: Unable to import 'project.utils.notify' (import-error)
+trade_executor/autonomous_bot.py:26:0: R0902: Too many instance attributes (18/7) (too-many-instance-attributes)
+trade_executor/autonomous_bot.py:70:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/autonomous_bot.py:66:17: W1514: Using open without explicitly specifying an encoding (unspecified-encoding)
+trade_executor/autonomous_bot.py:163:23: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/autonomous_bot.py:170:4: R0914: Too many local variables (17/15) (too-many-locals)
+trade_executor/autonomous_bot.py:290:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/autonomous_bot.py:118:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+trade_executor/autonomous_bot.py:272:35: E0602: Undefined variable 'OrderStatus' (undefined-variable)
+trade_executor/autonomous_bot.py:170:4: R0912: Too many branches (13/12) (too-many-branches)
+trade_executor/autonomous_bot.py:293:4: R0914: Too many local variables (24/15) (too-many-locals)
+trade_executor/autonomous_bot.py:406:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/autonomous_bot.py:293:4: R0912: Too many branches (15/12) (too-many-branches)
+trade_executor/autonomous_bot.py:293:4: R0915: Too many statements (51/50) (too-many-statements)
+trade_executor/autonomous_bot.py:442:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+trade_executor/autonomous_bot.py:473:12: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+trade_executor/autonomous_bot.py:452:14: W0613: Unused argument 'symbol' (unused-argument)
+trade_executor/autonomous_bot.py:499:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+trade_executor/autonomous_bot.py:489:14: W0613: Unused argument 'symbol' (unused-argument)
+trade_executor/autonomous_bot.py:515:14: W0613: Unused argument 'symbol' (unused-argument)
+trade_executor/autonomous_bot.py:515:27: W0613: Unused argument 'market_data' (unused-argument)
+trade_executor/autonomous_bot.py:570:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/autonomous_bot.py:590:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/autonomous_bot.py:574:43: W0613: Unused argument 'symbol' (unused-argument)
+trade_executor/autonomous_bot.py:619:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/autonomous_bot.py:616:23: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/autonomous_bot.py:600:26: W0612: Unused variable 'order' (unused-variable)
+trade_executor/autonomous_bot.py:3:0: W0611: Unused import logging (unused-import)
+trade_executor/autonomous_bot.py:6:0: W0611: Unused List imported from typing (unused-import)
+trade_executor/autonomous_bot.py:6:0: W0611: Unused Optional imported from typing (unused-import)
+trade_executor/autonomous_bot.py:21:0: W0611: Unused send_notification imported from project.utils.notify (unused-import)
+************* Module New-test.trade_executor.dynamic_sl_tp
+trade_executor/dynamic_sl_tp.py:127:0: C0301: Line too long (130/100) (line-too-long)
+trade_executor/dynamic_sl_tp.py:149:0: C0301: Line too long (130/100) (line-too-long)
+trade_executor/dynamic_sl_tp.py:165:0: C0301: Line too long (107/100) (line-too-long)
+trade_executor/dynamic_sl_tp.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+trade_executor/dynamic_sl_tp.py:6:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+trade_executor/dynamic_sl_tp.py:7:0: E0401: Unable to import 'project.data.market_data' (import-error)
+trade_executor/dynamic_sl_tp.py:8:0: E0401: Unable to import 'project.config' (import-error)
+trade_executor/dynamic_sl_tp.py:9:0: E0401: Unable to import 'project.trade_executor.advanced_order_manager' (import-error)
+trade_executor/dynamic_sl_tp.py:19:0: R0902: Too many instance attributes (11/7) (too-many-instance-attributes)
+trade_executor/dynamic_sl_tp.py:89:19: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/dynamic_sl_tp.py:78:27: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/dynamic_sl_tp.py:93:4: R0912: Too many branches (13/12) (too-many-branches)
+trade_executor/dynamic_sl_tp.py:198:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/dynamic_sl_tp.py:221:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/dynamic_sl_tp.py:253:8: W0612: Unused variable 'sl_params' (unused-variable)
+trade_executor/dynamic_sl_tp.py:316:4: R0913: Too many arguments (7/5) (too-many-arguments)
+trade_executor/dynamic_sl_tp.py:316:4: R0917: Too many positional arguments (7/5) (too-many-positional-arguments)
+trade_executor/dynamic_sl_tp.py:346:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/dynamic_sl_tp.py:2:0: W0611: Unused List imported from typing (unused-import)
+trade_executor/dynamic_sl_tp.py:3:0: W0611: Unused datetime imported from datetime (unused-import)
+trade_executor/dynamic_sl_tp.py:4:0: W0611: Unused import math (unused-import)
+************* Module New-test.trade_executor.order_executor
+trade_executor/order_executor.py:1:0: C0302: Too many lines in module (1187/1000) (too-many-lines)
+trade_executor/order_executor.py:7:0: E0401: Unable to import 'project.utils.notify' (import-error)
+trade_executor/order_executor.py:8:0: E0401: Unable to import 'project.infrastructure.database' (import-error)
+trade_executor/order_executor.py:9:0: E0401: Unable to import 'project.data.symbol_manager' (import-error)
+trade_executor/order_executor.py:14:0: W0404: Reimport 'Dict' (imported line 11) (reimported)
+trade_executor/order_executor.py:14:0: W0404: Reimport 'List' (imported line 11) (reimported)
+trade_executor/order_executor.py:14:0: W0404: Reimport 'Any' (imported line 11) (reimported)
+trade_executor/order_executor.py:14:0: W0404: Reimport 'Optional' (imported line 11) (reimported)
+trade_executor/order_executor.py:18:0: E0401: Unable to import 'project.config' (import-error)
+trade_executor/order_executor.py:19:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+trade_executor/order_executor.py:20:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+trade_executor/order_executor.py:21:0: E0401: Unable to import 'project.utils.ccxt_exchanges' (import-error)
+trade_executor/order_executor.py:41:0: R0902: Too many instance attributes (8/7) (too-many-instance-attributes)
+trade_executor/order_executor.py:54:0: R0902: Too many instance attributes (8/7) (too-many-instance-attributes)
+trade_executor/order_executor.py:104:4: R0913: Too many arguments (8/5) (too-many-arguments)
+trade_executor/order_executor.py:104:4: R0917: Too many positional arguments (8/5) (too-many-positional-arguments)
+trade_executor/order_executor.py:104:4: R0914: Too many local variables (16/15) (too-many-locals)
+trade_executor/order_executor.py:224:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/order_executor.py:214:19: E1123: Unexpected keyword argument 'filled' in constructor call (unexpected-keyword-arg)
+trade_executor/order_executor.py:214:19: E1123: Unexpected keyword argument 'cost' in constructor call (unexpected-keyword-arg)
+trade_executor/order_executor.py:214:19: E1123: Unexpected keyword argument 'price' in constructor call (unexpected-keyword-arg)
+trade_executor/order_executor.py:214:19: E1123: Unexpected keyword argument 'raw_data' in constructor call (unexpected-keyword-arg)
+trade_executor/order_executor.py:104:4: R0911: Too many return statements (7/6) (too-many-return-statements)
+trade_executor/order_executor.py:231:4: R0913: Too many arguments (7/5) (too-many-arguments)
+trade_executor/order_executor.py:231:4: R0917: Too many positional arguments (7/5) (too-many-positional-arguments)
+trade_executor/order_executor.py:323:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/order_executor.py:250:12: E0401: Unable to import 'project.data.market_data' (import-error)
+trade_executor/order_executor.py:250:12: C0415: Import outside toplevel (project.data.market_data.MarketData) (import-outside-toplevel)
+trade_executor/order_executor.py:299:19: E1123: Unexpected keyword argument 'filled' in constructor call (unexpected-keyword-arg)
+trade_executor/order_executor.py:299:19: E1123: Unexpected keyword argument 'cost' in constructor call (unexpected-keyword-arg)
+trade_executor/order_executor.py:299:19: E1123: Unexpected keyword argument 'price' in constructor call (unexpected-keyword-arg)
+trade_executor/order_executor.py:299:19: E1123: Unexpected keyword argument 'raw_data' in constructor call (unexpected-keyword-arg)
+trade_executor/order_executor.py:380:4: R0913: Too many arguments (6/5) (too-many-arguments)
+trade_executor/order_executor.py:380:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+trade_executor/order_executor.py:412:4: R0913: Too many arguments (6/5) (too-many-arguments)
+trade_executor/order_executor.py:412:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+trade_executor/order_executor.py:459:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/order_executor.py:507:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/order_executor.py:503:19: E1123: Unexpected keyword argument 'raw_data' in constructor call (unexpected-keyword-arg)
+trade_executor/order_executor.py:577:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/order_executor.py:540:23: E1123: Unexpected keyword argument 'filled' in constructor call (unexpected-keyword-arg)
+trade_executor/order_executor.py:540:23: E1123: Unexpected keyword argument 'price' in constructor call (unexpected-keyword-arg)
+trade_executor/order_executor.py:540:23: E1123: Unexpected keyword argument 'cost' in constructor call (unexpected-keyword-arg)
+trade_executor/order_executor.py:567:19: E1123: Unexpected keyword argument 'filled' in constructor call (unexpected-keyword-arg)
+trade_executor/order_executor.py:567:19: E1123: Unexpected keyword argument 'price' in constructor call (unexpected-keyword-arg)
+trade_executor/order_executor.py:567:19: E1123: Unexpected keyword argument 'cost' in constructor call (unexpected-keyword-arg)
+trade_executor/order_executor.py:567:19: E1123: Unexpected keyword argument 'raw_data' in constructor call (unexpected-keyword-arg)
+trade_executor/order_executor.py:600:12: W0621: Redefining name 'fetch_open_orders' from outer scope (line 21) (redefined-outer-name)
+trade_executor/order_executor.py:605:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/order_executor.py:600:12: E0401: Unable to import 'project.utils.ccxt_exchanges' (import-error)
+trade_executor/order_executor.py:600:12: W0404: Reimport 'fetch_open_orders' (imported line 21) (reimported)
+trade_executor/order_executor.py:600:12: C0415: Import outside toplevel (project.utils.ccxt_exchanges.fetch_open_orders) (import-outside-toplevel)
+trade_executor/order_executor.py:610:4: R0913: Too many arguments (8/5) (too-many-arguments)
+trade_executor/order_executor.py:610:4: R0917: Too many positional arguments (8/5) (too-many-positional-arguments)
+trade_executor/order_executor.py:637:12: W0621: Redefining name 'Database' from outer scope (line 8) (redefined-outer-name)
+trade_executor/order_executor.py:660:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/order_executor.py:637:12: E0401: Unable to import 'project.data.database' (import-error)
+trade_executor/order_executor.py:637:12: W0404: Reimport 'Database' (imported line 8) (reimported)
+trade_executor/order_executor.py:637:12: C0415: Import outside toplevel (project.data.database.Database) (import-outside-toplevel)
+trade_executor/order_executor.py:665:0: W0105: String statement has no effect (pointless-string-statement)
+trade_executor/order_executor.py:675:0: E0102: class already defined line 41 (function-redefined)
+trade_executor/order_executor.py:675:0: R0902: Too many instance attributes (9/7) (too-many-instance-attributes)
+trade_executor/order_executor.py:691:0: E0102: class already defined line 54 (function-redefined)
+trade_executor/order_executor.py:691:0: R0902: Too many instance attributes (9/7) (too-many-instance-attributes)
+trade_executor/order_executor.py:728:4: R0913: Too many arguments (7/5) (too-many-arguments)
+trade_executor/order_executor.py:728:4: R0917: Too many positional arguments (7/5) (too-many-positional-arguments)
+trade_executor/order_executor.py:828:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/order_executor.py:892:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/order_executor.py:867:12: W0612: Unused variable 'cancelled_order' (unused-variable)
+trade_executor/order_executor.py:957:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/order_executor.py:996:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/order_executor.py:1162:12: W0621: Redefining name 'Database' from outer scope (line 8) (redefined-outer-name)
+trade_executor/order_executor.py:1174:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trade_executor/order_executor.py:1162:12: E0401: Unable to import 'project.data.database' (import-error)
+trade_executor/order_executor.py:1162:12: W0404: Reimport 'Database' (imported line 8) (reimported)
+trade_executor/order_executor.py:1162:12: C0415: Import outside toplevel (project.data.database.Database) (import-outside-toplevel)
+trade_executor/order_executor.py:1153:38: W0613: Unused argument 'exchange_id' (unused-argument)
+trade_executor/order_executor.py:11:0: C0411: standard import "typing.Any" should be placed before third party imports "project.utils.notify.send_trading_signal", "project.infrastructure.database.Database", "project.data.symbol_manager.SymbolManager" and local import "config.get_config" (wrong-import-order)
+trade_executor/order_executor.py:12:0: C0411: standard import "time" should be placed before third party imports "project.utils.notify.send_trading_signal", "project.infrastructure.database.Database", "project.data.symbol_manager.SymbolManager" and local import "config.get_config" (wrong-import-order)
+trade_executor/order_executor.py:13:0: C0411: standard import "uuid" should be placed before third party imports "project.utils.notify.send_trading_signal", "project.infrastructure.database.Database", "project.data.symbol_manager.SymbolManager" and local import "config.get_config" (wrong-import-order)
+trade_executor/order_executor.py:14:0: C0411: standard import "typing.Dict" should be placed before third party imports "project.utils.notify.send_trading_signal", "project.infrastructure.database.Database", "project.data.symbol_manager.SymbolManager" and local import "config.get_config" (wrong-import-order)
+trade_executor/order_executor.py:15:0: C0411: standard import "dataclasses.dataclass" should be placed before third party imports "project.utils.notify.send_trading_signal", "project.infrastructure.database.Database", "project.data.symbol_manager.SymbolManager" and local import "config.get_config" (wrong-import-order)
+trade_executor/order_executor.py:18:0: C0411: third party import "project.config.get_config" should be placed before local import "config.get_config" (wrong-import-order)
+trade_executor/order_executor.py:19:0: C0411: third party import "project.utils.error_handler.async_handle_error" should be placed before local import "config.get_config" (wrong-import-order)
+trade_executor/order_executor.py:20:0: C0411: third party import "project.utils.logging_utils.get_logger" should be placed before local import "config.get_config" (wrong-import-order)
+trade_executor/order_executor.py:21:0: C0411: third party import "project.utils.ccxt_exchanges.get_exchange" should be placed before local import "config.get_config" (wrong-import-order)
+trade_executor/order_executor.py:14:0: C0412: Imports from package typing are not grouped (ungrouped-imports)
+trade_executor/order_executor.py:8:0: W0611: Unused Database imported from project.infrastructure.database (unused-import)
+************* Module New-test.bots.base_bot
+bots/base_bot.py:12:0: E0401: Unable to import 'project.config' (import-error)
+bots/base_bot.py:13:0: E0401: Unable to import 'project.data.market_data' (import-error)
+bots/base_bot.py:14:0: E0401: Unable to import 'project.trade_executor.order_executor' (import-error)
+bots/base_bot.py:15:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/base_bot.py:16:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/base_bot.py:17:0: E0401: Unable to import 'project.utils.notify' (import-error)
+bots/base_bot.py:22:0: R0902: Too many instance attributes (14/7) (too-many-instance-attributes)
+bots/base_bot.py:98:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/base_bot.py:202:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/base_bot.py:224:4: R0913: Too many arguments (6/5) (too-many-arguments)
+bots/base_bot.py:224:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+bots/base_bot.py:276:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/base_bot.py:300:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/base_bot.py:322:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/base_bot.py:9:0: W0611: Unused Dict imported from typing (unused-import)
+bots/base_bot.py:9:0: W0611: Unused List imported from typing (unused-import)
+bots/base_bot.py:9:0: W0611: Unused Any imported from typing (unused-import)
+************* Module New-test.bots.arbitrage.utils
+bots/arbitrage/utils.py:10:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/arbitrage/utils.py:11:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/arbitrage/utils.py:268:0: R0914: Too many local variables (19/15) (too-many-locals)
+bots/arbitrage/utils.py:298:14: W0612: Unused variable 'quote' (unused-variable)
+bots/arbitrage/utils.py:336:0: R0913: Too many arguments (7/5) (too-many-arguments)
+bots/arbitrage/utils.py:336:0: R0917: Too many positional arguments (7/5) (too-many-positional-arguments)
+bots/arbitrage/utils.py:336:0: R0914: Too many local variables (23/15) (too-many-locals)
+bots/arbitrage/utils.py:408:11: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/utils.py:6:0: W0611: Unused import time (unused-import)
+************* Module New-test.bots.arbitrage.core
+bots/arbitrage/core.py:1:0: C0302: Too many lines in module (1857/1000) (too-many-lines)
+bots/arbitrage/core.py:7:0: E0401: Unable to import 'project.utils.notify' (import-error)
+bots/arbitrage/core.py:15:0: W0404: Reimport 'Dict' (imported line 11) (reimported)
+bots/arbitrage/core.py:15:0: W0404: Reimport 'List' (imported line 11) (reimported)
+bots/arbitrage/core.py:15:0: W0404: Reimport 'Optional' (imported line 11) (reimported)
+bots/arbitrage/core.py:15:0: W0404: Reimport 'Any' (imported line 11) (reimported)
+bots/arbitrage/core.py:18:0: E0401: Unable to import 'project.config' (import-error)
+bots/arbitrage/core.py:19:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/arbitrage/core.py:20:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/arbitrage/core.py:21:0: E0401: Unable to import 'project.utils.ccxt_exchanges' (import-error)
+bots/arbitrage/core.py:22:0: E0401: Unable to import 'project.data.market_data' (import-error)
+bots/arbitrage/core.py:29:0: R0902: Too many instance attributes (15/7) (too-many-instance-attributes)
+bots/arbitrage/core.py:51:0: R0902: Too many instance attributes (11/7) (too-many-instance-attributes)
+bots/arbitrage/core.py:106:4: R0914: Too many local variables (29/15) (too-many-locals)
+bots/arbitrage/core.py:269:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/core.py:152:27: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/core.py:171:16: C0200: Consider using enumerate instead of iterating with range and len (consider-using-enumerate)
+bots/arbitrage/core.py:106:4: R0915: Too many statements (53/50) (too-many-statements)
+bots/arbitrage/core.py:293:4: R0914: Too many local variables (19/15) (too-many-locals)
+bots/arbitrage/core.py:386:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/core.py:293:4: R0911: Too many return statements (7/6) (too-many-return-statements)
+bots/arbitrage/core.py:393:4: R0914: Too many local variables (20/15) (too-many-locals)
+bots/arbitrage/core.py:473:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/core.py:480:4: R0914: Too many local variables (29/15) (too-many-locals)
+bots/arbitrage/core.py:607:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/core.py:649:0: W0105: String statement has no effect (pointless-string-statement)
+bots/arbitrage/core.py:665:0: E0102: class already defined line 29 (function-redefined)
+bots/arbitrage/core.py:665:0: R0902: Too many instance attributes (15/7) (too-many-instance-attributes)
+bots/arbitrage/core.py:687:0: E0102: class already defined line 51 (function-redefined)
+bots/arbitrage/core.py:687:0: R0902: Too many instance attributes (11/7) (too-many-instance-attributes)
+bots/arbitrage/core.py:730:4: R0914: Too many local variables (29/15) (too-many-locals)
+bots/arbitrage/core.py:893:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/core.py:776:27: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/core.py:795:16: C0200: Consider using enumerate instead of iterating with range and len (consider-using-enumerate)
+bots/arbitrage/core.py:730:4: R0915: Too many statements (53/50) (too-many-statements)
+bots/arbitrage/core.py:898:4: R0914: Too many local variables (19/15) (too-many-locals)
+bots/arbitrage/core.py:991:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/core.py:898:4: R0911: Too many return statements (7/6) (too-many-return-statements)
+bots/arbitrage/core.py:998:4: R0914: Too many local variables (20/15) (too-many-locals)
+bots/arbitrage/core.py:1078:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/core.py:1085:4: R0914: Too many local variables (29/15) (too-many-locals)
+bots/arbitrage/core.py:1212:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/core.py:1254:0: W0105: String statement has no effect (pointless-string-statement)
+bots/arbitrage/core.py:1270:0: E0102: class already defined line 29 (function-redefined)
+bots/arbitrage/core.py:1270:0: R0902: Too many instance attributes (15/7) (too-many-instance-attributes)
+bots/arbitrage/core.py:1292:0: E0102: class already defined line 51 (function-redefined)
+bots/arbitrage/core.py:1292:0: R0902: Too many instance attributes (11/7) (too-many-instance-attributes)
+bots/arbitrage/core.py:1335:4: R0914: Too many local variables (29/15) (too-many-locals)
+bots/arbitrage/core.py:1498:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/core.py:1381:27: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/core.py:1400:16: C0200: Consider using enumerate instead of iterating with range and len (consider-using-enumerate)
+bots/arbitrage/core.py:1335:4: R0915: Too many statements (53/50) (too-many-statements)
+bots/arbitrage/core.py:1503:4: R0914: Too many local variables (19/15) (too-many-locals)
+bots/arbitrage/core.py:1596:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/core.py:1590:0: W1404: Implicit string concatenation found in call (implicit-str-concat)
+bots/arbitrage/core.py:1503:4: R0911: Too many return statements (7/6) (too-many-return-statements)
+bots/arbitrage/core.py:1603:4: R0914: Too many local variables (20/15) (too-many-locals)
+bots/arbitrage/core.py:1683:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/core.py:1690:4: R0914: Too many local variables (29/15) (too-many-locals)
+bots/arbitrage/core.py:1818:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/core.py:9:0: C0411: standard import "logging" should be placed before third party imports "project.utils.notify.send_trading_signal", "numpy" (wrong-import-order)
+bots/arbitrage/core.py:11:0: C0411: standard import "typing.Dict" should be placed before third party imports "project.utils.notify.send_trading_signal", "numpy", "pandas" (wrong-import-order)
+bots/arbitrage/core.py:12:0: C0411: standard import "time" should be placed before third party imports "project.utils.notify.send_trading_signal", "numpy", "pandas" (wrong-import-order)
+bots/arbitrage/core.py:13:0: C0411: standard import "dataclasses" should be placed before third party imports "project.utils.notify.send_trading_signal", "numpy", "pandas" (wrong-import-order)
+bots/arbitrage/core.py:14:0: C0411: standard import "dataclasses.dataclass" should be placed before third party imports "project.utils.notify.send_trading_signal", "numpy", "pandas" (wrong-import-order)
+bots/arbitrage/core.py:15:0: C0411: standard import "typing.Dict" should be placed before third party imports "project.utils.notify.send_trading_signal", "numpy", "pandas" (wrong-import-order)
+bots/arbitrage/core.py:15:0: C0412: Imports from package typing are not grouped (ungrouped-imports)
+bots/arbitrage/core.py:18:0: C0412: Imports from package project are not grouped (ungrouped-imports)
+bots/arbitrage/core.py:7:0: W0611: Unused send_trading_signal imported from project.utils.notify (unused-import)
+bots/arbitrage/core.py:8:0: W0611: Unused numpy imported as np (unused-import)
+bots/arbitrage/core.py:10:0: W0611: Unused pandas imported as pd (unused-import)
+bots/arbitrage/core.py:11:0: W0611: Unused Optional imported from typing (unused-import)
+bots/arbitrage/core.py:11:0: W0611: Unused Set imported from typing (unused-import)
+************* Module New-test.bots.arbitrage.multi_exchange
+bots/arbitrage/multi_exchange.py:12:0: E0401: Unable to import 'project.config' (import-error)
+bots/arbitrage/multi_exchange.py:13:0: E0401: Unable to import 'project.bots.base_bot' (import-error)
+bots/arbitrage/multi_exchange.py:14:0: E0401: Unable to import 'project.data.market_data' (import-error)
+bots/arbitrage/multi_exchange.py:15:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/arbitrage/multi_exchange.py:16:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/arbitrage/multi_exchange.py:17:0: E0401: Unable to import 'project.utils.ccxt_exchanges' (import-error)
+bots/arbitrage/multi_exchange.py:18:0: E0401: Unable to import 'project.bots.arbitrage.core' (import-error)
+bots/arbitrage/multi_exchange.py:19:0: E0401: Unable to import 'project.bots.arbitrage.utils' (import-error)
+bots/arbitrage/multi_exchange.py:24:0: R0902: Too many instance attributes (12/7) (too-many-instance-attributes)
+bots/arbitrage/multi_exchange.py:93:12: W0612: Unused variable 'symbol' (unused-variable)
+bots/arbitrage/multi_exchange.py:169:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/multi_exchange.py:219:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/multi_exchange.py:108:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+bots/arbitrage/multi_exchange.py:321:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/multi_exchange.py:261:12: E0401: Unable to import 'project.trade_executor.order_executor' (import-error)
+bots/arbitrage/multi_exchange.py:261:12: C0415: Import outside toplevel (project.trade_executor.order_executor.OrderExecutor) (import-outside-toplevel)
+bots/arbitrage/multi_exchange.py:386:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/multi_exchange.py:426:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/multi_exchange.py:508:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/arbitrage/multi_exchange.py:465:12: E0401: Unable to import 'project.trade_executor.order_executor' (import-error)
+bots/arbitrage/multi_exchange.py:465:12: C0415: Import outside toplevel (project.trade_executor.order_executor.OrderExecutor) (import-outside-toplevel)
+bots/arbitrage/multi_exchange.py:9:0: W0611: Unused List imported from typing (unused-import)
+bots/arbitrage/multi_exchange.py:12:0: W0611: Unused get_config imported from project.config (unused-import)
+bots/arbitrage/multi_exchange.py:19:0: W0611: Unused calculate_max_trade_sizes imported from project.bots.arbitrage.utils (unused-import)
+************* Module New-test.bots.strategies.strategy_manager
+bots/strategies/strategy_manager.py:9:0: E0401: Unable to import 'project.bots.strategies.base_strategy' (import-error)
+bots/strategies/strategy_manager.py:10:0: E0401: Unable to import 'project.config' (import-error)
+bots/strategies/strategy_manager.py:11:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/strategies/strategy_manager.py:12:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/strategies/strategy_manager.py:13:0: E0401: Unable to import 'project.utils.notify' (import-error)
+bots/strategies/strategy_manager.py:48:4: R0914: Too many local variables (16/15) (too-many-locals)
+bots/strategies/strategy_manager.py:87:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/strategy_manager.py:54:12: E0401: Unable to import 'project.bots.strategies.cross' (import-error)
+bots/strategies/strategy_manager.py:54:12: C0415: Import outside toplevel (project.bots.strategies.cross.CrossStrategy) (import-outside-toplevel)
+bots/strategies/strategy_manager.py:55:12: E0401: Unable to import 'project.bots.strategies.futures' (import-error)
+bots/strategies/strategy_manager.py:55:12: C0415: Import outside toplevel (project.bots.strategies.futures.FuturesStrategy) (import-outside-toplevel)
+bots/strategies/strategy_manager.py:56:12: E0401: Unable to import 'project.bots.strategies.main_strategy' (import-error)
+bots/strategies/strategy_manager.py:56:12: C0415: Import outside toplevel (project.bots.strategies.main_strategy.MainStrategy) (import-outside-toplevel)
+bots/strategies/strategy_manager.py:57:12: E0401: Unable to import 'project.bots.strategies.mean_revision' (import-error)
+bots/strategies/strategy_manager.py:57:12: C0415: Import outside toplevel (project.bots.strategies.mean_revision.MeanReversionStrategy) (import-outside-toplevel)
+bots/strategies/strategy_manager.py:58:12: E0401: Unable to import 'project.bots.strategies.memcoin' (import-error)
+bots/strategies/strategy_manager.py:58:12: C0415: Import outside toplevel (project.bots.strategies.memcoin.MemcoinStrategy) (import-outside-toplevel)
+bots/strategies/strategy_manager.py:59:12: E0401: Unable to import 'project.bots.strategies.scalping' (import-error)
+bots/strategies/strategy_manager.py:59:12: C0415: Import outside toplevel (project.bots.strategies.scalping.ScalpingStrategy) (import-outside-toplevel)
+bots/strategies/strategy_manager.py:60:12: E0401: Unable to import 'project.bots.strategies.volatility_strategy' (import-error)
+bots/strategies/strategy_manager.py:60:12: C0415: Import outside toplevel (project.bots.strategies.volatility_strategy.VolatilityStrategy) (import-outside-toplevel)
+bots/strategies/strategy_manager.py:80:23: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/strategy_manager.py:353:23: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/strategy_manager.py:374:19: W0718: Catching too general exception Exception (broad-exception-caught)
+************* Module New-test.bots.strategies.memcoin
+bots/strategies/memcoin.py:10:0: E0401: Unable to import 'project.bots.strategies.base_strategy' (import-error)
+bots/strategies/memcoin.py:11:0: E0401: Unable to import 'project.technicals.indicators' (import-error)
+bots/strategies/memcoin.py:12:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/strategies/memcoin.py:13:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/strategies/memcoin.py:23:4: R0913: Too many arguments (6/5) (too-many-arguments)
+bots/strategies/memcoin.py:23:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+bots/strategies/memcoin.py:167:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/memcoin.py:283:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/memcoin.py:331:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/memcoin.py:298:8: W0612: Unused variable 'base_coin' (unused-variable)
+bots/strategies/memcoin.py:335:4: R0914: Too many local variables (18/15) (too-many-locals)
+bots/strategies/memcoin.py:436:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/memcoin.py:441:4: R0913: Too many arguments (8/5) (too-many-arguments)
+bots/strategies/memcoin.py:441:4: R0917: Too many positional arguments (8/5) (too-many-positional-arguments)
+bots/strategies/memcoin.py:18:0: R0903: Too few public methods (0/2) (too-few-public-methods)
+************* Module New-test.bots.strategies.volatility_strategy
+bots/strategies/volatility_strategy.py:10:0: E0401: Unable to import 'project.bots.strategies.base_strategy' (import-error)
+bots/strategies/volatility_strategy.py:11:0: E0401: Unable to import 'project.bots.strategies.modifications' (import-error)
+bots/strategies/volatility_strategy.py:12:0: E0401: Unable to import 'project.technicals.indicators' (import-error)
+bots/strategies/volatility_strategy.py:13:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/strategies/volatility_strategy.py:14:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/strategies/volatility_strategy.py:24:4: R0913: Too many arguments (6/5) (too-many-arguments)
+bots/strategies/volatility_strategy.py:24:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+bots/strategies/volatility_strategy.py:85:4: R0912: Too many branches (13/12) (too-many-branches)
+bots/strategies/volatility_strategy.py:177:4: R0914: Too many local variables (26/15) (too-many-locals)
+bots/strategies/volatility_strategy.py:287:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/volatility_strategy.py:314:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/volatility_strategy.py:408:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/volatility_strategy.py:318:4: R0912: Too many branches (14/12) (too-many-branches)
+bots/strategies/volatility_strategy.py:510:20: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+bots/strategies/volatility_strategy.py:19:0: R0903: Too few public methods (0/2) (too-few-public-methods)
+************* Module New-test.bots.strategies.futures
+bots/strategies/futures.py:10:0: E0401: Unable to import 'project.bots.strategies.base_strategy' (import-error)
+bots/strategies/futures.py:11:0: E0401: Unable to import 'project.technicals.indicators' (import-error)
+bots/strategies/futures.py:12:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/strategies/futures.py:13:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/strategies/futures.py:23:4: R0913: Too many arguments (6/5) (too-many-arguments)
+bots/strategies/futures.py:23:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+bots/strategies/futures.py:184:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/futures.py:205:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/futures.py:230:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/futures.py:254:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/futures.py:259:58: W0613: Unused argument 'position_size' (unused-argument)
+bots/strategies/futures.py:313:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+bots/strategies/futures.py:378:4: R0914: Too many local variables (34/15) (too-many-locals)
+bots/strategies/futures.py:596:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/futures.py:532:32: R1714: Consider merging these comparisons with 'in' by using 'higher_trend not in (final_signal, 'neutral')'. Use a set instead if elements are hashable. (consider-using-in)
+bots/strategies/futures.py:390:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+bots/strategies/futures.py:378:4: R0912: Too many branches (23/12) (too-many-branches)
+bots/strategies/futures.py:378:4: R0915: Too many statements (75/50) (too-many-statements)
+bots/strategies/futures.py:638:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+bots/strategies/futures.py:702:4: R0913: Too many arguments (6/5) (too-many-arguments)
+bots/strategies/futures.py:702:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+bots/strategies/futures.py:703:14: W0613: Unused argument 'symbol' (unused-argument)
+bots/strategies/futures.py:703:22: W0613: Unused argument 'side' (unused-argument)
+bots/strategies/futures.py:703:28: W0613: Unused argument 'price' (unused-argument)
+bots/strategies/futures.py:703:35: W0613: Unused argument 'risk_amount' (unused-argument)
+bots/strategies/futures.py:18:0: R0903: Too few public methods (0/2) (too-few-public-methods)
+************* Module New-test.bots.strategies.modifications
+bots/strategies/modifications.py:9:0: E0401: Unable to import 'project.technicals.indicators' (import-error)
+bots/strategies/modifications.py:10:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/strategies/modifications.py:11:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/strategies/modifications.py:23:4: R0913: Too many arguments (6/5) (too-many-arguments)
+bots/strategies/modifications.py:23:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+bots/strategies/modifications.py:46:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+bots/strategies/modifications.py:24:8: W0613: Unused argument 'current_price' (unused-argument)
+bots/strategies/modifications.py:129:4: R0913: Too many arguments (6/5) (too-many-arguments)
+bots/strategies/modifications.py:129:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+bots/strategies/modifications.py:130:8: W0613: Unused argument 'account_balance' (unused-argument)
+bots/strategies/modifications.py:132:8: W0613: Unused argument 'stop_loss_pct' (unused-argument)
+bots/strategies/modifications.py:264:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+bots/strategies/modifications.py:357:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+bots/strategies/modifications.py:412:8: R1705: Unnecessary "else" after "return", remove the "else" and de-indent the code inside it (no-else-return)
+bots/strategies/modifications.py:387:12: W0612: Unused variable 'timeframe' (unused-variable)
+bots/strategies/modifications.py:388:16: W0612: Unused variable 'indicator' (unused-variable)
+************* Module New-test.bots.strategies.cross
+bots/strategies/cross.py:322:0: C0301: Line too long (105/100) (line-too-long)
+bots/strategies/cross.py:331:0: C0301: Line too long (101/100) (line-too-long)
+bots/strategies/cross.py:361:0: C0301: Line too long (105/100) (line-too-long)
+bots/strategies/cross.py:554:0: C0301: Line too long (101/100) (line-too-long)
+bots/strategies/cross.py:13:0: E0401: Unable to import 'project.bots.strategies.base_strategy' (import-error)
+bots/strategies/cross.py:14:0: E0401: Unable to import 'project.config' (import-error)
+bots/strategies/cross.py:15:0: E0401: Unable to import 'project.data.market_data' (import-error)
+bots/strategies/cross.py:16:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/strategies/cross.py:17:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/strategies/cross.py:27:4: R0913: Too many arguments (6/5) (too-many-arguments)
+bots/strategies/cross.py:27:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+bots/strategies/cross.py:173:23: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/cross.py:249:4: R0914: Too many local variables (20/15) (too-many-locals)
+bots/strategies/cross.py:367:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/cross.py:256:8: R1702: Too many nested blocks (8/5) (too-many-nested-blocks)
+bots/strategies/cross.py:249:4: R0912: Too many branches (15/12) (too-many-branches)
+bots/strategies/cross.py:373:4: R0914: Too many local variables (21/15) (too-many-locals)
+bots/strategies/cross.py:256:8: R1702: Too many nested blocks (8/5) (too-many-nested-blocks)
+bots/strategies/cross.py:405:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/cross.py:447:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/cross.py:535:16: R1724: Unnecessary "else" after "continue", remove the "else" and de-indent the code inside it (no-else-continue)
+bots/strategies/cross.py:564:12: W0612: Unused variable 'i' (unused-variable)
+bots/strategies/cross.py:572:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+bots/strategies/cross.py:579:4: C0116: Missing function or method docstring (missing-function-docstring)
+bots/strategies/cross.py:579:4: R1710: Either all return statements in a function should return an expression, or none of them should. (inconsistent-return-statements)
+bots/strategies/cross.py:138:8: W0201: Attribute 'update_interval' defined outside __init__ (attribute-defined-outside-init)
+bots/strategies/cross.py:6:0: W0611: Unused import asyncio (unused-import)
+bots/strategies/cross.py:7:0: W0611: Unused import logging (unused-import)
+bots/strategies/cross.py:9:0: W0611: Unused Optional imported from typing (unused-import)
+bots/strategies/cross.py:9:0: W0611: Unused Set imported from typing (unused-import)
+bots/strategies/cross.py:9:0: W0611: Unused Tuple imported from typing (unused-import)
+bots/strategies/cross.py:9:0: W0611: Unused Union imported from typing (unused-import)
+bots/strategies/cross.py:11:0: W0611: Unused numpy imported as np (unused-import)
+bots/strategies/cross.py:12:0: W0611: Unused pandas imported as pd (unused-import)
+bots/strategies/cross.py:13:0: W0611: Unused StrategyStatus imported from project.bots.strategies.base_strategy (unused-import)
+bots/strategies/cross.py:14:0: W0611: Unused get_config imported from project.config (unused-import)
+bots/strategies/cross.py:15:0: W0611: Unused MarketData imported from project.data.market_data (unused-import)
+************* Module New-test.bots.strategies.main_strategy
+bots/strategies/main_strategy.py:10:0: E0401: Unable to import 'project.bots.strategies.base_strategy' (import-error)
+bots/strategies/main_strategy.py:11:0: E0401: Unable to import 'project.technicals.indicators' (import-error)
+bots/strategies/main_strategy.py:12:0: E0401: Unable to import 'project.technicals.patterns' (import-error)
+bots/strategies/main_strategy.py:13:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/strategies/main_strategy.py:14:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/strategies/main_strategy.py:24:4: R0913: Too many arguments (6/5) (too-many-arguments)
+bots/strategies/main_strategy.py:24:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+bots/strategies/main_strategy.py:85:4: R0912: Too many branches (16/12) (too-many-branches)
+bots/strategies/main_strategy.py:176:4: R0914: Too many local variables (19/15) (too-many-locals)
+bots/strategies/main_strategy.py:296:23: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/main_strategy.py:294:20: E1121: Too many positional arguments for method call (too-many-function-args)
+bots/strategies/main_strategy.py:337:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/main_strategy.py:387:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/main_strategy.py:392:4: R0914: Too many local variables (20/15) (too-many-locals)
+bots/strategies/main_strategy.py:550:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/main_strategy.py:392:4: R0912: Too many branches (39/12) (too-many-branches)
+bots/strategies/main_strategy.py:392:4: R0915: Too many statements (77/50) (too-many-statements)
+bots/strategies/main_strategy.py:556:4: R0914: Too many local variables (26/15) (too-many-locals)
+bots/strategies/main_strategy.py:668:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/main_strategy.py:556:4: R0912: Too many branches (18/12) (too-many-branches)
+bots/strategies/main_strategy.py:682:8: E1111: Assigning result of a function call, where the function has no return (assignment-from-no-return)
+bots/strategies/main_strategy.py:683:8: E1111: Assigning result of a function call, where the function has no return (assignment-from-no-return)
+bots/strategies/main_strategy.py:684:8: E1111: Assigning result of a function call, where the function has no return (assignment-from-no-return)
+bots/strategies/main_strategy.py:19:0: R0903: Too few public methods (1/2) (too-few-public-methods)
+************* Module New-test.bots.strategies.base_strategy
+bots/strategies/base_strategy.py:1:0: C0302: Too many lines in module (1098/1000) (too-many-lines)
+bots/strategies/base_strategy.py:13:0: E0401: Unable to import 'project.config' (import-error)
+bots/strategies/base_strategy.py:14:0: E0401: Unable to import 'project.data.market_data' (import-error)
+bots/strategies/base_strategy.py:15:0: E0401: Unable to import 'project.risk_management.position_sizer' (import-error)
+bots/strategies/base_strategy.py:16:0: E0401: Unable to import 'project.trade_executor.order_executor' (import-error)
+bots/strategies/base_strategy.py:17:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/strategies/base_strategy.py:18:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/strategies/base_strategy.py:19:0: E0401: Unable to import 'project.utils.notify' (import-error)
+bots/strategies/base_strategy.py:37:0: R0902: Too many instance attributes (26/7) (too-many-instance-attributes)
+bots/strategies/base_strategy.py:114:93: E0602: Undefined variable 'exchange_id' (undefined-variable)
+bots/strategies/base_strategy.py:146:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/base_strategy.py:176:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/base_strategy.py:345:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/base_strategy.py:286:4: R0912: Too many branches (13/12) (too-many-branches)
+bots/strategies/base_strategy.py:410:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/base_strategy.py:397:12: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+bots/strategies/base_strategy.py:352:4: R0911: Too many return statements (8/6) (too-many-return-statements)
+bots/strategies/base_strategy.py:435:23: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/base_strategy.py:447:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/base_strategy.py:501:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/base_strategy.py:542:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/base_strategy.py:531:27: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/base_strategy.py:600:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/base_strategy.py:604:4: R0914: Too many local variables (16/15) (too-many-locals)
+bots/strategies/base_strategy.py:722:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/base_strategy.py:608:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+bots/strategies/base_strategy.py:608:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+bots/strategies/base_strategy.py:604:4: R0912: Too many branches (13/12) (too-many-branches)
+bots/strategies/base_strategy.py:770:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/base_strategy.py:896:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/base_strategy.py:774:4: R0911: Too many return statements (8/6) (too-many-return-statements)
+bots/strategies/base_strategy.py:1005:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/base_strategy.py:1021:8: R1705: Unnecessary "else" after "return", remove the "else" and de-indent the code inside it (no-else-return)
+bots/strategies/base_strategy.py:1009:35: W0613: Unused argument 'symbol' (unused-argument)
+bots/strategies/base_strategy.py:1040:8: R1705: Unnecessary "else" after "return", remove the "else" and de-indent the code inside it (no-else-return)
+bots/strategies/base_strategy.py:1027:14: W0613: Unused argument 'symbol' (unused-argument)
+bots/strategies/base_strategy.py:1045:34: W0613: Unused argument 'symbol' (unused-argument)
+************* Module New-test.bots.strategies.scalping
+bots/strategies/scalping.py:9:0: E0401: Unable to import 'project.bots.strategies.base_strategy' (import-error)
+bots/strategies/scalping.py:10:0: E0401: Unable to import 'project.technicals.indicators' (import-error)
+bots/strategies/scalping.py:11:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/strategies/scalping.py:12:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/strategies/scalping.py:22:4: R0913: Too many arguments (6/5) (too-many-arguments)
+bots/strategies/scalping.py:22:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+bots/strategies/scalping.py:156:23: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/scalping.py:227:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/scalping.py:233:4: R0914: Too many local variables (19/15) (too-many-locals)
+bots/strategies/scalping.py:336:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/scalping.py:283:16: R0916: Too many boolean expressions in if statement (6/5) (too-many-boolean-expressions)
+bots/strategies/scalping.py:375:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+bots/strategies/scalping.py:422:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/scalping.py:415:12: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+bots/strategies/scalping.py:426:4: R0914: Too many local variables (20/15) (too-many-locals)
+bots/strategies/scalping.py:426:4: R0912: Too many branches (19/12) (too-many-branches)
+bots/strategies/scalping.py:462:16: W0612: Unused variable 'indicator' (unused-variable)
+bots/strategies/scalping.py:127:8: W0201: Attribute 'update_interval' defined outside __init__ (attribute-defined-outside-init)
+bots/strategies/scalping.py:17:0: R0903: Too few public methods (0/2) (too-few-public-methods)
+************* Module New-test.bots.strategies.mean_revision
+bots/strategies/mean_revision.py:11:0: E0401: Unable to import 'project.bots.strategies.base_strategy' (import-error)
+bots/strategies/mean_revision.py:12:0: E0401: Unable to import 'project.technicals.indicators' (import-error)
+bots/strategies/mean_revision.py:13:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/strategies/mean_revision.py:14:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/strategies/mean_revision.py:24:4: R0913: Too many arguments (6/5) (too-many-arguments)
+bots/strategies/mean_revision.py:24:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+bots/strategies/mean_revision.py:205:23: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/mean_revision.py:357:4: R0914: Too many local variables (19/15) (too-many-locals)
+bots/strategies/mean_revision.py:449:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/strategies/mean_revision.py:357:4: R0912: Too many branches (16/12) (too-many-branches)
+bots/strategies/mean_revision.py:454:4: R0913: Too many arguments (6/5) (too-many-arguments)
+bots/strategies/mean_revision.py:454:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+bots/strategies/mean_revision.py:454:4: R0914: Too many local variables (17/15) (too-many-locals)
+bots/strategies/mean_revision.py:489:15: R0916: Too many boolean expressions in if statement (6/5) (too-many-boolean-expressions)
+bots/strategies/mean_revision.py:539:17: R1714: Consider merging these comparisons with 'in' by using 'signal_direction in (bb_signal, rsi_signal)'. Use a set instead if elements are hashable. (consider-using-in)
+bots/strategies/mean_revision.py:19:0: R0903: Too few public methods (0/2) (too-few-public-methods)
+************* Module New-test.bots.news.news_bot
+bots/news/news_bot.py:11:0: E0401: Unable to import 'project.bots.base_bot' (import-error)
+bots/news/news_bot.py:12:0: E0401: Unable to import 'project.bots.news.parsers.bitcoinmag_parser' (import-error)
+bots/news/news_bot.py:13:0: E0401: Unable to import 'project.bots.news.parsers.coindesk_parser' (import-error)
+bots/news/news_bot.py:14:0: E0401: Unable to import 'project.config' (import-error)
+bots/news/news_bot.py:15:0: E0401: Unable to import 'project.utils.ccxt_exchanges' (import-error)
+bots/news/news_bot.py:16:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/news/news_bot.py:17:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/news/news_bot.py:18:0: E0401: Unable to import 'project.utils.notify' (import-error)
+bots/news/news_bot.py:23:0: R0902: Too many instance attributes (17/7) (too-many-instance-attributes)
+bots/news/news_bot.py:237:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/news/news_bot.py:262:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/news/news_bot.py:266:4: R0914: Too many local variables (17/15) (too-many-locals)
+bots/news/news_bot.py:299:19: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/news/news_bot.py:580:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/news/news_bot.py:587:4: R0914: Too many local variables (19/15) (too-many-locals)
+bots/news/news_bot.py:587:4: R0912: Too many branches (17/12) (too-many-branches)
+bots/news/news_bot.py:587:4: R0915: Too many statements (52/50) (too-many-statements)
+bots/news/news_bot.py:202:8: W0201: Attribute 'news_task' defined outside __init__ (attribute-defined-outside-init)
+bots/news/news_bot.py:23:0: R0903: Too few public methods (0/2) (too-few-public-methods)
+************* Module New-test.bots.news.parsers.bitcoinmag_parser
+bots/news/parsers/bitcoinmag_parser.py:61:0: C0301: Line too long (104/100) (line-too-long)
+bots/news/parsers/bitcoinmag_parser.py:10:0: E0401: Unable to import 'feedparser' (import-error)
+bots/news/parsers/bitcoinmag_parser.py:12:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/news/parsers/bitcoinmag_parser.py:13:0: E0401: Unable to import 'project.utils.http_utils' (import-error)
+bots/news/parsers/bitcoinmag_parser.py:14:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/news/parsers/bitcoinmag_parser.py:36:4: R0914: Too many local variables (17/15) (too-many-locals)
+bots/news/parsers/bitcoinmag_parser.py:115:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/news/parsers/bitcoinmag_parser.py:83:23: W0718: Catching too general exception BaseException (broad-exception-caught)
+bots/news/parsers/bitcoinmag_parser.py:107:16: E0602: Undefined variable 'asyncio' (undefined-variable)
+bots/news/parsers/bitcoinmag_parser.py:159:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/news/parsers/bitcoinmag_parser.py:163:4: R0914: Too many local variables (19/15) (too-many-locals)
+bots/news/parsers/bitcoinmag_parser.py:235:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/news/parsers/bitcoinmag_parser.py:228:20: E0602: Undefined variable 'asyncio' (undefined-variable)
+************* Module New-test.bots.news.parsers.coindesk_parser
+bots/news/parsers/coindesk_parser.py:10:0: E0401: Unable to import 'feedparser' (import-error)
+bots/news/parsers/coindesk_parser.py:12:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/news/parsers/coindesk_parser.py:13:0: E0401: Unable to import 'project.utils.http_utils' (import-error)
+bots/news/parsers/coindesk_parser.py:14:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/news/parsers/coindesk_parser.py:36:4: R0914: Too many local variables (17/15) (too-many-locals)
+bots/news/parsers/coindesk_parser.py:115:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/news/parsers/coindesk_parser.py:83:23: W0718: Catching too general exception BaseException (broad-exception-caught)
+bots/news/parsers/coindesk_parser.py:107:16: E0602: Undefined variable 'asyncio' (undefined-variable)
+bots/news/parsers/coindesk_parser.py:159:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/news/parsers/coindesk_parser.py:163:4: R0914: Too many local variables (19/15) (too-many-locals)
+bots/news/parsers/coindesk_parser.py:237:15: W0718: Catching too general exception Exception (broad-exception-caught)
+bots/news/parsers/coindesk_parser.py:230:20: E0602: Undefined variable 'asyncio' (undefined-variable)
+************* Module New-test.bots.news.analyzers.sentiment_analyzer
+bots/news/analyzers/sentiment_analyzer.py:9:0: E0401: Unable to import 'nltk' (import-error)
+bots/news/analyzers/sentiment_analyzer.py:10:0: E0401: Unable to import 'nltk.corpus' (import-error)
+bots/news/analyzers/sentiment_analyzer.py:11:0: E0401: Unable to import 'nltk.sentiment' (import-error)
+bots/news/analyzers/sentiment_analyzer.py:12:0: E0401: Unable to import 'nltk.tokenize' (import-error)
+bots/news/analyzers/sentiment_analyzer.py:13:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/news/analyzers/sentiment_analyzer.py:14:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+************* Module New-test.bots.news.analyzers.keyword_analyzer
+bots/news/analyzers/keyword_analyzer.py:562:0: C0301: Line too long (118/100) (line-too-long)
+bots/news/analyzers/keyword_analyzer.py:9:0: E0401: Unable to import 'nltk' (import-error)
+bots/news/analyzers/keyword_analyzer.py:10:0: E0401: Unable to import 'nltk.corpus' (import-error)
+bots/news/analyzers/keyword_analyzer.py:11:0: E0401: Unable to import 'nltk.tokenize' (import-error)
+bots/news/analyzers/keyword_analyzer.py:12:0: E0401: Unable to import 'nltk.util' (import-error)
+bots/news/analyzers/keyword_analyzer.py:13:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+bots/news/analyzers/keyword_analyzer.py:14:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+bots/news/analyzers/keyword_analyzer.py:287:12: W0612: Unused variable 'category' (unused-variable)
+bots/news/analyzers/keyword_analyzer.py:413:4: R0914: Too many local variables (18/15) (too-many-locals)
+bots/news/analyzers/keyword_analyzer.py:552:8: C0415: Import outside toplevel (random) (import-outside-toplevel)
+bots/news/analyzers/keyword_analyzer.py:413:4: R0912: Too many branches (14/12) (too-many-branches)
+************* Module New-test.trading.trading_bot
+trading/trading_bot.py:1005:0: C0301: Line too long (133/100) (line-too-long)
+trading/trading_bot.py:1044:0: C0301: Line too long (131/100) (line-too-long)
+trading/trading_bot.py:1055:0: C0301: Line too long (105/100) (line-too-long)
+trading/trading_bot.py:1099:0: C0301: Line too long (188/100) (line-too-long)
+trading/trading_bot.py:1140:0: C0301: Line too long (167/100) (line-too-long)
+trading/trading_bot.py:1153:0: C0301: Line too long (108/100) (line-too-long)
+trading/trading_bot.py:1:0: C0302: Too many lines in module (1505/1000) (too-many-lines)
+trading/trading_bot.py:1414:13: W0511: TODO: Реализовать расчет просадки на основе истории изменения капитала (fixme)
+trading/trading_bot.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+trading/trading_bot.py:10:0: E0401: Unable to import 'project.data.database' (import-error)
+trading/trading_bot.py:11:0: E0401: Unable to import 'project.exchange.exchange_manager' (import-error)
+trading/trading_bot.py:12:0: E0401: Unable to import 'project.trading.strategy_base' (import-error)
+trading/trading_bot.py:13:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+trading/trading_bot.py:14:0: E0401: Unable to import 'project.utils.notify' (import-error)
+trading/trading_bot.py:29:0: R0902: Too many instance attributes (46/7) (too-many-instance-attributes)
+trading/trading_bot.py:378:19: W0718: Catching too general exception Exception (broad-exception-caught)
+trading/trading_bot.py:427:12: C0415: Import outside toplevel (pandas) (import-outside-toplevel)
+trading/trading_bot.py:480:12: C0415: Import outside toplevel (pandas) (import-outside-toplevel)
+trading/trading_bot.py:517:12: E0401: Unable to import 'project.trading.strategy_base' (import-error)
+trading/trading_bot.py:517:12: C0415: Import outside toplevel (project.trading.strategy_base.StrategyRegistry) (import-outside-toplevel)
+trading/trading_bot.py:605:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trading/trading_bot.py:545:4: R0912: Too many branches (14/12) (too-many-branches)
+trading/trading_bot.py:660:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trading/trading_bot.py:710:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trading/trading_bot.py:738:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trading/trading_bot.py:826:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trading/trading_bot.py:746:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+trading/trading_bot.py:894:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trading/trading_bot.py:1049:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trading/trading_bot.py:1147:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trading/trading_bot.py:1098:20: W1309: Using an f-string that does not have any interpolated variables (f-string-without-interpolation)
+trading/trading_bot.py:1139:20: W1309: Using an f-string that does not have any interpolated variables (f-string-without-interpolation)
+trading/trading_bot.py:1152:16: W1309: Using an f-string that does not have any interpolated variables (f-string-without-interpolation)
+trading/trading_bot.py:1201:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trading/trading_bot.py:1190:12: R1705: Unnecessary "else" after "return", remove the "else" and de-indent the code inside it (no-else-return)
+trading/trading_bot.py:1222:11: R1701: Consider merging these isinstance calls to isinstance(self.stop_loss, (float, int)) (consider-merging-isinstance)
+trading/trading_bot.py:1224:12: R1705: Unnecessary "else" after "return", remove the "else" and de-indent the code inside it (no-else-return)
+trading/trading_bot.py:1239:20: R1705: Unnecessary "else" after "return", remove the "else" and de-indent the code inside it (no-else-return)
+trading/trading_bot.py:1263:11: R1701: Consider merging these isinstance calls to isinstance(self.take_profit, (float, int)) (consider-merging-isinstance)
+trading/trading_bot.py:1265:12: R1705: Unnecessary "else" after "return", remove the "else" and de-indent the code inside it (no-else-return)
+trading/trading_bot.py:1302:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trading/trading_bot.py:1412:12: W0612: Unused variable 'equity_history' (unused-variable)
+trading/trading_bot.py:1473:19: W0718: Catching too general exception Exception (broad-exception-caught)
+************* Module New-test.trading.strategy_base
+trading/strategy_base.py:12:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+trading/strategy_base.py:17:0: R0902: Too many instance attributes (8/7) (too-many-instance-attributes)
+trading/strategy_base.py:20:4: R0913: Too many arguments (8/5) (too-many-arguments)
+trading/strategy_base.py:20:4: R0917: Too many positional arguments (8/5) (too-many-positional-arguments)
+trading/strategy_base.py:123:0: R0902: Too many instance attributes (15/7) (too-many-instance-attributes)
+trading/strategy_base.py:126:4: R0913: Too many arguments (11/5) (too-many-arguments)
+trading/strategy_base.py:126:4: R0917: Too many positional arguments (11/5) (too-many-positional-arguments)
+trading/strategy_base.py:303:0: R0902: Too many instance attributes (11/7) (too-many-instance-attributes)
+trading/strategy_base.py:450:15: W0718: Catching too general exception Exception (broad-exception-caught)
+trading/strategy_base.py:443:26: E1102: self.on_signal is not callable (not-callable)
+trading/strategy_base.py:454:28: W0613: Unused argument 'tick' (unused-argument)
+trading/strategy_base.py:467:29: W0613: Unused argument 'trade' (unused-argument)
+trading/strategy_base.py:480:34: W0613: Unused argument 'order_book' (unused-argument)
+trading/strategy_base.py:505:18: E1102: self.on_position_opened is not callable (not-callable)
+trading/strategy_base.py:507:18: E1102: self.on_position_closed is not callable (not-callable)
+************* Module New-test.visualization.data_visualizer
+visualization/data_visualizer.py:1633:0: C0301: Line too long (107/100) (line-too-long)
+visualization/data_visualizer.py:1:0: C0302: Too many lines in module (2026/1000) (too-many-lines)
+visualization/data_visualizer.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+visualization/data_visualizer.py:17:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+visualization/data_visualizer.py:64:4: R0913: Too many arguments (6/5) (too-many-arguments)
+visualization/data_visualizer.py:64:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+visualization/data_visualizer.py:64:4: R0914: Too many local variables (25/15) (too-many-locals)
+visualization/data_visualizer.py:253:15: W0718: Catching too general exception Exception (broad-exception-caught)
+visualization/data_visualizer.py:180:23: R1701: Consider merging these isinstance calls to isinstance(indicator_data, (pd.DataFrame, pd.Series)) (consider-merging-isinstance)
+visualization/data_visualizer.py:85:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+visualization/data_visualizer.py:85:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+visualization/data_visualizer.py:64:4: R0912: Too many branches (17/12) (too-many-branches)
+visualization/data_visualizer.py:64:4: R0915: Too many statements (56/50) (too-many-statements)
+visualization/data_visualizer.py:257:4: R0913: Too many arguments (6/5) (too-many-arguments)
+visualization/data_visualizer.py:257:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+visualization/data_visualizer.py:257:4: R0914: Too many local variables (19/15) (too-many-locals)
+visualization/data_visualizer.py:426:15: W0718: Catching too general exception Exception (broad-exception-caught)
+visualization/data_visualizer.py:333:23: R1701: Consider merging these isinstance calls to isinstance(indicator_data, (pd.DataFrame, pd.Series)) (consider-merging-isinstance)
+visualization/data_visualizer.py:278:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+visualization/data_visualizer.py:406:23: R1735: Consider using '{"orientation": 'h', "yanchor": 'bottom', "y": 1.02, "xanchor": 'right', ... }' instead of a call to 'dict'. (use-dict-literal)
+visualization/data_visualizer.py:278:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+visualization/data_visualizer.py:257:4: R0912: Too many branches (17/12) (too-many-branches)
+visualization/data_visualizer.py:527:15: W0718: Catching too general exception Exception (broad-exception-caught)
+visualization/data_visualizer.py:655:15: W0718: Catching too general exception Exception (broad-exception-caught)
+visualization/data_visualizer.py:631:23: R1735: Consider using '{"orientation": 'h', "yanchor": 'bottom', "y": 1.02, "xanchor": 'right', ... }' instead of a call to 'dict'. (use-dict-literal)
+visualization/data_visualizer.py:659:4: R0914: Too many local variables (16/15) (too-many-locals)
+visualization/data_visualizer.py:738:15: W0718: Catching too general exception Exception (broad-exception-caught)
+visualization/data_visualizer.py:742:4: R0914: Too many local variables (16/15) (too-many-locals)
+visualization/data_visualizer.py:837:15: W0718: Catching too general exception Exception (broad-exception-caught)
+visualization/data_visualizer.py:804:31: R1735: Consider using '{"symbol": 'triangle-up', "size": 12, "color": 'green', "opacity": 0.7, ... }' instead of a call to 'dict'. (use-dict-literal)
+visualization/data_visualizer.py:820:31: R1735: Consider using '{"symbol": 'triangle-down', "size": 12, "color": 'red', "opacity": 0.7, ... }' instead of a call to 'dict'. (use-dict-literal)
+visualization/data_visualizer.py:940:15: W0718: Catching too general exception Exception (broad-exception-caught)
+visualization/data_visualizer.py:903:27: R1735: Consider using '{"facecolor": 'black', "shrink": 0.05, "width": 1.5}' instead of a call to 'dict'. (use-dict-literal)
+visualization/data_visualizer.py:944:4: R0914: Too many local variables (16/15) (too-many-locals)
+visualization/data_visualizer.py:1043:15: W0718: Catching too general exception Exception (broad-exception-caught)
+visualization/data_visualizer.py:1047:4: R0914: Too many local variables (16/15) (too-many-locals)
+visualization/data_visualizer.py:1168:15: W0718: Catching too general exception Exception (broad-exception-caught)
+visualization/data_visualizer.py:1124:25: R1735: Consider using '{"boxstyle": 'round', "alpha": 0.1}' instead of a call to 'dict'. (use-dict-literal)
+visualization/data_visualizer.py:1137:25: R1735: Consider using '{"boxstyle": 'round', "alpha": 0.1}' instead of a call to 'dict'. (use-dict-literal)
+visualization/data_visualizer.py:1172:4: R0914: Too many local variables (17/15) (too-many-locals)
+visualization/data_visualizer.py:1304:15: W0718: Catching too general exception Exception (broad-exception-caught)
+visualization/data_visualizer.py:1279:21: R1735: Consider using '{"boxstyle": 'round', "alpha": 0.1}' instead of a call to 'dict'. (use-dict-literal)
+visualization/data_visualizer.py:1308:4: R0914: Too many local variables (17/15) (too-many-locals)
+visualization/data_visualizer.py:1400:15: W0718: Catching too general exception Exception (broad-exception-caught)
+visualization/data_visualizer.py:1369:20: W0612: Unused variable 'text' (unused-variable)
+visualization/data_visualizer.py:1404:4: R0913: Too many arguments (6/5) (too-many-arguments)
+visualization/data_visualizer.py:1404:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+visualization/data_visualizer.py:1404:4: R0914: Too many local variables (19/15) (too-many-locals)
+visualization/data_visualizer.py:1523:15: W0718: Catching too general exception Exception (broad-exception-caught)
+visualization/data_visualizer.py:1486:24: W0612: Unused variable 'text' (unused-variable)
+visualization/data_visualizer.py:1527:4: R0913: Too many arguments (6/5) (too-many-arguments)
+visualization/data_visualizer.py:1527:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+visualization/data_visualizer.py:1527:4: R0914: Too many local variables (28/15) (too-many-locals)
+visualization/data_visualizer.py:1700:15: W0718: Catching too general exception Exception (broad-exception-caught)
+visualization/data_visualizer.py:1589:16: C0103: Variable name "X" doesn't conform to snake_case naming style (invalid-name)
+visualization/data_visualizer.py:1589:19: C0103: Variable name "Y" doesn't conform to snake_case naming style (invalid-name)
+visualization/data_visualizer.py:1592:16: C0103: Variable name "Z" doesn't conform to snake_case naming style (invalid-name)
+visualization/data_visualizer.py:1616:16: W0632: Possible unbalanced tuple unpacking with sequence defined at line 2 of : left side has 2 labels, right side has 1 value (unbalanced-tuple-unpacking)
+visualization/data_visualizer.py:1704:4: R0914: Too many local variables (21/15) (too-many-locals)
+visualization/data_visualizer.py:1827:15: W0718: Catching too general exception Exception (broad-exception-caught)
+visualization/data_visualizer.py:1759:73: W0640: Cell variable timestamp defined in loop (cell-var-from-loop)
+visualization/data_visualizer.py:1704:4: R0912: Too many branches (16/12) (too-many-branches)
+visualization/data_visualizer.py:1831:4: R0914: Too many local variables (22/15) (too-many-locals)
+visualization/data_visualizer.py:1972:15: W0718: Catching too general exception Exception (broad-exception-caught)
+visualization/data_visualizer.py:1831:4: R0912: Too many branches (15/12) (too-many-branches)
+visualization/data_visualizer.py:2001:15: W0718: Catching too general exception Exception (broad-exception-caught)
+visualization/data_visualizer.py:3:0: W0611: Unused import json (unused-import)
+visualization/data_visualizer.py:4:0: W0611: Unused import logging (unused-import)
+visualization/data_visualizer.py:6:0: W0611: Unused datetime imported from datetime (unused-import)
+visualization/data_visualizer.py:6:0: W0611: Unused timedelta imported from datetime (unused-import)
+visualization/data_visualizer.py:7:0: W0611: Unused Callable imported from typing (unused-import)
+visualization/data_visualizer.py:13:0: W0611: Unused plotly.express imported as px (unused-import)
+************* Module New-test.data.database
+data/database.py:349:0: C0301: Line too long (103/100) (line-too-long)
+data/database.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+data/database.py:8:0: E0401: Unable to import 'aiosqlite' (import-error)
+data/database.py:10:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+data/database.py:387:15: W0718: Catching too general exception Exception (broad-exception-caught)
+data/database.py:5:0: W0611: Unused datetime imported from datetime (unused-import)
+data/database.py:5:0: W0611: Unused timedelta imported from datetime (unused-import)
+data/database.py:6:0: W0611: Unused List imported from typing (unused-import)
+data/database.py:6:0: W0611: Unused Optional imported from typing (unused-import)
+data/database.py:9:0: W0611: Unused pandas imported as pd (unused-import)
+************* Module New-test.data.symbol_manager
+data/symbol_manager.py:167:0: C0301: Line too long (105/100) (line-too-long)
+data/symbol_manager.py:213:0: C0301: Line too long (102/100) (line-too-long)
+data/symbol_manager.py:8:0: E0401: Unable to import 'project.config' (import-error)
+data/symbol_manager.py:9:0: E0401: Unable to import 'project.utils.cache_utils' (import-error)
+data/symbol_manager.py:10:0: E0401: Unable to import 'project.utils.ccxt_exchanges' (import-error)
+data/symbol_manager.py:11:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+data/symbol_manager.py:12:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+data/symbol_manager.py:172:8: E0401: Unable to import 'project.data.market_data' (import-error)
+data/symbol_manager.py:172:8: C0415: Import outside toplevel (project.data.market_data.MarketData) (import-outside-toplevel)
+data/symbol_manager.py:206:19: W0718: Catching too general exception Exception (broad-exception-caught)
+data/symbol_manager.py:237:8: R1705: Unnecessary "else" after "return", remove the "else" and de-indent the code inside it (no-else-return)
+************* Module New-test.data.market_data
+data/market_data.py:11:0: E0401: Unable to import 'project.utils.cache_utils' (import-error)
+data/market_data.py:12:0: E0401: Unable to import 'project.utils.ccxt_exchanges' (import-error)
+data/market_data.py:17:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+data/market_data.py:22:0: R0902: Too many instance attributes (10/7) (too-many-instance-attributes)
+data/market_data.py:117:4: R0913: Too many arguments (6/5) (too-many-arguments)
+data/market_data.py:117:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+data/market_data.py:239:4: R0913: Too many arguments (9/5) (too-many-arguments)
+data/market_data.py:239:4: R0917: Too many positional arguments (9/5) (too-many-positional-arguments)
+data/market_data.py:329:27: W0718: Catching too general exception Exception (broad-exception-caught)
+data/market_data.py:357:27: W0718: Catching too general exception Exception (broad-exception-caught)
+data/market_data.py:383:27: W0718: Catching too general exception Exception (broad-exception-caught)
+data/market_data.py:413:4: R0914: Too many local variables (16/15) (too-many-locals)
+data/market_data.py:496:15: W0718: Catching too general exception Exception (broad-exception-caught)
+************* Module New-test.main.main
+main/main.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+main/main.py:7:0: E0401: Unable to import 'project.optimizers.genetic_optimizer' (import-error)
+main/main.py:8:0: E0401: Unable to import 'project.visualizers.data_visualizer' (import-error)
+main/main.py:10:0: E0401: Unable to import 'config' (import-error)
+main/main.py:15:0: C0116: Missing function or method docstring (missing-function-docstring)
+main/main.py:38:4: E0401: Unable to import 'project.trading.strategy_base' (import-error)
+main/main.py:38:4: C0415: Import outside toplevel (project.trading.strategy_base.Strategy) (import-outside-toplevel)
+main/main.py:59:4: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+main/main.py:62:0: C0116: Missing function or method docstring (missing-function-docstring)
+main/main.py:96:11: W0718: Catching too general exception Exception (broad-exception-caught)
+main/main.py:97:8: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+************* Module New-test.main.application
+main/application.py:97:9: W0511: TODO: Загружать стратегии из конфигурации или БД (fixme)
+main/application.py:9:0: E0401: Unable to import 'project.bots.strategies.strategy_manager' (import-error)
+main/application.py:10:0: E0401: Unable to import 'project.config' (import-error)
+main/application.py:11:0: E0401: Unable to import 'project.infrastructure.database' (import-error)
+main/application.py:12:0: E0401: Unable to import 'project.infrastructure.message_broker' (import-error)
+main/application.py:13:0: E0401: Unable to import 'project.integrations.telegram_integration' (import-error)
+main/application.py:14:0: E0401: Unable to import 'project.main.eventloop' (import-error)
+main/application.py:15:0: E0401: Unable to import 'project.utils.error_handler' (import-error)
+main/application.py:16:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+main/application.py:85:15: W0718: Catching too general exception Exception (broad-exception-caught)
+main/application.py:138:19: W0718: Catching too general exception Exception (broad-exception-caught)
+main/application.py:146:19: W0718: Catching too general exception Exception (broad-exception-caught)
+main/application.py:154:19: W0718: Catching too general exception Exception (broad-exception-caught)
+main/application.py:165:19: W0718: Catching too general exception Exception (broad-exception-caught)
+main/application.py:192:11: W0718: Catching too general exception Exception (broad-exception-caught)
+************* Module New-test.main.eventloop
+main/eventloop.py:13:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+main/eventloop.py:50:8: C0415: Import outside toplevel (resource) (import-outside-toplevel)
+main/eventloop.py:53:8: W0612: Unused variable 'soft' (unused-variable)
+main/eventloop.py:60:22: W0613: Unused argument 'loop' (unused-argument)
+main/eventloop.py:157:15: W0718: Catching too general exception Exception (broad-exception-caught)
+************* Module New-test.utils.websocket_client
+utils/websocket_client.py:1:0: C0302: Too many lines in module (1342/1000) (too-many-lines)
+utils/websocket_client.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+utils/websocket_client.py:16:0: E0401: Unable to import 'websockets' (import-error)
+utils/websocket_client.py:19:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+utils/websocket_client.py:24:0: R0902: Too many instance attributes (31/7) (too-many-instance-attributes)
+utils/websocket_client.py:27:4: R0913: Too many arguments (14/5) (too-many-arguments)
+utils/websocket_client.py:27:4: R0917: Too many positional arguments (14/5) (too-many-positional-arguments)
+utils/websocket_client.py:183:15: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/websocket_client.py:104:4: R0912: Too many branches (16/12) (too-many-branches)
+utils/websocket_client.py:221:15: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/websocket_client.py:312:15: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/websocket_client.py:283:23: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/websocket_client.py:264:4: R0912: Too many branches (16/12) (too-many-branches)
+utils/websocket_client.py:403:19: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/websocket_client.py:425:19: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/websocket_client.py:437:19: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/websocket_client.py:470:12: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+utils/websocket_client.py:490:23: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/websocket_client.py:458:4: R0911: Too many return statements (9/6) (too-many-return-statements)
+utils/websocket_client.py:683:12: W0612: Unused variable 'conn_id' (unused-variable)
+utils/websocket_client.py:717:19: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/websocket_client.py:923:0: R0902: Too many instance attributes (10/7) (too-many-instance-attributes)
+utils/websocket_client.py:1078:15: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/websocket_client.py:1157:19: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/websocket_client.py:1141:31: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/websocket_client.py:1101:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+utils/websocket_client.py:1187:19: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/websocket_client.py:1216:0: C0103: Constant name "_ws_pool" doesn't conform to UPPER_CASE naming style (invalid-name)
+utils/websocket_client.py:1217:0: C0103: Constant name "_message_processor" doesn't conform to UPPER_CASE naming style (invalid-name)
+utils/websocket_client.py:1227:4: W0603: Using the global statement (global-statement)
+utils/websocket_client.py:1242:4: W0603: Using the global statement (global-statement)
+utils/websocket_client.py:1266:4: W0603: Using the global statement (global-statement)
+utils/websocket_client.py:1272:4: W0603: Using the global statement (global-statement)
+utils/websocket_client.py:1315:51: W0613: Unused argument 'url' (unused-argument)
+utils/websocket_client.py:1337:4: W0612: Unused variable 'signature' (unused-variable)
+************* Module New-test.utils.logging_utils
+utils/logging_utils.py:13:0: C0103: Constant name "_logging_initialized" doesn't conform to UPPER_CASE naming style (invalid-name)
+utils/logging_utils.py:38:4: W0603: Using the global statement (global-statement)
+utils/logging_utils.py:59:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/logging_utils.py:45:8: E0401: Unable to import 'project.config' (import-error)
+utils/logging_utils.py:45:8: C0415: Import outside toplevel (project.config.get_config) (import-outside-toplevel)
+utils/logging_utils.py:132:8: C0415: Import outside toplevel (inspect) (import-outside-toplevel)
+utils/logging_utils.py:140:8: W0127: Assigning the same variable 'name' to itself (self-assigning-variable)
+utils/logging_utils.py:167:4: C0415: Import outside toplevel (inspect) (import-outside-toplevel)
+utils/logging_utils.py:9:0: W0611: Unused datetime imported from datetime (unused-import)
+utils/logging_utils.py:10:0: W0611: Unused Dict imported from typing (unused-import)
+utils/logging_utils.py:10:0: W0611: Unused Any imported from typing (unused-import)
+************* Module New-test.utils.gpu_utils
+utils/gpu_utils.py:342:0: C0301: Line too long (106/100) (line-too-long)
+utils/gpu_utils.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+utils/gpu_utils.py:6:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+utils/gpu_utils.py:42:4: C0115: Missing class docstring (missing-class-docstring)
+utils/gpu_utils.py:42:4: R0903: Too few public methods (1/2) (too-few-public-methods)
+utils/gpu_utils.py:48:4: C0115: Missing class docstring (missing-class-docstring)
+utils/gpu_utils.py:48:4: R0903: Too few public methods (1/2) (too-few-public-methods)
+utils/gpu_utils.py:55:4: C0103: Class name "cudf" doesn't conform to PascalCase naming style (invalid-name)
+utils/gpu_utils.py:70:8: W0621: Redefining name 'devices' from outer scope (line 21) (redefined-outer-name)
+utils/gpu_utils.py:71:12: W0621: Redefining name 'i' from outer scope (line 22) (redefined-outer-name)
+utils/gpu_utils.py:72:12: W0621: Redefining name 'device' from outer scope (line 23) (redefined-outer-name)
+utils/gpu_utils.py:93:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/gpu_utils.py:122:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/gpu_utils.py:155:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/gpu_utils.py:144:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+utils/gpu_utils.py:187:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/gpu_utils.py:176:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+utils/gpu_utils.py:192:0: R0914: Too many local variables (18/15) (too-many-locals)
+utils/gpu_utils.py:224:12: W0621: Redefining name 'i' from outer scope (line 22) (redefined-outer-name)
+utils/gpu_utils.py:265:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/gpu_utils.py:224:12: W0612: Unused variable 'i' (unused-variable)
+utils/gpu_utils.py:229:12: W0612: Unused variable 'u' (unused-variable)
+utils/gpu_utils.py:229:15: W0612: Unused variable 's' (unused-variable)
+utils/gpu_utils.py:229:18: W0612: Unused variable 'v' (unused-variable)
+utils/gpu_utils.py:280:4: W0621: Redefining name 'i' from outer scope (line 22) (redefined-outer-name)
+utils/gpu_utils.py:329:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/gpu_utils.py:344:4: W0621: Redefining name 'i' from outer scope (line 22) (redefined-outer-name)
+utils/gpu_utils.py:346:7: R1716: Simplify chained comparison between the operands (chained-comparison)
+utils/gpu_utils.py:371:12: W0621: Redefining name 'i' from outer scope (line 22) (redefined-outer-name)
+utils/gpu_utils.py:397:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/gpu_utils.py:418:4: W0621: Redefining name 'i' from outer scope (line 22) (redefined-outer-name)
+utils/gpu_utils.py:420:7: R1716: Simplify chained comparison between the operands (chained-comparison)
+utils/gpu_utils.py:464:12: W0621: Redefining name 'i' from outer scope (line 22) (redefined-outer-name)
+utils/gpu_utils.py:496:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/gpu_utils.py:553:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/gpu_utils.py:569:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/gpu_utils.py:596:8: W0621: Redefining name 'cp' from outer scope (line 13) (redefined-outer-name)
+utils/gpu_utils.py:601:12: W0621: Redefining name 'cuda' from outer scope (line 14) (redefined-outer-name)
+utils/gpu_utils.py:596:8: C0415: Import outside toplevel (cupy) (import-outside-toplevel)
+utils/gpu_utils.py:601:12: R0402: Use 'from numba import cuda' instead (consider-using-from-import)
+utils/gpu_utils.py:601:12: C0415: Import outside toplevel (numba.cuda) (import-outside-toplevel)
+************* Module New-test.utils.error_handler
+utils/error_handler.py:102:21: W0511: TODO: Добавить отправку в телеграм (fixme)
+utils/error_handler.py:106:21: W0511: TODO: Добавить отправку на email (fixme)
+utils/error_handler.py:154:21: W0511: TODO: Добавить отправку в телеграм (fixme)
+utils/error_handler.py:158:21: W0511: TODO: Добавить отправку на email (fixme)
+utils/error_handler.py:320:5: W0511: TODO: Отправка уведомления через нужный канал (fixme)
+utils/error_handler.py:12:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+utils/error_handler.py:33:15: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/error_handler.py:60:15: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/error_handler.py:141:16: C0415: Import outside toplevel (time) (import-outside-toplevel)
+utils/error_handler.py:219:24: W0707: Consider explicitly re-raising using 'raise last_exception from e' (raise-missing-from)
+utils/error_handler.py:8:0: W0611: Unused import inspect (unused-import)
+utils/error_handler.py:9:0: W0611: Unused import sys (unused-import)
+utils/error_handler.py:10:0: W0611: Unused Any imported from typing (unused-import)
+utils/error_handler.py:10:0: W0611: Unused Callable imported from typing (unused-import)
+utils/error_handler.py:10:0: W0611: Unused Dict imported from typing (unused-import)
+utils/error_handler.py:10:0: W0611: Unused Optional imported from typing (unused-import)
+************* Module New-test.utils.notify
+utils/notify.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+utils/notify.py:13:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+utils/notify.py:18:0: R0902: Too many instance attributes (35/7) (too-many-instance-attributes)
+utils/notify.py:106:19: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/notify.py:18:0: R0903: Too few public methods (1/2) (too-few-public-methods)
+utils/notify.py:110:0: R0902: Too many instance attributes (8/7) (too-many-instance-attributes)
+utils/notify.py:187:19: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/notify.py:327:19: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/notify.py:353:0: C0103: Constant name "_notification_service" doesn't conform to UPPER_CASE naming style (invalid-name)
+utils/notify.py:363:4: W0603: Using the global statement (global-statement)
+utils/notify.py:370:4: W0603: Using the global statement (global-statement)
+utils/notify.py:378:4: W0602: Using global for '_notification_service' but no assignment is done (global-variable-not-assigned)
+utils/notify.py:4:0: W0611: Unused import smtplib (unused-import)
+utils/notify.py:7:0: W0611: Unused MIMEMultipart imported from email.mime.multipart (unused-import)
+utils/notify.py:8:0: W0611: Unused MIMEText imported from email.mime.text (unused-import)
+utils/notify.py:10:0: W0611: Unused Any imported from typing (unused-import)
+utils/notify.py:10:0: W0611: Unused List imported from typing (unused-import)
+utils/notify.py:10:0: W0611: Unused Union imported from typing (unused-import)
+************* Module New-test.utils.http_utils
+utils/http_utils.py:521:0: C0301: Line too long (113/100) (line-too-long)
+utils/http_utils.py:527:0: C0301: Line too long (101/100) (line-too-long)
+utils/http_utils.py:533:0: C0301: Line too long (104/100) (line-too-long)
+utils/http_utils.py:625:0: C0301: Line too long (113/100) (line-too-long)
+utils/http_utils.py:631:0: C0301: Line too long (101/100) (line-too-long)
+utils/http_utils.py:637:0: C0301: Line too long (104/100) (line-too-long)
+utils/http_utils.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+utils/http_utils.py:10:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+utils/http_utils.py:106:19: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/http_utils.py:104:21: W1514: Using open without explicitly specifying an encoding (unspecified-encoding)
+utils/http_utils.py:116:15: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/http_utils.py:114:17: W1514: Using open without explicitly specifying an encoding (unspecified-encoding)
+utils/http_utils.py:250:15: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/http_utils.py:247:21: W1514: Using open without explicitly specifying an encoding (unspecified-encoding)
+utils/http_utils.py:255:4: R0913: Too many arguments (6/5) (too-many-arguments)
+utils/http_utils.py:255:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+utils/http_utils.py:305:15: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/http_utils.py:297:17: W1514: Using open without explicitly specifying an encoding (unspecified-encoding)
+utils/http_utils.py:308:4: R0912: Too many branches (14/12) (too-many-branches)
+utils/http_utils.py:360:0: R0902: Too many instance attributes (8/7) (too-many-instance-attributes)
+utils/http_utils.py:363:4: R0913: Too many arguments (11/5) (too-many-arguments)
+utils/http_utils.py:363:4: R0917: Too many positional arguments (11/5) (too-many-positional-arguments)
+utils/http_utils.py:435:4: R0913: Too many arguments (7/5) (too-many-arguments)
+utils/http_utils.py:435:4: R0917: Too many positional arguments (7/5) (too-many-positional-arguments)
+utils/http_utils.py:530:19: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/http_utils.py:545:8: R1720: Unnecessary "else" after "raise", remove the "else" and de-indent the code inside it (no-else-raise)
+utils/http_utils.py:548:12: W0719: Raising too general exception: Exception (broad-exception-raised)
+utils/http_utils.py:435:4: R0912: Too many branches (14/12) (too-many-branches)
+utils/http_utils.py:552:4: R0913: Too many arguments (6/5) (too-many-arguments)
+utils/http_utils.py:552:4: R0917: Too many positional arguments (6/5) (too-many-positional-arguments)
+utils/http_utils.py:634:19: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/http_utils.py:649:8: R1720: Unnecessary "else" after "raise", remove the "else" and de-indent the code inside it (no-else-raise)
+utils/http_utils.py:652:12: W0719: Raising too general exception: Exception (broad-exception-raised)
+utils/http_utils.py:658:0: C0103: Constant name "_http_client" doesn't conform to UPPER_CASE naming style (invalid-name)
+utils/http_utils.py:661:0: R0913: Too many arguments (10/5) (too-many-arguments)
+utils/http_utils.py:661:0: R0917: Too many positional arguments (10/5) (too-many-positional-arguments)
+utils/http_utils.py:691:4: W0603: Using the global statement (global-statement)
+utils/http_utils.py:716:4: W0603: Using the global statement (global-statement)
+utils/http_utils.py:727:0: R0913: Too many arguments (9/5) (too-many-arguments)
+utils/http_utils.py:727:0: R0917: Too many positional arguments (9/5) (too-many-positional-arguments)
+utils/http_utils.py:761:4: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+************* Module New-test.utils.fix_f_strings
+utils/fix_f_strings.py:16:0: C0116: Missing function or method docstring (missing-function-docstring)
+utils/fix_f_strings.py:16:18: W0621: Redefining name 'file_path' from outer scope (line 44) (redefined-outer-name)
+utils/fix_f_strings.py:38:0: C0103: Constant name "fixed_count" doesn't conform to UPPER_CASE naming style (invalid-name)
+utils/fix_f_strings.py:7:0: W0611: Unused import os (unused-import)
+utils/fix_f_strings.py:9:0: W0611: Unused Path imported from pathlib (unused-import)
+************* Module New-test.utils.constants
+utils/constants.py:20:0: C0116: Missing function or method docstring (missing-function-docstring)
+utils/constants.py:22:8: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+************* Module New-test.utils.cache_utils
+utils/cache_utils.py:12:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+utils/cache_utils.py:59:15: R1716: Simplify chained comparison between the operands (chained-comparison)
+utils/cache_utils.py:112:15: R1716: Simplify chained comparison between the operands (chained-comparison)
+utils/cache_utils.py:139:4: W0602: Using global for '_cache' but no assignment is done (global-variable-not-assigned)
+utils/cache_utils.py:148:11: R1716: Simplify chained comparison between the operands (chained-comparison)
+utils/cache_utils.py:167:4: W0602: Using global for '_cache' but no assignment is done (global-variable-not-assigned)
+utils/cache_utils.py:190:4: W0603: Using the global statement (global-statement)
+utils/cache_utils.py:237:4: W0602: Using global for '_cache' but no assignment is done (global-variable-not-assigned)
+utils/cache_utils.py:305:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/cache_utils.py:320:4: W0603: Using the global statement (global-statement)
+utils/cache_utils.py:351:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/cache_utils.py:363:4: W0602: Using global for '_cache' but no assignment is done (global-variable-not-assigned)
+utils/cache_utils.py:369:11: R1716: Simplify chained comparison between the operands (chained-comparison)
+utils/cache_utils.py:9:0: W0611: Unused Optional imported from typing (unused-import)
+utils/cache_utils.py:9:0: W0611: Unused Callable imported from typing (unused-import)
+utils/cache_utils.py:9:0: W0611: Unused Union imported from typing (unused-import)
+utils/cache_utils.py:9:0: W0611: Unused Set imported from typing (unused-import)
+utils/cache_utils.py:9:0: W0611: Unused List imported from typing (unused-import)
+************* Module New-test.utils.ccxt_exchanges
+utils/ccxt_exchanges.py:12:0: E0401: Unable to import 'ccxt.async_support' (import-error)
+utils/ccxt_exchanges.py:15:0: E0401: Unable to import 'project.config' (import-error)
+utils/ccxt_exchanges.py:16:0: E0401: Unable to import 'project.utils.logging_utils' (import-error)
+utils/ccxt_exchanges.py:103:4: W0602: Using global for '_exchange_instances' but no assignment is done (global-variable-not-assigned)
+utils/ccxt_exchanges.py:112:15: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/ccxt_exchanges.py:131:4: W0602: Using global for '_exchange_instances' but no assignment is done (global-variable-not-assigned)
+utils/ccxt_exchanges.py:140:15: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/ccxt_exchanges.py:152:4: W0603: Using the global statement (global-statement)
+utils/ccxt_exchanges.py:192:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/ccxt_exchanges.py:229:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/ccxt_exchanges.py:277:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/ccxt_exchanges.py:309:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/ccxt_exchanges.py:314:0: R0913: Too many arguments (7/5) (too-many-arguments)
+utils/ccxt_exchanges.py:314:0: R0917: Too many positional arguments (7/5) (too-many-positional-arguments)
+utils/ccxt_exchanges.py:361:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/ccxt_exchanges.py:396:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/ccxt_exchanges.py:437:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/ccxt_exchanges.py:479:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/ccxt_exchanges.py:518:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/ccxt_exchanges.py:563:11: W0718: Catching too general exception Exception (broad-exception-caught)
+utils/ccxt_exchanges.py:7:0: W0611: Unused import asyncio (unused-import)
+utils/ccxt_exchanges.py:8:0: W0611: Unused import time (unused-import)
+utils/ccxt_exchanges.py:9:0: W0611: Unused Any imported from typing (unused-import)
+************* Module New-test.utils.__init__
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.news.parsers.bitcoinmag_parser:[61:86]
+==New-test.bots.news.parsers.coindesk_parser:[61:86]
+                        )
+                        return []
+
+                    rss_content = await response.text()
+
+            # Парсим RSS
+            feed = feedparser.parse(rss_content)
+
+            # Обрабатываем каждую запись
+            for entry in feed.entries[:limit]:
+                # Извлекаем данные из записи
+                title = entry.get("title", "")
+                link = entry.get("link", "")
+                published = entry.get("published", "")
+                summary = entry.get("summary", "")
+
+                # Преобразуем дату публикации
+                try:
+                    published_at = datetime.strptime(
+                        published, "%a, %d %b %Y %H:%M:%S %z"
+                    )
+                except BaseException:
+                    published_at = datetime.now()
+
+                # Определяем автора (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.news.parsers.bitcoinmag_parser:[116:146]
+==New-test.bots.news.parsers.coindesk_parser:[116:146]
+            return []
+
+    @async_handle_error
+    async def _fetch_article_content(self, url: str) -> None:
+        """
+        Получает полное содержимое статьи по URL.
+
+        Args:
+            url: URL статьи
+        """
+        if not url or url not in self.articles_cache:
+            return
+
+        try:
+            # Получаем HTML-страницу
+            async with aiohttp_session() as session:
+                async with session.get(url) as response:
+                    if response.status != 200:
+                        logger.warning(
+                            f"Не удалось получить содержимое статьи {url}. Статус: {
+                                response.status}"
+                        )
+                        return
+
+                    html_content = await response.text()
+
+            # Парсим HTML
+            soup = BeautifulSoup(html_content, "html.parser")
+
+            # Ищем содержимое статьи (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.main_strategy:[179:194]
+==New-test.bots.strategies.mean_revision:[165:180]
+        for symbol in self.symbols:
+            for timeframe in self.timeframes:
+                try:
+                    # Загружаем данные OHLCV
+                    ohlcv = await self.market_data.get_ohlcv(
+                        self.exchange_id, symbol, timeframe, limit=100
+                    )
+
+                    if ohlcv.empty:
+                        logger.warning(
+                            f"Нет данных OHLCV для {symbol} на таймфрейме {timeframe}"
+                        )
+                        continue
+
+                    # Сохраняем недавние максимумы и минимумы (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.main_strategy:[352:368]
+==New-test.bots.strategies.scalping:[168:184]
+        signals = {}
+
+        for symbol in self.symbols:
+            try:
+                # Получаем тикер
+                ticker = await self.market_data.get_ticker(self.exchange_id, symbol)
+                if not ticker:
+                    continue
+
+                # Проверяем объем
+                volume = ticker.get("quoteVolume", 0) or ticker.get("volume", 0)
+                if volume < self.strategy_config["min_volume"]:
+                    continue
+
+                # Получаем текущую цену, спред и проверяем его размер
+                current_price = ticker.get("last", 0) (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.news.parsers.bitcoinmag_parser:[148:175]
+==New-test.bots.news.parsers.coindesk_parser:[148:175]
+            if article_body:
+                # Извлекаем текст из всех параграфов
+                paragraphs = article_body[0].find_all("p")
+                content = " ".join([p.get_text().strip() for p in paragraphs])
+
+                # Обновляем кэшированную статью
+                if url in self.articles_cache:
+                    self.articles_cache[url]["content"] = content
+                    logger.debug(f"Обновлено содержимое статьи: {url}")
+
+        except Exception as e:
+            logger.error(f"Ошибка при получении содержимого статьи {url}: {str(e)}")
+
+    @async_handle_error
+    async def search_news(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
+        """
+        Ищет новости по запросу.
+
+        Args:
+            query: Поисковый запрос
+            limit: Максимальное количество результатов
+
+        Returns:
+            Список словарей с данными статей
+        """
+        try:
+            # Формируем URL для поиска (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.news.parsers.bitcoinmag_parser:[45:60]
+==New-test.bots.news.parsers.coindesk_parser:[45:60]
+        current_time = time.time()
+
+        # Проверяем, не слишком ли часто делаем запросы (не чаще раза в 5 минут)
+        if current_time - self.last_fetch_time < 300:
+            # Возвращаем кэшированные статьи
+            return list(self.articles_cache.values())[:limit]
+
+        try:
+            articles = []
+
+            # Получаем RSS-ленту
+            async with aiohttp_session() as session:
+                async with session.get(self.rss_url) as response:
+                    if response.status != 200:
+                        logger.warning( (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.main_strategy:[632:645]
+==New-test.bots.strategies.scalping:[491:504]
+            if symbol in self.open_positions:
+                position = self.open_positions[symbol]
+                position_side = position["side"]
+
+                # Если сигнал противоположен стороне позиции, закрываем позицию
+                if (position_side == "long" and action == "sell") or (
+                    position_side == "short" and action == "buy"
+                ):
+                    action = "exit"
+                # Если сигнал совпадает со стороной позиции или "hold", продолжаем держать
+                else:
+                    action = "hold"
+            # Если позиции нет, и сигнал "hold", не делаем ничего (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.main_strategy:[210:220]
+==New-test.bots.strategies.scalping:[257:268]
+            ema_short = Indicators.exponential_moving_average(
+                ohlcv, self.strategy_config["ema_short_period"]
+            )
+            ema_medium = Indicators.exponential_moving_average(
+                ohlcv, self.strategy_config["ema_medium_period"]
+            )
+            ema_long = Indicators.exponential_moving_average(
+                ohlcv, self.strategy_config["ema_long_period"]
+            )
+
+            # Рассчитываем RSI (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.futures:[389:402]
+==New-test.bots.strategies.mean_revision:[368:381]
+        for symbol in self.symbols:
+            try:
+                # Получаем тикер
+                ticker = await self.market_data.get_ticker(self.exchange_id, symbol)
+                if not ticker:
+                    continue
+
+                # Получаем текущую цену
+                current_price = ticker.get("last", 0)
+                if current_price <= 0:
+                    continue
+
+                # Проверяем объем (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.main_strategy:[183:194]
+==New-test.bots.strategies.volatility_strategy:[186:197]
+                ohlcv = await self.market_data.get_ohlcv(
+                    self.exchange_id, symbol, timeframe, limit=100
+                )
+
+                if ohlcv.empty:
+                    logger.warning(
+                        f"Нет данных OHLCV для {symbol} на таймфрейме {timeframe}"
+                    )
+                    continue
+
+                # Рассчитываем ATR (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.news.parsers.bitcoinmag_parser:[208:217]
+==New-test.bots.news.parsers.coindesk_parser:[210:219]
+                    summary = ""
+                    if summary_elem:
+                        summary = summary_elem.get_text().strip()
+
+                    # Создаем запись о статье
+                    article = {
+                        "title": title,
+                        "url": link,
+                        "published_at": datetime.now(),  # Точная дата неизвестна (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.news.parsers.bitcoinmag_parser:[89:96]
+==New-test.bots.news.parsers.coindesk_parser:[89:96]
+                article = {
+                    "title": title,
+                    "url": link,
+                    "published_at": published_at,
+                    "author": author,
+                    "summary": summary,
+                    "content": summary,  # Краткое содержание по умолчанию (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.news.news_bot:[605:615]
+==New-test.bots.strategies.base_strategy:[554:564]
+            if not ticker:
+                continue
+
+            current_price = ticker.get("last", 0)
+            if current_price <= 0:
+                continue
+
+            # Получаем детали позиции
+            entry_price = position["entry_price"]
+            side = position["side"] (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.news.news_bot:[539:549]
+==New-test.bots.strategies.base_strategy:[839:849]
+                exchange_id=self.exchange_id,
+            )
+
+            if not order_result.success:
+                logger.error(
+                    f"Ошибка при выполнении ордера для {symbol}: {order_result.error}"
+                )
+                return False
+
+            # Создаем запись о позиции (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.base_strategy:[551:562]
+==New-test.bots.strategies.mean_revision:[369:381]
+            try:
+                # Получаем текущие рыночные данные
+                ticker = await self.market_data.get_ticker(self.exchange_id, symbol)
+                if not ticker:
+                    continue
+
+                current_price = ticker.get("last", 0)
+                if current_price <= 0:
+                    continue
+
+                # Проверяем, достигнуты ли уровни стоп-лосса или тейк-профита (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.futures:[390:402]
+==New-test.bots.strategies.volatility_strategy:[341:353]
+            try:
+                # Получаем тикер
+                ticker = await self.market_data.get_ticker(self.exchange_id, symbol)
+                if not ticker:
+                    continue
+
+                # Получаем текущую цену
+                current_price = ticker.get("last", 0)
+                if current_price <= 0:
+                    continue
+
+                # Получаем данные OHLCV для основного таймфрейма (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.mean_revision:[366:377]
+==New-test.bots.strategies.memcoin:[348:359]
+        await self._load_historical_data()
+
+        for symbol in self.symbols:
+            try:
+                # Получаем тикер
+                ticker = await self.market_data.get_ticker(self.exchange_id, symbol)
+                if not ticker:
+                    continue
+
+                # Получаем текущую цену и объем
+                current_price = ticker.get("last", 0) (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.base_strategy:[164:173]
+==New-test.integrations.binance_liquidations:[116:124]
+        if self.task:
+            self.task.cancel()
+            try:
+                await self.task
+            except asyncio.CancelledError:
+                pass
+            self.task = None
+
+        # Вызываем метод очистки (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.api.rest_api:[27:35]
+==New-test.console:[25:34]
+logger = get_logger(__name__)
+
+# Глобальные объекты
+config = get_config()
+market_data = MarketData.get_instance()
+order_executor = OrderExecutor.get_instance()
+bot_manager = BotManager.get_instance()
+strategy_manager = StrategyManager.get_instance()
+arbitrage_core = ArbitrageCore.get_instance() (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.data.market_data:[153:163]
+==New-test.trading.trading_bot:[429:441]
+            df = pd.DataFrame(
+                ohlcv_data,
+                columns=["timestamp", "open", "high", "low", "close", "volume"],
+            )
+
+            # Преобразуем timestamp в datetime
+            df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
+
+            # Устанавливаем timestamp в качестве индекса
+            df.set_index("timestamp", inplace=True)
+
+            # Добавляем атрибуты (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.news.analyzers.keyword_analyzer:[321:327]
+==New-test.bots.news.analyzers.sentiment_analyzer:[279:285]
+            "article": {
+                "title": title,
+                "url": article.get("url", ""),
+                "source": article.get("source", ""),
+                "published_at": article.get("published_at", ""),
+            }, (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.news.news_bot:[537:544]
+==New-test.bots.strategies.base_strategy:[929:936]
+                amount=quantity,
+                order_type="market",
+                exchange_id=self.exchange_id,
+            )
+
+            if not order_result.success:
+                logger.error( (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.main_strategy:[547:568]
+==New-test.bots.strategies.scalping:[333:351]
+            return signals
+
+        except Exception as e:
+            logger.error(
+                f"Ошибка при генерации сигналов для {symbol} на {timeframe}: {str(e)}"
+            )
+            return {}
+
+    def _combine_timeframe_signals(
+        self, symbol: str, timeframe_signals: Dict[str, Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """
+        Комбинирует сигналы с разных таймфреймов.
+
+        Args:
+            symbol: Символ для торговли
+            timeframe_signals: Словарь с сигналами для каждого таймфрейма
+
+        Returns:
+            Комбинированный сигнал
+        """ (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.main_strategy:[448:456]
+==New-test.bots.strategies.scalping:[326:333]
+                        if last_macd > last_signal and prev_macd <= prev_signal:
+                            signals["macd"] = "buy"
+                        elif last_macd < last_signal and prev_macd >= prev_signal:
+                            signals["macd"] = "sell"
+                        else:
+                            signals["macd"] = "hold"
+
+            # Сигналы от полос Боллинджера (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.main_strategy:[423:431]
+==New-test.bots.strategies.scalping:[318:326]
+            if last_rsi < self.strategy_config["rsi_oversold"]:
+                signals["rsi"] = "buy"
+            elif last_rsi > self.strategy_config["rsi_overbought"]:
+                signals["rsi"] = "sell"
+            else:
+                signals["rsi"] = "hold"
+
+            # Сигналы от MACD (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.main_strategy:[225:232]
+==New-test.bots.strategies.scalping:[273:281]
+                    macd_data = Indicators.macd(
+                        ohlcv,
+                        self.strategy_config["macd_fast_period"],
+                        self.strategy_config["macd_slow_period"],
+                        self.strategy_config["macd_signal_period"],
+                    )
+ (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.futures:[389:398]
+==New-test.bots.strategies.memcoin:[350:359]
+        for symbol in self.symbols:
+            try:
+                # Получаем тикер
+                ticker = await self.market_data.get_ticker(self.exchange_id, symbol)
+                if not ticker:
+                    continue
+
+                # Получаем текущую цену
+                current_price = ticker.get("last", 0) (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.memcoin:[519:537]
+==New-test.bots.strategies.volatility_strategy:[529:547]
+                "timestamp": time.time(),
+            }
+
+        return None
+
+    @async_handle_error
+    async def _check_memcoin_position(self, symbol: str, current_price: float) -> None:
+        """
+        Проверяет состояние открытой позиции мемкоина.
+
+        Args:
+            symbol: Символ монеты
+            current_price: Текущая цена
+        """
+        if symbol not in self.open_positions:
+            return
+
+        position = self.open_positions[symbol] (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.integrations.rest_api:[155:163]
+==New-test.integrations.trading_view_webhooks:[111:119]
+        if self.site:
+            await self.site.stop()
+            self.site = None
+
+        if self.runner:
+            await self.runner.cleanup()
+            self.runner = None
+ (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.infrastructure.cache_service:[117:123]
+==New-test.utils.websocket_client:[673:681]
+            self._cleanup_task.cancel()
+            try:
+                await self._cleanup_task
+            except asyncio.CancelledError:
+                pass
+            self._cleanup_task = None (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.api.rest_api:[257:263]
+==New-test.integrations.rest_api:[376:382]
+                symbol=symbol,
+                side=side,
+                amount=amount,
+                order_type=order_type,
+                price=price,
+                exchange_id=exchange_id, (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.main_strategy:[386:409]
+==New-test.bots.strategies.scalping:[226:249]
+            except Exception as e:
+                logger.error(f"Ошибка при генерации сигналов для {symbol}: {str(e)}")
+
+        return signals
+
+    @async_handle_error
+    async def _generate_timeframe_signal(
+        self, symbol: str, timeframe: str
+    ) -> Dict[str, str]:
+        """
+        Генерирует сигналы для конкретного таймфрейма.
+
+        Args:
+            symbol: Символ для торговли
+            timeframe: Таймфрейм для анализа
+
+        Returns:
+            Словарь с сигналами
+        """
+        signals = {}
+
+        try:
+            # Получаем данные OHLCV (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.futures:[389:397]
+==New-test.bots.strategies.scalping:[170:178]
+        for symbol in self.symbols:
+            try:
+                # Получаем тикер
+                ticker = await self.market_data.get_ticker(self.exchange_id, symbol)
+                if not ticker:
+                    continue
+
+                # Проверяем объем (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.news.news_bot:[605:613]
+==New-test.bots.strategies.volatility_strategy:[344:353]
+            if not ticker:
+                continue
+
+            current_price = ticker.get("last", 0)
+            if current_price <= 0:
+                continue
+
+            # Получаем детали позиции (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.main_strategy:[354:362]
+==New-test.bots.strategies.memcoin:[350:358]
+        for symbol in self.symbols:
+            try:
+                # Получаем тикер
+                ticker = await self.market_data.get_ticker(self.exchange_id, symbol)
+                if not ticker:
+                    continue
+
+                # Получаем текущую цену и объем (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.memcoin:[351:359]
+==New-test.bots.strategies.volatility_strategy:[341:349]
+            try:
+                # Получаем тикер
+                ticker = await self.market_data.get_ticker(self.exchange_id, symbol)
+                if not ticker:
+                    continue
+
+                # Получаем текущую цену и объем
+                current_price = ticker.get("last", 0) (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.strategies.strategy_manager:[22:41]
+==New-test.data.symbol_manager:[21:40]
+    _instance = None
+
+    @classmethod
+    def get_instance(cls) -> "SymbolManager":
+        """
+        Получает экземпляр класса SymbolManager (Singleton).
+
+        Returns:
+            Экземпляр класса SymbolManager
+        """
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+
+    def __init__(self):
+        """
+        Инициализирует менеджер символов.
+        """
+        self.config = get_config() (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.arbitrage.multi_exchange:[94:100]
+==New-test.data.market_data:[303:309]
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+ (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.integrations.slack_integration:[22:44]
+==New-test.risk_management.portfolio_manager:[41:60]
+    _instance = None
+
+    @classmethod
+    def get_instance(cls) -> "SlackIntegration":
+        """
+        Получает экземпляр интеграции со Slack (Singleton).
+
+        Returns:
+            Экземпляр класса SlackIntegration
+        """
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+
+    def __init__(self, token: Optional[str] = None):
+        """
+        Инициализирует интеграцию со Slack.
+
+        Args:
+            token: Токен Slack API (None для использования из конфигурации)
+        """
+        self.config = get_config() (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.bots.base_bot:[120:126]
+==New-test.integrations.binance_liquidations:[117:122]
+            self.task.cancel()
+            try:
+                await self.task
+            except asyncio.CancelledError:
+                pass
+ (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.infrastructure.cache_service:[61:80]
+==New-test.integrations.email_sender:[25:64]
+    _instance = None
+
+    @classmethod
+    def get_instance(cls) -> "EmailSender":
+        """
+        Получает экземпляр отправителя email (Singleton).
+
+        Returns:
+            Экземпляр класса EmailSender
+        """
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+
+    def __init__(
+        self,
+        smtp_server: Optional[str] = None,
+        port: Optional[int] = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
+    ):
+        """
+        Инициализирует отправителя электронных писем.
+
+        Args:
+            smtp_server: SMTP-сервер
+            port: Порт SMTP-сервера
+            username: Имя пользователя (email)
+            password: Пароль
+        """
+        self.config = get_config()
+
+        # В реальном приложении параметры должны быть в конфигурации
+        # self.smtp_server = smtp_server or self.config.EMAIL_SMTP_SERVER
+        # self.port = port or self.config.EMAIL_SMTP_PORT
+        # self.username = username or self.config.EMAIL_USERNAME
+        # self.password = password or self.config.EMAIL_PASSWORD
+
+        # Для демонстрации используем значения по умолчанию (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.infrastructure.database:[30:55]
+==New-test.infrastructure.message_broker:[25:50]
+    _instance = None
+
+    @classmethod
+    def get_instance(cls, connection_string: Optional[str] = None) -> "MessageBroker":
+        """
+        Получает экземпляр брокера сообщений (Singleton).
+
+        Args:
+            connection_string: Строка подключения к брокеру (None для использования из конфигурации)
+
+        Returns:
+            Экземпляр класса MessageBroker
+        """
+        if cls._instance is None:
+            cls._instance = cls(connection_string)
+        return cls._instance
+
+    def __init__(self, connection_string: Optional[str] = None):
+        """
+        Инициализирует брокер сообщений.
+
+        Args:
+            connection_string: Строка подключения к брокеру (None для использования из конфигурации)
+        """
+        self.config = get_config() (duplicate-code)
+utils/__init__.py:1:0: R0801: Similar lines in 2 files
+==New-test.api.rest_api:[257:262]
+==New-test.bots.base_bot:[252:257]
+                symbol=symbol,
+                side=side,
+                amount=amount,
+                order_type=order_type,
+                price=price, (duplicate-code)
+
+------------------------------------------------------------------
+Your code has been rated at 7.74/10 (previous run: 6.47/10, +1.27)
+

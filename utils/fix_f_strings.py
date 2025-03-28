@@ -1,6 +1,6 @@
 """
 Скрипт для автоматического исправления неправильно оформленных f-строк в проекте.
-Исправляет конструкции типа f"текст {переменная}" на правильные f"текст {переменная}".
+Исправляет конструкции типа "текст {переменная}" % на правильные f"текст {переменная}".
 """
 
 import re
@@ -31,19 +31,24 @@ def fix_f_strings(file_path):
     return True
 
 
-# Находим все Python-файлы в проекте
-python_files = glob.glob("/workspaces/New-test/**/*.py", recursive=True)
+def main():
+    # Находим все Python-файлы в проекте
+    python_files = glob.glob("/workspaces/New-test/**/*.py", recursive=True)
 
-# Счетчики
-fixed_count = 0
-total_files = len(python_files)
+    # Счетчики
+    fixed_count = 0
+    total_files = len(python_files)
 
-print(f"Начато исправление f-строк в {total_files} файлах...")
+    print(f"Начато исправление f-строк в {total_files} файлах...")
 
-# Обрабатываем каждый файл
-for file_path in python_files:
-    if fix_f_strings(file_path):
-        fixed_count += 1
-        print(f"Исправлен файл: {file_path}")
+    # Обрабатываем каждый файл
+    for file_path in python_files:
+        if fix_f_strings(file_path):
+            fixed_count += 1
+            print(f"Исправлен файл: {file_path}")
 
-print(f"\nИсправление завершено. Исправлено {fixed_count} файлов из {total_files}.")
+    print(f"\nИсправление завершено. Исправлено {fixed_count} файлов из {total_files}.")
+
+
+if __name__ == "__main__":
+    main()
