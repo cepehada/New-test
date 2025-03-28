@@ -67,7 +67,6 @@ def jwt_required(func):
 
             # Вызываем исходную функцию
             return await func(request)
-            logger.error(f"Error in JWT middleware: {str(e)}")
         except Exception as e:
             logger.error(f"Error in JWT middleware: {str(e)}")
             return web.json_response({"error": "Authentication error"}, status=500)
@@ -113,7 +112,6 @@ async def login(request):
                 "expires": time.time() + JWT_EXPIRATION,
             }
         )
-        logger.error(f"Error in login: {str(e)}")
     except Exception as e:
         logger.error(f"Error in login: {str(e)}")
         return web.json_response({"error": "Login error"}, status=500)
@@ -147,7 +145,6 @@ async def get_tickers(request):
                 results[symbol] = ticker
 
         return web.json_response(results)
-        logger.error(f"Error in get_tickers: {str(e)}")
     except Exception as e:
         logger.error(f"Error in get_tickers: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
@@ -178,7 +175,6 @@ async def get_orderbook(request):
             )
 
         return web.json_response(orderbook)
-        logger.error(f"Error in get_orderbook: {str(e)}")
     except Exception as e:
         logger.error(f"Error in get_orderbook: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
@@ -224,7 +220,6 @@ async def get_ohlcv(request):
             )
 
         return web.json_response(data)
-        logger.error(f"Error in get_ohlcv: {str(e)}")
     except Exception as e:
         logger.error(f"Error in get_ohlcv: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
@@ -290,7 +285,6 @@ async def execute_order(request):
                 "timestamp": time.time(),
             }
         )
-        logger.error(f"Error in execute_order: {str(e)}")
     except Exception as e:
         logger.error(f"Error in execute_order: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
@@ -310,7 +304,6 @@ async def get_open_orders(request):
         orders = await order_executor.get_open_orders(exchange_id, symbol)
 
         return web.json_response(orders)
-        logger.error(f"Error in get_open_orders: {str(e)}")
     except Exception as e:
         logger.error(f"Error in get_open_orders: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
@@ -355,7 +348,6 @@ async def cancel_order(request):
                 "timestamp": time.time(),
             }
         )
-        logger.error(f"Error in cancel_order: {str(e)}")
     except Exception as e:
         logger.error(f"Error in cancel_order: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
@@ -389,7 +381,6 @@ async def list_bots(request):
             bot_list.append(bot_info)
 
         return web.json_response(bot_list)
-        logger.error(f"Error in list_bots: {str(e)}")
     except Exception as e:
         logger.error(f"Error in list_bots: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
@@ -416,7 +407,6 @@ async def get_bot_state(request):
             )
 
         return web.json_response(state)
-        logger.error(f"Error in get_bot_state: {str(e)}")
     except Exception as e:
         logger.error(f"Error in get_bot_state: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
@@ -466,7 +456,6 @@ async def start_bot(request):
                 "timestamp": time.time(),
             }
         )
-        logger.error(f"Error in start_bot: {str(e)}")
     except Exception as e:
         logger.error(f"Error in start_bot: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
@@ -495,7 +484,6 @@ async def stop_bot(request):
         return web.json_response(
             {"success": True, "bot_id": bot_id, "timestamp": time.time()}
         )
-        logger.error(f"Error in stop_bot: {str(e)}")
     except Exception as e:
         logger.error(f"Error in stop_bot: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
@@ -520,7 +508,6 @@ async def list_strategies(request):
                 "running_strategies": running_strategies,
             }
         )
-        logger.error(f"Error in list_strategies: {str(e)}")
     except Exception as e:
         logger.error(f"Error in list_strategies: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
@@ -571,7 +558,6 @@ async def start_strategy(request):
                 "timestamp": time.time(),
             }
         )
-        logger.error(f"Error in start_strategy: {str(e)}")
     except Exception as e:
         logger.error(f"Error in start_strategy: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
@@ -600,7 +586,6 @@ async def stop_strategy(request):
         return web.json_response(
             {"success": True, "strategy_id": strategy_id, "timestamp": time.time()}
         )
-        logger.error(f"Error in stop_strategy: {str(e)}")
     except Exception as e:
         logger.error(f"Error in stop_strategy: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
@@ -627,7 +612,6 @@ async def get_strategy_state(request):
             )
 
         return web.json_response(state)
-        logger.error(f"Error in get_strategy_state: {str(e)}")
     except Exception as e:
         logger.error(f"Error in get_strategy_state: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
@@ -673,7 +657,6 @@ async def scan_arbitrage(request):
             )
 
         return web.json_response(opps_list)
-        logger.error(f"Error in scan_arbitrage: {str(e)}")
     except Exception as e:
         logger.error(f"Error in scan_arbitrage: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
@@ -753,7 +736,6 @@ async def execute_arbitrage(request):
                 "timestamp": time.time(),
             }
         )
-        logger.error(f"Error in execute_arbitrage: {str(e)}")
     except Exception as e:
         logger.error(f"Error in execute_arbitrage: {str(e)}")
         return web.json_response({"error": str(e)}, status=500)
