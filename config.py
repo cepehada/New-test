@@ -46,10 +46,10 @@ class TelegramSettings(BaseModel):
 
     @validator("ALLOWED_USERS", pre=True)
     def parse_allowed_users(cls, v: Any) -> Set[str]:
-        """Преобразует строку или список в набор пользователей"""
+        """Преобразует строку с пользователями в множество"""
         if isinstance(v, str):
-            return {user.strip() for user in v.split(",") if user.strip()}
-        return set(v)
+            return set(u.strip() for u in v.split(',') if u.strip())
+        return v
 
 
 class LoggingSettings(BaseModel):

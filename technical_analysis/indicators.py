@@ -489,7 +489,7 @@ class Indicators:
         Returns:
             Series со значениями OBV
         """
-        if len(data) < 2 или "volume" not in data.columns:
+        if len(data) < 2 or "volume" not in data.columns:
             logger.warning("Недостаточно данных для расчета OBV")
             return pd.Series(index=data.index)
 
@@ -518,7 +518,7 @@ class Indicators:
         Returns:
             Series со значениями A/D Line
         """
-        if len(data) < 1 или "volume" not in data.columns:
+        if len(data) < 1 or "volume" not in data.columns:
             logger.warning("Недостаточно данных для расчета A/D Line")
             return pd.Series(index=data.index)
 

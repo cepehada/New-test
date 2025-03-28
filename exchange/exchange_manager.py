@@ -1146,14 +1146,14 @@ class ExchangeManager:
             exchange = await self.get_exchange(exchange_id)
 
             # Проверяем, поддерживает ли биржа временной интервал
-            if hasattr(exchange, 'timeframes') and exchange.timeframes and timeframe in exchange.timeframes:s:
+            if hasattr(exchange, 'timeframes') and exchange.timeframes and timeframe in exchange.timeframes:
                 return timeframe
 
             # Если не нашли, возвращаем None
             return None
 
         except Exception as e:
-            logger.error("Error mapping timeframe {timeframe} for {exchange_id}: {str(e)}" %)
+            logger.error(f"Error mapping timeframe {timeframe} for {exchange_id}: {str(e)}")
             return None
 
     async def fetch_ticker(self, symbol: str, exchange_id: str) -> Optional[Dict]:
@@ -1398,285 +1398,285 @@ class ExchangeManager:
         Returns:
             Optional[Dict]: Информация о созданном ордере или None
         """
-        # Если биржа не указана, выбираем лучшуюа, выбираем лучшую
+        # Если биржа не указана, выбираем лучшую
         if not exchange_id:
-            exchange_id, _ = await self.select_best_exchange(symbol, ['createOrder'])elect_best_exchange(symbol, ['createOrder'])
+            exchange_id, _ = await self.select_best_exchange(symbol, ['createOrder'])
             if not exchange_id:
-                logger.error("No suitable exchange found for {symbol}" %)logger.error("No suitable exchange found for {symbol}" %)
+                logger.error(f"No suitable exchange found for {symbol}")
                 return None
 
         try:
             # Отслеживаем ограничения частоты запросов
-            await self.rate_limits[exchange_id].acquire()f.rate_limits[exchange_id].acquire()
+            await self.rate_limits[exchange_id].acquire()
 
             # Преобразуем символ
             mapped_symbol = await self.map_symbol(symbol, exchange_id)
-            if not mapped_symbol:ot mapped_symbol:
-                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
+            if not mapped_symbol:
+                logger.warning(f"Symbol {symbol} not found on {exchange_id}")
                 return None
 
             # Получаем экземпляр биржи
-            exchange = await self.get_exchange(exchange_id)= await self.get_exchange(exchange_id)
+            exchange = await self.get_exchange(exchange_id)
 
             # Создаем ордер
-            params = params or {} or {}
-            order = await exchange.create_order(mapped_symbol, order_type, side, amount, price, params)nt, price, params)
+            params = params or {}
+            order = await exchange.create_order(mapped_symbol, order_type, side, amount, price, params)
 
             # Инвалидируем кеш баланса
-            await self.cache.invalidate('balance', exchange_id)e.invalidate('balance', exchange_id)
+            await self.cache.invalidate('balance', exchange_id)
 
-            return orderreturn order
+            return order
 
         except Exception as e:
-            # Увеличиваем счетчик ошибок            # Увеличиваем счетчик ошибок
-            self._increment_error_counter(exchange_id, e)r_counter(exchange_id, e)
+            # Увеличиваем счетчик ошибок
+            self._increment_error_counter(exchange_id, e)
 
-            logger.error("Error creating order for {symbol} on {exchange_id}: {str(e)}" %)creating order for {symbol} on {exchange_id}: {str(e)}")
+            logger.error(f"Error creating order for {symbol} on {exchange_id}: {str(e)}")
             return None
 
-    async def cancel_order(self, order_id: str, symbol: str, exchange_id: str) -> Optional[Dict]:    async def cancel_order(self, order_id: str, symbol: str, exchange_id: str) -> Optional[Dict]:
+    async def cancel_order(self, order_id: str, symbol: str, exchange_id: str) -> Optional[Dict]:
         """
         Отменяет ордер
 
         Args:
             order_id: ID ордера
             symbol: Символ
-            exchange_id: ID биржи            exchange_id: ID биржи
-
-        Returns:
-            Optional[Dict]: Информация об отмененном ордере или None            Optional[Dict]: Информация об отмененном ордере или None
-        """
-        try:        try:
-            # Отслеживаем ограничения частоты запросовничения частоты запросов
-            await self.rate_limits[exchange_id].acquire()nge_id].acquire()
-
-            # Преобразуем символ            # Преобразуем символ
-            mapped_symbol = await self.map_symbol(symbol, exchange_id)
-            if not mapped_symbol:ed_symbol:
-                logger.warning("Symbol {symbol} not found on {exchange_id}" %)                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
-                return None
-
-            # Получаем экземпляр биржи экземпляр биржи
-            exchange = await self.get_exchange(exchange_id)            exchange = await self.get_exchange(exchange_id)
-
-            # Отменяем ордер
-            order = await exchange.cancel_order(order_id, mapped_symbol)exchange.cancel_order(order_id, mapped_symbol)
-
-            # Инвалидируем кеш баланса            # Инвалидируем кеш баланса
-            await self.cache.invalidate('balance', exchange_id)t self.cache.invalidate('balance', exchange_id)
-
-            return order return order
-
-        except Exception as e:
-            # Увеличиваем счетчик ошибок
-            self._increment_error_counter(exchange_id, e)            self._increment_error_counter(exchange_id, e)
-
-            logger.error("Error canceling order {order_id} for {symbol} on {exchange_id}: {str(e)}" %)l} on {exchange_id}: {str(e)}")
-            return None
-
-    async def fetch_order(self, order_id: str, symbol: str, exchange_id: str) -> Optional[Dict]:elf, order_id: str, symbol: str, exchange_id: str) -> Optional[Dict]:
-        """        """
-        Получает информацию об ордере
-
-        Args:        Args:
-            order_id: ID ордераера
-            symbol: Символ
-            exchange_id: ID биржи            exchange_id: ID биржи
-
-        Returns:
-            Optional[Dict]: Информация об ордере или None            Optional[Dict]: Информация об ордере или None
-        """
-        try:        try:
-            # Отслеживаем ограничения частоты запросовничения частоты запросов
-            await self.rate_limits[exchange_id].acquire()nge_id].acquire()
-
-            # Преобразуем символ            # Преобразуем символ
-            mapped_symbol = await self.map_symbol(symbol, exchange_id)
-            if not mapped_symbol:ed_symbol:
-                logger.warning("Symbol {symbol} not found on {exchange_id}" %)                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
-                return None
-
-            # Получаем экземпляр биржии
-            exchange = await self.get_exchange(exchange_id)            exchange = await self.get_exchange(exchange_id)
-
-            # Получаем информацию об ордереию об ордере
-            order = await exchange.fetch_order(order_id, mapped_symbol)exchange.fetch_order(order_id, mapped_symbol)
-
-            return order            return order
-
-        except Exception as e:
-            # Увеличиваем счетчик ошибок # Увеличиваем счетчик ошибок
-            self._increment_error_counter(exchange_id, e)self._increment_error_counter(exchange_id, e)
-
-            logger.error("Error fetching order {order_id} for {symbol} on {exchange_id}: {str(e)}" %)} for {symbol} on {exchange_id}: {str(e)}")
-            return None            return None
-
-    async def fetch_orders(self, symbol: str, exchange_id: str, since: int = None, limit: int = None) -> Optional[List]: int = None, limit: int = None) -> Optional[List]:
-        """
-        Получает список ордеров
-
-        Args:        Args:
-            symbol: Символ
             exchange_id: ID биржи
-            since: Начальная метка времени            since: Начальная метка времени
-            limit: Максимальное количество ордеровордеров
 
-        Returns:        Returns:
-            Optional[List]: Список ордеров или Nonet]: Список ордеров или None
-        """        """
+        Returns:
+            Optional[Dict]: Информация об отмененном ордере или None
+        """
         try:
-            # Отслеживаем ограничения частоты запросовстоты запросов
+            # Отслеживаем ограничения частоты запросов
             await self.rate_limits[exchange_id].acquire()
 
             # Преобразуем символ
-            mapped_symbol = await self.map_symbol(symbol, exchange_id)ol = await self.map_symbol(symbol, exchange_id)
-            if not mapped_symbol:            if not mapped_symbol:
+            mapped_symbol = await self.map_symbol(symbol, exchange_id)
+            if not mapped_symbol:
                 logger.warning("Symbol {symbol} not found on {exchange_id}" %)
-                return None     return None
+                return None
 
-            # Получаем экземпляр биржи            # Получаем экземпляр биржи
-            exchange = await self.get_exchange(exchange_id)xchange = await self.get_exchange(exchange_id)
+            # Получаем экземпляр биржи
+            exchange = await self.get_exchange(exchange_id)
 
-            # Получаем список ордероверов
-            orders = await exchange.fetch_orders(mapped_symbol, since, limit)orders(mapped_symbol, since, limit)
+            # Отменяем ордер
+            order = await exchange.cancel_order(order_id, mapped_symbol)
 
-            return orders            return orders
+            # Инвалидируем кеш баланса
+            await self.cache.invalidate('balance', exchange_id)
+
+            return order
 
         except Exception as e:
-            # Увеличиваем счетчик ошибок # Увеличиваем счетчик ошибок
-            self._increment_error_counter(exchange_id, e)self._increment_error_counter(exchange_id, e)
+            # Увеличиваем счетчик ошибок
+            self._increment_error_counter(exchange_id, e)
 
-            logger.error("Error fetching orders for {symbol} on {exchange_id}: {str(e)}" %)bol} on {exchange_id}: {str(e)}")
-            return None            return None
+            logger.error("Error canceling order {order_id} for {symbol} on {exchange_id}: {str(e)}" %)
+            return None
 
-    async def fetch_open_orders(self, symbol: str = None, exchange_id: str = None) -> Optional[List]: str = None) -> Optional[List]:
+    async def fetch_order(self, order_id: str, symbol: str, exchange_id: str) -> Optional[Dict]:
+        """
+        Получает информацию об ордере
+
+        Args:
+            order_id: ID ордера
+            symbol: Символ
+            exchange_id: ID биржи
+
+        Returns:
+            Optional[Dict]: Информация об ордере или None
+        """
+        try:
+            # Отслеживаем ограничения частоты запросов
+            await self.rate_limits[exchange_id].acquire()
+
+            # Преобразуем символ
+            mapped_symbol = await self.map_symbol(symbol, exchange_id)
+            if not mapped_symbol:
+                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
+                return None
+
+            # Получаем экземпляр биржи
+            exchange = await self.get_exchange(exchange_id)
+
+            # Получаем информацию об ордере
+            order = await exchange.fetch_order(order_id, mapped_symbol)
+
+            return order
+
+        except Exception as e:
+            # Увеличиваем счетчик ошибок
+            self._increment_error_counter(exchange_id, e)
+
+            logger.error("Error fetching order {order_id} for {symbol} on {exchange_id}: {str(e)}" %)
+            return None
+
+    async def fetch_orders(self, symbol: str, exchange_id: str, since: int = None, limit: int = None) -> Optional[List]:
+        """
+        Получает список ордеров
+
+        Args:
+            symbol: Символ
+            exchange_id: ID биржи
+            since: Начальная метка времени
+            limit: Максимальное количество ордеров
+
+        Returns:
+            Optional[List]: Список ордеров или None
+        """
+        try:
+            # Отслеживаем ограничения частоты запросов
+            await self.rate_limits[exchange_id].acquire()
+
+            # Преобразуем символ
+            mapped_symbol = await self.map_symbol(symbol, exchange_id)
+            if not mapped_symbol:
+                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
+                return None
+
+            # Получаем экземпляр биржи
+            exchange = await self.get_exchange(exchange_id)
+
+            # Получаем список ордеров
+            orders = await exchange.fetch_orders(mapped_symbol, since, limit)
+
+            return orders
+
+        except Exception as e:
+            # Увеличиваем счетчик ошибок
+            self._increment_error_counter(exchange_id, e)
+
+            logger.error("Error fetching orders for {symbol} on {exchange_id}: {str(e)}" %)
+            return None
+
+    async def fetch_open_orders(self, symbol: str = None, exchange_id: str = None) -> Optional[List]:
         """
         Получает список открытых ордеров
 
-        Args:        Args:
+        Args:
             symbol: Символ
             exchange_id: ID биржи
 
         Returns:
             Optional[List]: Список открытых ордеров или None
-        """        """
-        # Если биржа не указана, выбираем лучшуюказана, выбираем лучшую
-        if not exchange_id:        if not exchange_id:
+        """
+        # Если биржа не указана, выбираем лучшую
+        if not exchange_id:
             if symbol:
-                exchange_id, _ = await self.select_best_exchange(symbol, ['fetchOpenOrders'])elf.select_best_exchange(symbol, ['fetchOpenOrders'])
+                exchange_id, _ = await self.select_best_exchange(symbol, ['fetchOpenOrders'])
             else:
-                # Если символ не указан, выбираем первую доступную биржу                # Если символ не указан, выбираем первую доступную биржу
+                # Если символ не указан, выбираем первую доступную биржу
                 exchange_id = next(iter(self.exchange_configs.keys()), None)
 
-            if not exchange_id:            if not exchange_id:
+            if not exchange_id:
                 logger.error("No suitable exchange found")
-                return None     return None
+                return None
 
-        try:        try:
-            # Отслеживаем ограничения частоты запросов Отслеживаем ограничения частоты запросов
-            await self.rate_limits[exchange_id].acquire()e_limits[exchange_id].acquire()
+        try:
+            # Отслеживаем ограничения частоты запросов
+            await self.rate_limits[exchange_id].acquire()
 
-            # Преобразуем символ, если указан            # Преобразуем символ, если указан
-            mapped_symbol = Noneed_symbol = None
+            # Преобразуем символ, если указан
+            mapped_symbol = None
             if symbol:
-                mapped_symbol = await self.map_symbol(symbol, exchange_id)     mapped_symbol = await self.map_symbol(symbol, exchange_id)
+                mapped_symbol = await self.map_symbol(symbol, exchange_id)
                 if not mapped_symbol:
-                    logger.warning("Symbol {symbol} not found on {exchange_id}" %)warning(f"Symbol {symbol} not found on {exchange_id}")
-                    return Noneturn None
+                    logger.warning("Symbol {symbol} not found on {exchange_id}" %)
+                    return None
 
-            # Получаем экземпляр биржиучаем экземпляр биржи
+            # Получаем экземпляр биржи
             exchange = await self.get_exchange(exchange_id)
 
-            # Получаем список открытых ордеров            # Получаем список открытых ордеров
-            orders = await exchange.fetch_open_orders(mapped_symbol)ange.fetch_open_orders(mapped_symbol)
+            # Получаем список открытых ордеров
+            orders = await exchange.fetch_open_orders(mapped_symbol)
 
             return orders
 
-        except Exception as e:pt Exception as e:
+        except Exception as e:
             # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error("Error fetching open orders on {exchange_id}: {str(e)}" %)n orders on {exchange_id}: {str(e)}")
+            logger.error("Error fetching open orders on {exchange_id}: {str(e)}" %)
             return None
 
-    async def fetch_my_trades(self, symbol: str, exchange_id: str, since: int = None, limit: int = None) -> Optional[List]:int = None, limit: int = None) -> Optional[List]:
+    async def fetch_my_trades(self, symbol: str, exchange_id: str, since: int = None, limit: int = None) -> Optional[List]:
         """
         Получает список сделок пользователя
 
-        Args:        Args:
+        Args:
             symbol: Символ
             exchange_id: ID биржи
-            since: Начальная метка времени            since: Начальная метка времени
-            limit: Максимальное количество сделоклок
+            since: Начальная метка времени
+            limit: Максимальное количество сделок
 
-        Returns:        Returns:
-            Optional[List]: Список сделок или None]: Список сделок или None
-        """        """
+        Returns:
+            Optional[List]: Список сделок или None
+        """
         # Проверяем в кеше
-        cache_key = f"{exchange_id}_{symbol}_{limit}_{since}"bol}_{limit}_{since}"
-        cached_trades = await self.cache.get('my_trades', cache_key) cache_key)
-        if cached_trades:        if cached_trades:
+        cache_key = f"{exchange_id}_{symbol}_{limit}_{since}"
+        cached_trades = await self.cache.get('my_trades', cache_key)
+        if cached_trades:
             return cached_trades
 
-        try:        try:
+        try:
             # Отслеживаем ограничения частоты запросов
-            await self.rate_limits[exchange_id].acquire() await self.rate_limits[exchange_id].acquire()
+            await self.rate_limits[exchange_id].acquire()
 
-            # Преобразуем символ            # Преобразуем символ
-            mapped_symbol = await self.map_symbol(symbol, exchange_id)apped_symbol = await self.map_symbol(symbol, exchange_id)
-            if not mapped_symbol:symbol:
-                logger.warning("Symbol {symbol} not found on {exchange_id}" %)Symbol {symbol} not found on {exchange_id}")
+            # Преобразуем символ
+            mapped_symbol = await self.map_symbol(symbol, exchange_id)
+            if not mapped_symbol:
+                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
                 return None
 
-            # Получаем экземпляр биржи            # Получаем экземпляр биржи
-            exchange = await self.get_exchange(exchange_id)ange = await self.get_exchange(exchange_id)
+            # Получаем экземпляр биржи
+            exchange = await self.get_exchange(exchange_id)
 
-            # Получаем список сделок # Получаем список сделок
-            trades = await exchange.fetch_my_trades(mapped_symbol, since, limit) exchange.fetch_my_trades(mapped_symbol, since, limit)
+            # Получаем список сделок
+            trades = await exchange.fetch_my_trades(mapped_symbol, since, limit)
 
             # Сохраняем в кеш
-            await self.cache.set('my_trades', trades, cache_key)che.set('my_trades', trades, cache_key)
+            await self.cache.set('my_trades', trades, cache_key)
 
-            return trades            return trades
+            return trades
 
         except Exception as e:
             # Увеличиваем счетчик ошибок
-            self._increment_error_counter(exchange_id, e)            self._increment_error_counter(exchange_id, e)
+            self._increment_error_counter(exchange_id, e)
 
-            logger.error("Error fetching my trades for {symbol} on {exchange_id}: {str(e)}" %)xchange_id}: {str(e)}")
+            logger.error("Error fetching my trades for {symbol} on {exchange_id}: {str(e)}" %)
             return None
 
-    def _increment_error_counter(self, exchange_id: str, error: Exception):unter(self, exchange_id: str, error: Exception):
-        """        """
+    def _increment_error_counter(self, exchange_id: str, error: Exception):
+        """
         Увеличивает счетчики ошибок
 
-        Args:        Args:
+        Args:
             exchange_id: ID биржи
             error: Исключение
-        """        """
-        if exchange_id not in self.error_counters: self.error_counters:
+        """
+        if exchange_id not in self.error_counters:
             return
 
-        # Увеличиваем общий счетчикий счетчик
-        self.error_counters[exchange_id]['total'] += 1        self.error_counters[exchange_id]['total'] += 1
+        # Увеличиваем общий счетчик
+        self.error_counters[exchange_id]['total'] += 1
 
         # Определяем тип ошибки
         error_str = str(error).lower()
 
         if 'connection' in error_str or 'timeout' in error_str or 'network' in error_str:
-            self.error_counters[exchange_id]['connection'] += 1counters[exchange_id]['connection'] += 1
-        elif 'auth' in error_str or 'api key' in error_str or 'signature' in error_str:        elif 'auth' in error_str or 'api key' in error_str or 'signature' in error_str:
+            self.error_counters[exchange_id]['connection'] += 1
+        elif 'auth' in error_str or 'api key' in error_str or 'signature' in error_str:
             self.error_counters[exchange_id]['auth'] += 1
-        elif 'rate limit' in error_str or 'too many requests' in error_str:f 'rate limit' in error_str or 'too many requests' in error_str:
-            self.error_counters[exchange_id]['rate_limit'] += 1hange_id]['rate_limit'] += 1
-        elif 'insufficient' in error_str or 'balance' in error_str:        elif 'insufficient' in error_str or 'balance' in error_str:
-            self.error_counters[exchange_id]['insufficient_funds'] += 1elf.error_counters[exchange_id]['insufficient_funds'] += 1
-        elif 'order not found' in error_str or 'no such order' in error_str: error_str or 'no such order' in error_str:
-            self.error_counters[exchange_id]['order_not_found'] += 1rs[exchange_id]['order_not_found'] += 1
-        else:e:
-            self.error_counters[exchange_id]['other'] += 1r'] += 1
+        elif 'rate limit' in error_str or 'too many requests' in error_str:
+            self.error_counters[exchange_id]['rate_limit'] += 1
+        elif 'insufficient' in error_str or 'balance' in error_str:
+            self.error_counters[exchange_id]['insufficient_funds'] += 1
+        elif 'order not found' in error_str or 'no such order' in error_str:
+            self.error_counters[exchange_id]['order_not_found'] += 1
+        else:
+            self.error_counters[exchange_id]['other'] += 1
 
-    async def get_error_stats(self, exchange_id: str = None) -> Dict:    async def get_error_stats(self, exchange_id: str = None) -> Dict:
+    async def get_error_stats(self, exchange_id: str = None) -> Dict:
         """
         Возвращает статистику ошибок
 
@@ -1693,490 +1693,490 @@ class ExchangeManager:
 
     async def get_rate_limit_usage(self, exchange_id: str = None) -> Dict:
         """
-        Возвращает информацию об использовании ограничений частоты запросоващает информацию об использовании ограничений частоты запросов
+        Возвращает информацию об использовании ограничений частоты запросов
 
-        Args:        Args:
+        Args:
             exchange_id: ID биржи
 
         Returns:
-            Dict: Информация об использовании            Dict: Информация об использовании
+            Dict: Информация об использовании
         """
         if exchange_id:
-            return self.rate_limits.get(exchange_id, ExchangeRateLimit()).get_usage()            return self.rate_limits.get(exchange_id, ExchangeRateLimit()).get_usage()
+            return self.rate_limits.get(exchange_id, ExchangeRateLimit()).get_usage()
         else:
-            return {ex_id: limiter.get_usage() for ex_id, limiter in self.rate_limits.items()}get_usage() for ex_id, limiter in self.rate_limits.items()}
+            return {ex_id: limiter.get_usage() for ex_id, limiter in self.rate_limits.items()}
 
-    async def get_cache_stats(self) -> Dict:_stats(self) -> Dict:
+    async def get_cache_stats(self) -> Dict:
         """
-        Возвращает статистику кешаащает статистику кеша
+        Возвращает статистику кеша
 
-        Returns:        Returns:
+        Returns:
             Dict: Статистика кеша
         """
         return self.cache.get_stats()
 
-    async def clear_cache(self, key: str = None, subkey: str = None): clear_cache(self, key: str = None, subkey: str = None):
+    async def clear_cache(self, key: str = None, subkey: str = None):
         """
-        Очищает кеш        Очищает кеш
+        Очищает кеш
 
         Args:
-            key: Ключ кеша key: Ключ кеша
-            subkey: Подключ кешаключ кеша
+            key: Ключ кеша
+            subkey: Подключ кеша
         """
-        await self.cache.invalidate(key, subkey) self.cache.invalidate(key, subkey)
+        await self.cache.invalidate(key, subkey)
 
-    async def subscribe_to_ticker(self, symbol: str, exchange_id: str, callback: Callable = None) -> bool:    async def subscribe_to_ticker(self, symbol: str, exchange_id: str, callback: Callable = None) -> bool:
+    async def subscribe_to_ticker(self, symbol: str, exchange_id: str, callback: Callable = None) -> bool:
         """
-        Подписывается на обновления тикераписывается на обновления тикера
+        Подписывается на обновления тикера
 
-        Args:        Args:
-            symbol: Символol: Символ
+        Args:
+            symbol: Символ
             exchange_id: ID биржи
-            callback: Функция для обработки обновлений callback: Функция для обработки обновлений
+            callback: Функция для обработки обновлений
 
-        Returns:        Returns:
+        Returns:
             bool: True, если подписка успешна, иначе False
         """
-        if exchange_id not in self.websocket_clients:_id not in self.websocket_clients:
-            logger.warning("WebSocket not initialized for {exchange_id}" %)            logger.warning("WebSocket not initialized for {exchange_id}" %)
-            return Falseeturn False
+        if exchange_id not in self.websocket_clients:
+            logger.warning("WebSocket not initialized for {exchange_id}" %)
+            return False
 
         try:
-            # Преобразуем символ # Преобразуем символ
-            mapped_symbol = await self.map_symbol(symbol, exchange_id)l(symbol, exchange_id)
-            if not mapped_symbol:            if not mapped_symbol:
+            # Преобразуем символ
+            mapped_symbol = await self.map_symbol(symbol, exchange_id)
+            if not mapped_symbol:
                 logger.warning("Symbol {symbol} not found on {exchange_id}" %)
-                return False     return False
-
-            # Формируем сообщение подписки            # Формируем сообщение подписки
-            subscription = self._get_ticker_subscription(exchange_id, mapped_symbol)ubscription = self._get_ticker_subscription(exchange_id, mapped_symbol)
-            if not subscription:ption:
-                logger.warning("Ticker subscription not supported for {exchange_id}" %)Ticker subscription not supported for {exchange_id}")
                 return False
 
-            # Добавляем подпискубавляем подписку
-            self.websocket_clients[exchange_id].add_subscription(subscription)iption(subscription)
+            # Формируем сообщение подписки
+            subscription = self._get_ticker_subscription(exchange_id, mapped_symbol)
+            if not subscription:
+                logger.warning("Ticker subscription not supported for {exchange_id}" %)
+                return False
+
+            # Добавляем подписку
+            self.websocket_clients[exchange_id].add_subscription(subscription)
 
             # Регистрируем обработчик, если указан
             if callback:
-                message_type = self._get_ticker_message_type(exchange_id)type = self._get_ticker_message_type(exchange_id)
-                if message_type:                if message_type:
-                    processor = get_message_processor()        processor = get_message_processor()
-                    processor.register_handler(message_type, callback)gister_handler(message_type, callback)
+                message_type = self._get_ticker_message_type(exchange_id)
+                if message_type:
+                    processor = get_message_processor()
+                    processor.register_handler(message_type, callback)
 
             return True
 
-        except Exception as e:e:
-            logger.error("Error subscribing to ticker for {symbol} on {exchange_id}: {str(e)}" %)            logger.error("Error subscribing to ticker for {symbol} on {exchange_id}: {str(e)}" %)
+        except Exception as e:
+            logger.error("Error subscribing to ticker for {symbol} on {exchange_id}: {str(e)}" %)
             return False
 
-    def _get_ticker_subscription(self, exchange_id: str, symbol: str) -> Optional[Dict]:(self, exchange_id: str, symbol: str) -> Optional[Dict]:
+    def _get_ticker_subscription(self, exchange_id: str, symbol: str) -> Optional[Dict]:
         """
-        Возвращает сообщение подписки на тикер подписки на тикер
+        Возвращает сообщение подписки на тикер
 
         Args:
             exchange_id: ID биржи
-            symbol: Символ            symbol: Символ
+            symbol: Символ
 
         Returns:
             Optional[Dict]: Сообщение подписки или None
         """
         # Сообщения подписки для разных бирж
         if exchange_id == 'binance':
-            return {            return {
-                'method': 'SUBSCRIBE',': 'SUBSCRIBE',
-                'params': [f"{symbol.lower()}@ticker"],                'params': [f"{symbol.lower()}@ticker"],
-                'id': int(time.time()).time())
-            }
-        elif exchange_id == 'bybit': == 'bybit':
-            return {            return {
-                'op': 'subscribe',
-                'args': [f"tickers.{symbol}"]     'args': [f"tickers.{symbol}"]
-            }
-        elif exchange_id == 'okx':        elif exchange_id == 'okx':
-            instrument_type = 'SPOT'  # или 'SWAP', 'FUTURES'nstrument_type = 'SPOT'  # или 'SWAP', 'FUTURES'
             return {
-                'op': 'subscribe',scribe',
-                'args': [{                'args': [{
-                    'channel': 'tickers',    'channel': 'tickers',
+                'method': 'SUBSCRIBE',
+                'params': [f"{symbol.lower()}@ticker"],
+                'id': int(time.time())
+            }
+        elif exchange_id == 'bybit':
+            return {
+                'op': 'subscribe',
+                'args': [f"tickers.{symbol}"]
+            }
+        elif exchange_id == 'okx':
+            instrument_type = 'SPOT'  # или 'SWAP', 'FUTURES'
+            return {
+                'op': 'subscribe',
+                'args': [{
+                    'channel': 'tickers',
                     'instId': symbol
-                }]     }]
+                }]
             }
 
-        # Добавить другие биржи по необходимостиругие биржи по необходимости
+        # Добавить другие биржи по необходимости
 
         return None
 
-    def _get_ticker_message_type(self, exchange_id: str) -> Optional[str]:ticker_message_type(self, exchange_id: str) -> Optional[str]:
+    def _get_ticker_message_type(self, exchange_id: str) -> Optional[str]:
         """
-        Возвращает тип сообщения для тикераип сообщения для тикера
+        Возвращает тип сообщения для тикера
 
         Args:
-            exchange_id: ID биржиxchange_id: ID биржи
-
-        Returns:
-            Optional[str]: Тип сообщения или None[str]: Тип сообщения или None
-        """
-        # Типы сообщений для разных биржля разных бирж
-        if exchange_id == 'binance':
-            return '24hrTicker'
-        elif exchange_id == 'bybit':nge_id == 'bybit':
-            return 'tickers'eturn 'tickers'
-        elif exchange_id == 'okx':        elif exchange_id == 'okx':
-            return 'tickers'
-
-        # Добавить другие биржи по необходимостидругие биржи по необходимости
-
-        return None
-
-    async def unsubscribe_from_ticker(self, symbol: str, exchange_id: str) -> bool: symbol: str, exchange_id: str) -> bool:
-        """        """
-        Отписывается от обновлений тикераывается от обновлений тикера
-
-        Args:        Args:
-            symbol: Символol: Символ
             exchange_id: ID биржи
 
         Returns:
-            bool: True, если отписка успешна, иначе False успешна, иначе False
+            Optional[str]: Тип сообщения или None
         """
-        if exchange_id not in self.websocket_clients:ebsocket_clients:
-            logger.warning("WebSocket not initialized for {exchange_id}" %)"WebSocket not initialized for {exchange_id}")
+        # Типы сообщений для разных бирж
+        if exchange_id == 'binance':
+            return '24hrTicker'
+        elif exchange_id == 'bybit':
+            return 'tickers'
+        elif exchange_id == 'okx':
+            return 'tickers'
+
+        # Добавить другие биржи по необходимости
+
+        return None
+
+    async def unsubscribe_from_ticker(self, symbol: str, exchange_id: str) -> bool:
+        """
+        Отписывается от обновлений тикера
+
+        Args:
+            symbol: Символ
+            exchange_id: ID биржи
+
+        Returns:
+            bool: True, если отписка успешна, иначе False
+        """
+        if exchange_id not in self.websocket_clients:
+            logger.warning("WebSocket not initialized for {exchange_id}" %)
             return False
 
-        try:        try:
+        try:
             # Преобразуем символ
-            mapped_symbol = await self.map_symbol(symbol, exchange_id)            mapped_symbol = await self.map_symbol(symbol, exchange_id)
-            if not mapped_symbol:mapped_symbol:
-                logger.warning("Symbol {symbol} not found on {exchange_id}" %)                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
+            mapped_symbol = await self.map_symbol(symbol, exchange_id)
+            if not mapped_symbol:
+                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
                 return False
 
             # Формируем сообщение отписки
-            unsubscription = self._get_ticker_unsubscription(exchange_id, mapped_symbol)            unsubscription = self._get_ticker_unsubscription(exchange_id, mapped_symbol)
-            if not unsubscription:f not unsubscription:
-                logger.warning("Ticker unsubscription not supported for {exchange_id}" %)ning(f"Ticker unsubscription not supported for {exchange_id}")
+            unsubscription = self._get_ticker_unsubscription(exchange_id, mapped_symbol)
+            if not unsubscription:
+                logger.warning("Ticker unsubscription not supported for {exchange_id}" %)
                 return False
 
-            # Отправляем сообщение отпискиправляем сообщение отписки
-            await self.websocket_clients[exchange_id].send(unsubscription)d(unsubscription)
+            # Отправляем сообщение отписки
+            await self.websocket_clients[exchange_id].send(unsubscription)
 
             # Удаляем из списка подписок
-            subscription = self._get_ticker_subscription(exchange_id, mapped_symbol)ed_symbol)
-            if subscription:ion:
-                self.websocket_clients[exchange_id].remove_subscription(subscription)                self.websocket_clients[exchange_id].remove_subscription(subscription)
+            subscription = self._get_ticker_subscription(exchange_id, mapped_symbol)
+            if subscription:
+                self.websocket_clients[exchange_id].remove_subscription(subscription)
 
             return True
 
         except Exception as e:
-            logger.error("Error unsubscribing from ticker for {symbol} on {exchange_id}: {str(e)}" %)xchange_id}: {str(e)}")
+            logger.error("Error unsubscribing from ticker for {symbol} on {exchange_id}: {str(e)}" %)
             return False
 
-    def _get_ticker_unsubscription(self, exchange_id: str, symbol: str) -> Optional[Dict]:exchange_id: str, symbol: str) -> Optional[Dict]:
+    def _get_ticker_unsubscription(self, exchange_id: str, symbol: str) -> Optional[Dict]:
         """
-        Возвращает сообщение отписки от тикераки от тикера
+        Возвращает сообщение отписки от тикера
 
         Args:
-            exchange_id: ID биржи            exchange_id: ID биржи
+            exchange_id: ID биржи
             symbol: Символ
 
-        Returns:        Returns:
-            Optional[Dict]: Сообщение отписки или Noneписки или None
+        Returns:
+            Optional[Dict]: Сообщение отписки или None
         """
-        # Сообщения отписки для разных бирждля разных бирж
+        # Сообщения отписки для разных бирж
         if exchange_id == 'binance':
-            return {            return {
-                'method': 'UNSUBSCRIBE',': 'UNSUBSCRIBE',
-                'params': [f"{symbol.lower()}@ticker"],                'params': [f"{symbol.lower()}@ticker"],
-                'id': int(time.time()).time())
+            return {
+                'method': 'UNSUBSCRIBE',
+                'params': [f"{symbol.lower()}@ticker"],
+                'id': int(time.time())
             }
-        elif exchange_id == 'bybit': == 'bybit':
-            return {            return {
+        elif exchange_id == 'bybit':
+            return {
                 'op': 'unsubscribe',
-                'args': [f"tickers.{symbol}"]     'args': [f"tickers.{symbol}"]
+                'args': [f"tickers.{symbol}"]
             }
-        elif exchange_id == 'okx':        elif exchange_id == 'okx':
-            return {eturn {
-                'op': 'unsubscribe',e',
+        elif exchange_id == 'okx':
+            return {
+                'op': 'unsubscribe',
                 'args': [{
-                    'channel': 'tickers',                    'channel': 'tickers',
-                    'instId': symbol    'instId': symbol
+                    'channel': 'tickers',
+                    'instId': symbol
                 }]
-            } }
+            }
 
-        # Добавить другие биржи по необходимостиеобходимости
+        # Добавить другие биржи по необходимости
 
         return None
 
-    async def subscribe_to_order_book(self, symbol: str, exchange_id: str, depth: int = 20, callback: Callable = None) -> bool:self, symbol: str, exchange_id: str, depth: int = 20, callback: Callable = None) -> bool:
+    async def subscribe_to_order_book(self, symbol: str, exchange_id: str, depth: int = 20, callback: Callable = None) -> bool:
         """
-        Подписывается на обновления книги ордеровкниги ордеров
+        Подписывается на обновления книги ордеров
 
         Args:
             symbol: Символ
-            exchange_id: ID биржиxchange_id: ID биржи
-            depth: Глубина книги ордероврдеров
-            callback: Функция для обработки обновлений: Функция для обработки обновлений
+            exchange_id: ID биржи
+            depth: Глубина книги ордеров
+            callback: Функция для обработки обновлений
 
         Returns:
-            bool: True, если подписка успешна, иначе Falseешна, иначе False
+            bool: True, если подписка успешна, иначе False
         """
-        if exchange_id not in self.websocket_clients:e_id not in self.websocket_clients:
-            logger.warning("WebSocket not initialized for {exchange_id}" %)ogger.warning(f"WebSocket not initialized for {exchange_id}")
-            return False            return False
+        if exchange_id not in self.websocket_clients:
+            logger.warning("WebSocket not initialized for {exchange_id}" %)
+            return False
 
-        try:        try:
-            # Преобразуем символразуем символ
-            mapped_symbol = await self.map_symbol(symbol, exchange_id)            mapped_symbol = await self.map_symbol(symbol, exchange_id)
+        try:
+            # Преобразуем символ
+            mapped_symbol = await self.map_symbol(symbol, exchange_id)
             if not mapped_symbol:
-                logger.warning("Symbol {symbol} not found on {exchange_id}" %)     logger.warning("Symbol {symbol} not found on {exchange_id}" %)
+                logger.warning("Symbol {symbol} not found on {exchange_id}" %)
                 return False
 
-            # Формируем сообщение подписки Формируем сообщение подписки
-            subscription = self._get_orderbook_subscription(exchange_id, mapped_symbol, depth) self._get_orderbook_subscription(exchange_id, mapped_symbol, depth)
+            # Формируем сообщение подписки
+            subscription = self._get_orderbook_subscription(exchange_id, mapped_symbol, depth)
             if not subscription:
-                logger.warning("Order book subscription not supported for {exchange_id}" %)ook subscription not supported for {exchange_id}")
+                logger.warning("Order book subscription not supported for {exchange_id}" %)
                 return False
 
-            # Добавляем подпискубавляем подписку
-            self.websocket_clients[exchange_id].add_subscription(subscription)iption(subscription)
+            # Добавляем подписку
+            self.websocket_clients[exchange_id].add_subscription(subscription)
 
             # Регистрируем обработчик, если указан
             if callback:
-                message_type = self._get_orderbook_message_type(exchange_id)type = self._get_orderbook_message_type(exchange_id)
-                if message_type:                if message_type:
-                    processor = get_message_processor()        processor = get_message_processor()
-                    processor.register_handler(message_type, callback)gister_handler(message_type, callback)
+                message_type = self._get_orderbook_message_type(exchange_id)
+                if message_type:
+                    processor = get_message_processor()
+                    processor.register_handler(message_type, callback)
 
             return True
 
-        except Exception as e:e:
-            logger.error("Error subscribing to order book for {symbol} on {exchange_id}: {str(e)}" %)            logger.error("Error subscribing to order book for {symbol} on {exchange_id}: {str(e)}" %)
+        except Exception as e:
+            logger.error("Error subscribing to order book for {symbol} on {exchange_id}: {str(e)}" %)
             return False
 
-    def _get_orderbook_subscription(self, exchange_id: str, symbol: str, depth: int = 20) -> Optional[Dict]:ion(self, exchange_id: str, symbol: str, depth: int = 20) -> Optional[Dict]:
+    def _get_orderbook_subscription(self, exchange_id: str, symbol: str, depth: int = 20) -> Optional[Dict]:
         """
-        Возвращает сообщение подписки на книгу ордеров подписки на книгу ордеров
+        Возвращает сообщение подписки на книгу ордеров
 
         Args:
             exchange_id: ID биржи
-            symbol: Символ            symbol: Символ
+            symbol: Символ
             depth: Глубина книги ордеров
 
         Returns:
-            Optional[Dict]: Сообщение подписки или Noneщение подписки или None
+            Optional[Dict]: Сообщение подписки или None
         """
         # Сообщения подписки для разных бирж
-        if exchange_id == 'binance':        if exchange_id == 'binance':
+        if exchange_id == 'binance':
             return {
-                'method': 'SUBSCRIBE',                'method': 'SUBSCRIBE',
-                'params': [f"{symbol.lower()}@depth{depth}"],symbol.lower()}@depth{depth}"],
+                'method': 'SUBSCRIBE',
+                'params': [f"{symbol.lower()}@depth{depth}"],
                 'id': int(time.time())
             }
-        elif exchange_id == 'bybit':        elif exchange_id == 'bybit':
+        elif exchange_id == 'bybit':
             return {
-                'op': 'subscribe',     'op': 'subscribe',
-                'args': [f"orderbook.{depth}.{symbol}"]]
-            }            }
-        elif exchange_id == 'okx':exchange_id == 'okx':
+                'op': 'subscribe',
+                'args': [f"orderbook.{depth}.{symbol}"]
+            }
+        elif exchange_id == 'okx':
             return {
-                'op': 'subscribe',scribe',
+                'op': 'subscribe',
                 'args': [{
-                    'channel': 'books',                    'channel': 'books',
-                    'instId': symbol,    'instId': symbol,
+                    'channel': 'books',
+                    'instId': symbol,
                     'depth': depth
-                }]     }]
+                }]
             }
 
-        # Добавить другие биржи по необходимостиругие биржи по необходимости
+        # Добавить другие биржи по необходимости
 
         return None
 
-    def _get_orderbook_message_type(self, exchange_id: str) -> Optional[str]:orderbook_message_type(self, exchange_id: str) -> Optional[str]:
+    def _get_orderbook_message_type(self, exchange_id: str) -> Optional[str]:
         """
-        Возвращает тип сообщения для книги ордеровип сообщения для книги ордеров
+        Возвращает тип сообщения для книги ордеров
 
         Args:
-            exchange_id: ID биржиxchange_id: ID биржи
-
-        Returns:
-            Optional[str]: Тип сообщения или Noneбщения или None
-        """
-        # Типы сообщений для разных биржж
-        if exchange_id == 'binance':
-            return 'depthUpdate'
-        elif exchange_id == 'bybit':nge_id == 'bybit':
-            return 'orderbook'eturn 'orderbook'
-        elif exchange_id == 'okx':        elif exchange_id == 'okx':
-            return 'books'
-
-        # Добавить другие биржи по необходимостидругие биржи по необходимости
-
-        return None
-
-    async def get_deposit_address(self, currency: str, exchange_id: str) -> Optional[Dict]:str, exchange_id: str) -> Optional[Dict]:
-        """        """
-        Получает адрес для пополнения балансаает адрес для пополнения баланса
-
-        Args:        Args:
-            currency: Валютаency: Валюта
             exchange_id: ID биржи
 
         Returns:
-            Optional[Dict]: Информация об адресе или Noneия об адресе или None
+            Optional[str]: Тип сообщения или None
+        """
+        # Типы сообщений для разных бирж
+        if exchange_id == 'binance':
+            return 'depthUpdate'
+        elif exchange_id == 'bybit':
+            return 'orderbook'
+        elif exchange_id == 'okx':
+            return 'books'
+
+        # Добавить другие биржи по необходимости
+
+        return None
+
+    async def get_deposit_address(self, currency: str, exchange_id: str) -> Optional[Dict]:
+        """
+        Получает адрес для пополнения баланса
+
+        Args:
+            currency: Валюта
+            exchange_id: ID биржи
+
+        Returns:
+            Optional[Dict]: Информация об адресе или None
         """
         try:
-            # Отслеживаем ограничения частоты запросовничения частоты запросов
-            await self.rate_limits[exchange_id].acquire()[exchange_id].acquire()
+            # Отслеживаем ограничения частоты запросов
+            await self.rate_limits[exchange_id].acquire()
 
-            # Получаем экземпляр биржи            # Получаем экземпляр биржи
-            exchange = await self.get_exchange(exchange_id)xchange_id)
+            # Получаем экземпляр биржи
+            exchange = await self.get_exchange(exchange_id)
 
-            # Проверяем, поддерживает ли биржа эту функциюряем, поддерживает ли биржа эту функцию
-            if not exchange.has.get('fetchDepositAddress', False):            if not exchange.has.get('fetchDepositAddress', False):
-                logger.warning("Exchange {exchange_id} does not support deposit addresses" %))
-                return None     return None
+            # Проверяем, поддерживает ли биржа эту функцию
+            if not exchange.has.get('fetchDepositAddress', False):
+                logger.warning("Exchange {exchange_id} does not support deposit addresses" %)
+                return None
 
-            # Получаем адрес            # Получаем адрес
-            address = await exchange.fetch_deposit_address(currency)ddress = await exchange.fetch_deposit_address(currency)
+            # Получаем адрес
+            address = await exchange.fetch_deposit_address(currency)
 
             return address
 
-        except Exception as e:xception as e:
+        except Exception as e:
             # Увеличиваем счетчик ошибок
-            self._increment_error_counter(exchange_id, e) self._increment_error_counter(exchange_id, e)
+            self._increment_error_counter(exchange_id, e)
 
-            logger.error("Error fetching deposit address for {currency} on {exchange_id}: {str(e)}" %)ess for {currency} on {exchange_id}: {str(e)}")
+            logger.error("Error fetching deposit address for {currency} on {exchange_id}: {str(e)}" %)
             return None
 
-    async def withdraw(self, currency: str, amount: float, address: str, exchange_id: str, tag: str = None, params: Dict = None) -> Optional[Dict]: str, amount: float, address: str, exchange_id: str, tag: str = None, params: Dict = None) -> Optional[Dict]:
+    async def withdraw(self, currency: str, amount: float, address: str, exchange_id: str, tag: str = None, params: Dict = None) -> Optional[Dict]:
         """
-        Выводит средства        Выводит средства
+        Выводит средства
 
         Args:
             currency: Валюта
             amount: Сумма
-            address: Адрес            address: Адрес
-            exchange_id: ID биржибиржи
+            address: Адрес
+            exchange_id: ID биржи
             tag: Тег или memo
-            params: Дополнительные параметры            params: Дополнительные параметры
+            params: Дополнительные параметры
 
-        Returns:        Returns:
-            Optional[Dict]: Информация о выводе или Noneформация о выводе или None
+        Returns:
+            Optional[Dict]: Информация о выводе или None
         """
         try:
-            # Отслеживаем ограничения частоты запросов            # Отслеживаем ограничения частоты запросов
+            # Отслеживаем ограничения частоты запросов
             await self.rate_limits[exchange_id].acquire()
 
-            # Получаем экземпляр биржи            # Получаем экземпляр биржи
+            # Получаем экземпляр биржи
             exchange = await self.get_exchange(exchange_id)
 
-            # Проверяем, поддерживает ли биржа эту функцию поддерживает ли биржа эту функцию
-            if not exchange.has.get('withdraw', False):            if not exchange.has.get('withdraw', False):
-                logger.warning("Exchange {exchange_id} does not support withdrawals" %)   logger.warning("Exchange {exchange_id} does not support withdrawals" %)
+            # Проверяем, поддерживает ли биржа эту функцию
+            if not exchange.has.get('withdraw', False):
+                logger.warning("Exchange {exchange_id} does not support withdrawals" %)
                 return None
 
-            # Формируем параметрыраметры
-            withdraw_params = params or {}ams or {}
+            # Формируем параметры
+            withdraw_params = params or {}
             if tag:
                 withdraw_params['tag'] = tag
 
-            # Выполняем выводполняем вывод
-            withdrawal = await exchange.withdraw(currency, amount, address, tag, withdraw_params)y, amount, address, tag, withdraw_params)
+            # Выполняем вывод
+            withdrawal = await exchange.withdraw(currency, amount, address, tag, withdraw_params)
 
-            # Инвалидируем кеш баланса# Инвалидируем кеш баланса
-            await self.cache.invalidate('balance', exchange_id)hange_id)
+            # Инвалидируем кеш баланса
+            await self.cache.invalidate('balance', exchange_id)
 
-            return withdrawal            return withdrawal
+            return withdrawal
 
         except Exception as e:
-            # Увеличиваем счетчик ошибок            # Увеличиваем счетчик ошибок
+            # Увеличиваем счетчик ошибок
             self._increment_error_counter(exchange_id, e)
 
-            logger.error("Error withdrawing {amount} {currency} to {address} on {exchange_id}: {str(e)}" %)ange_id}: {str(e)}")
+            logger.error("Error withdrawing {amount} {currency} to {address} on {exchange_id}: {str(e)}" %)
             return None
 
-    async def get_transfer_fee(self, currency: str, exchange_id: str) -> Optional[Dict]:lf, currency: str, exchange_id: str) -> Optional[Dict]:
+    async def get_transfer_fee(self, currency: str, exchange_id: str) -> Optional[Dict]:
         """
-        Получает комиссию за выводмиссию за вывод
+        Получает комиссию за вывод
 
-        Args:        Args:
+        Args:
             currency: Валюта
             exchange_id: ID биржи
 
         Returns:
             Optional[Dict]: Информация о комиссии или None
-        """        """
+        """
         try:
-            # Отслеживаем ограничения частоты запросов            # Отслеживаем ограничения частоты запросов
-            await self.rate_limits[exchange_id].acquire()mits[exchange_id].acquire()
+            # Отслеживаем ограничения частоты запросов
+            await self.rate_limits[exchange_id].acquire()
 
             # Получаем экземпляр биржи
-            exchange = await self.get_exchange(exchange_id)            exchange = await self.get_exchange(exchange_id)
+            exchange = await self.get_exchange(exchange_id)
 
-            # Получаем информацию о валютеинформацию о валюте
-            currencies = await exchange.fetch_currencies()            currencies = await exchange.fetch_currencies()
+            # Получаем информацию о валюте
+            currencies = await exchange.fetch_currencies()
 
-            if not currencies or currency not in currencies: if not currencies or currency not in currencies:
-                logger.warning("Currency {currency} not found on {exchange_id}" %)urrency {currency} not found on {exchange_id}")
-                return None                return None
+            if not currencies or currency not in currencies:
+                logger.warning("Currency {currency} not found on {exchange_id}" %)
+                return None
 
-            # Возвращаем информацию о комиссииормацию о комиссии
-            currency_info = currencies[currency]ncies[currency]
+            # Возвращаем информацию о комиссии
+            currency_info = currencies[currency]
 
-            return {rn {
+            return {
                 'currency': currency,
-                'withdraw_fee': currency_info.get('fee'),     'withdraw_fee': currency_info.get('fee'),
-                'withdraw_min': currency_info.get('limits', {}).get('withdraw', {}).get('min'),    'withdraw_min': currency_info.get('limits', {}).get('withdraw', {}).get('min'),
-                'withdraw_max': currency_info.get('limits', {}).get('withdraw', {}).get('max'),its', {}).get('withdraw', {}).get('max'),
-                'networks': currency_info.get('networks', {}) {})
-            }            }
+                'withdraw_fee': currency_info.get('fee'),
+                'withdraw_min': currency_info.get('limits', {}).get('withdraw', {}).get('min'),
+                'withdraw_max': currency_info.get('limits', {}).get('withdraw', {}).get('max'),
+                'networks': currency_info.get('networks', {})
+            }
 
         except Exception as e:
-            # Увеличиваем счетчик ошибок            # Увеличиваем счетчик ошибок
-            self._increment_error_counter(exchange_id, e)exchange_id, e)
+            # Увеличиваем счетчик ошибок
+            self._increment_error_counter(exchange_id, e)
 
-            logger.error("Error fetching transfer fee for {currency} on {exchange_id}: {str(e)}" %)            logger.error("Error fetching transfer fee for {currency} on {exchange_id}: {str(e)}" %)
+            logger.error("Error fetching transfer fee for {currency} on {exchange_id}: {str(e)}" %)
             return None
 
-    async def get_exchange_info(self, exchange_id: str) -> Optional[Dict]:info(self, exchange_id: str) -> Optional[Dict]:
-        """        """
+    async def get_exchange_info(self, exchange_id: str) -> Optional[Dict]:
+        """
         Получает общую информацию о бирже
 
-        Args:        Args:
-            exchange_id: ID биржи_id: ID биржи
+        Args:
+            exchange_id: ID биржи
 
         Returns:
             Optional[Dict]: Информация о бирже или None
         """
         try:
-            # Получаем экземпляр биржи Получаем экземпляр биржи
-            exchange = await self.get_exchange(exchange_id)            exchange = await self.get_exchange(exchange_id)
+            # Получаем экземпляр биржи
+            exchange = await self.get_exchange(exchange_id)
 
             # Формируем информацию
             info = {
-                'id': exchange_id,                'id': exchange_id,
+                'id': exchange_id,
                 'name': exchange.name,
-                'countries': exchange.countries,ies': exchange.countries,
-                'urls': exchange.urls,                'urls': exchange.urls,
+                'countries': exchange.countries,
+                'urls': exchange.urls,
                 'version': exchange.version,
-                'api_docs': exchange.urls.get('api') or exchange.urls.get('apiDocs'),     'api_docs': exchange.urls.get('api') or exchange.urls.get('apiDocs'),
+                'api_docs': exchange.urls.get('api') or exchange.urls.get('apiDocs'),
                 'has': exchange.has,
-                'timeframes': exchange.timeframes,                'timeframes': exchange.timeframes,
-                'timeout': exchange.timeout,   'timeout': exchange.timeout,
-                'rate_limit': exchange.rate_limit,hange.rate_limit,
-                'user_agent': exchange.userAgent,                'user_agent': exchange.userAgent,
-                'rate_limit_usage': self.rate_limits[exchange_id].get_usage() if exchange_id in self.rate_limits else None,'rate_limit_usage': self.rate_limits[exchange_id].get_usage() if exchange_id in self.rate_limits else None,
-                'error_stats': self.error_counters.get(exchange_id, {}),exchange_id, {}),
-                'score': self.exchange_scores.get(exchange_id, 0)     'score': self.exchange_scores.get(exchange_id, 0)
-            }}
+                'timeframes': exchange.timeframes,
+                'timeout': exchange.timeout,
+                'rate_limit': exchange.rate_limit,
+                'user_agent': exchange.userAgent,
+                'rate_limit_usage': self.rate_limits[exchange_id].get_usage() if exchange_id in self.rate_limits else None,
+                'error_stats': self.error_counters.get(exchange_id, {}),
+                'score': self.exchange_scores.get(exchange_id, 0)
+            }
 
             return info
 
         except Exception as e:
-            logger.error("Error fetching exchange info for {exchange_id}: {str(e)}" %)rror(f"Error fetching exchange info for {exchange_id}: {str(e)}")
+            logger.error("Error fetching exchange info for {exchange_id}: {str(e)}" %)
             return None
 
-    async def get_markets(self, exchange_id: str, reload: bool = False) -> Optional[Dict]:, reload: bool = False) -> Optional[Dict]:
+    async def get_markets(self, exchange_id: str, reload: bool = False) -> Optional[Dict]:
         """
         Получает список рынков
 
@@ -2188,51 +2188,49 @@ class ExchangeManager:
             Optional[Dict]: Список рынков или None
         """
         # Проверяем в кеше
-        cached_markets = await self.cache.get('markets', exchange_id)d_markets = await self.cache.get('markets', exchange_id)
-        if cached_markets and not reload:        if cached_markets and not reload:
-            return cached_marketsed_markets
+        cached_markets = await self.cache.get('markets', exchange_id)
+        if cached_markets and not reload:
+            return cached_markets
 
         try:
             # Отслеживаем ограничения частоты запросов
-            await self.rate_limits[exchange_id].acquire()rate_limits[exchange_id].acquire()
+            await self.rate_limits[exchange_id].acquire()
 
             # Получаем экземпляр биржи
-            exchange = await self.get_exchange(exchange_id) exchange = await self.get_exchange(exchange_id)
+            exchange = await self.get_exchange(exchange_id)
 
-            # Загружаем рынки            # Загружаем рынки
-            markets = await exchange.load_markets()arkets = await exchange.load_markets()
+            # Загружаем рынки
+            markets = await exchange.load_markets()
 
             # Сохраняем в кеш
-            await self.cache.set('markets', markets, exchange_id)            await self.cache.set('markets', markets, exchange_id)
+            await self.cache.set('markets', markets, exchange_id)
 
             return markets
 
-        except Exception as e:s e:
+        except Exception as e:
             # Увеличиваем счетчик ошибок
-            self._increment_error_counter(exchange_id, e)ter(exchange_id, e)
+            self._increment_error_counter(exchange_id, e)
 
-            logger.error("Error fetching markets on {exchange_id}: {str(e)}" %)            logger.error("Error fetching markets on {exchange_id}: {str(e)}" %)
-            return Nonereturn None
+            logger.error("Error fetching markets on {exchange_id}: {str(e)}" %)
+            return None
 
     def send_order(self, exchange_id, order_params):
-        """Отправляет ордер на биржу"""        """Отправляет ордер на биржу"""
-        if exchange_id in self.exchanges:es:
-            # ...existing code...
-            pass            pass
-        elif exchange_id in self.paper_trading_exchanges:elf.paper_trading_exchanges:
-            # Добавляем пропущенный блок после elif
-            return self.paper_trading_exchanges[exchange_id].send_order(order_params)            return self.paper_trading_exchanges[exchange_id].send_order(order_params)
+        """Отправляет ордер на биржу"""
+        if exchange_id in self.exchanges:
+            pass
+        elif exchange_id in self.paper_trading_exchanges:
+            return self.paper_trading_exchanges[exchange_id].send_order(order_params)
         else:
             raise ValueError(f"Exchange {exchange_id} not found")
 
 
-# Глобальный экземпляр менеджера бирж# Глобальный экземпляр менеджера бирж
+# Глобальный экземпляр менеджера бирж
 _exchange_manager = None
 
 
-async def get_exchange_manager() -> ExchangeManager:async def get_exchange_manager() -> ExchangeManager:
+async def get_exchange_manager() -> ExchangeManager:
     """
-    Возвращает глобальный экземпляр менеджера биржый экземпляр менеджера бирж
+    Возвращает глобальный экземпляр менеджера бирж
 
     Returns:
         ExchangeManager: Менеджер бирж
@@ -2246,15 +2244,15 @@ async def get_exchange_manager() -> ExchangeManager:async def get_exchange_manag
     return _exchange_manager
 
 
-async def get_exchange_instance(exchange_id: str) -> ccxt.Exchange:nge_id: str) -> ccxt.Exchange:
+async def get_exchange_instance(exchange_id: str) -> ccxt.Exchange:
     """
-    Возвращает экземпляр биржи    Возвращает экземпляр биржи
+    Возвращает экземпляр биржи
 
     Args:
-        exchange_id: ID биржи exchange_id: ID биржи
+        exchange_id: ID биржи
 
-    Returns:    Returns:
-        ccxt.Exchange: Экземпляр биржи.Exchange: Экземпляр биржи
+    Returns:
+        ccxt.Exchange: Экземпляр биржи
     """
-    exchange_manager = await get_exchange_manager()hange_manager = await get_exchange_manager()
-    return await exchange_manager.get_exchange(exchange_id)nager.get_exchange(exchange_id)
+    exchange_manager = await get_exchange_manager()
+    return await exchange_manager.get_exchange(exchange_id)
