@@ -59,7 +59,7 @@ class DataVisualizer:
             },
         }
 
-        logger.info("DataVisualizer initialized with theme: {theme}" %)
+        logger.info(f"DataVisualizer initialized with theme: {theme}" )
 
     def plot_ohlc(
         self,
@@ -87,7 +87,7 @@ class DataVisualizer:
             required_columns = ["open", "high", "low", "close"]
             for col in required_columns:
                 if col not in data.columns:
-                    logger.error("Missing required column: {col}" %)
+                    logger.error(f"Missing required column: {col}" )
                     return None
 
             # Создаем figure и определяем размер подграфиков
@@ -251,7 +251,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error("Error plotting OHLC chart: {str(e)}" %)
+            logger.error(f"Error plotting OHLC chart: {str(e)}" )
             return None
 
     def plot_ohlc_plotly(
@@ -280,7 +280,7 @@ class DataVisualizer:
             required_columns = ["open", "high", "low", "close"]
             for col in required_columns:
                 if col not in data.columns:
-                    logger.error("Missing required column: {col}" %)
+                    logger.error(f"Missing required column: {col}" )
                     return None
 
             # Определяем количество подграфиков
@@ -424,7 +424,7 @@ class DataVisualizer:
             return html
 
         except Exception as e:
-            logger.error("Error plotting OHLC chart with Plotly: {str(e)}" %)
+            logger.error(f"Error plotting OHLC chart with Plotly: {str(e)}" )
             return None
 
     def plot_equity_curve(
@@ -446,7 +446,7 @@ class DataVisualizer:
         """
         try:
             # Преобразуем список словарей в DataFrame
-            if isinstance(equity_curve, list) и len(equity_curve) > 0:
+            if isinstance(equity_curve, list) and len(equity_curve) > 0:
                 df = pd.DataFrame(equity_curve)
 
                 # Преобразуем временные метки
@@ -525,7 +525,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error("Error plotting equity curve: {str(e)}" %)
+            logger.error(f"Error plotting equity curve: {str(e)}" )
             return None
 
     def plot_equity_curve_plotly(
@@ -547,7 +547,7 @@ class DataVisualizer:
         """
         try:
             # Преобразуем список словарей в DataFrame
-            if isinstance(equity_curve, list) и len(equity_curve) > 0:
+            if isinstance(equity_curve, list) and len(equity_curve) > 0:
                 df = pd.DataFrame(equity_curve)
 
                 # Преобразуем временные метки
@@ -653,7 +653,7 @@ class DataVisualizer:
             return html
 
         except Exception as e:
-            logger.error("Error plotting equity curve with Plotly: {str(e)}" %)
+            logger.error(f"Error plotting equity curve with Plotly: {str(e)}" )
             return None
 
     def plot_trades(
@@ -736,7 +736,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error("Error plotting trades: {str(e)}" %)
+            logger.error(f"Error plotting trades: {str(e)}" )
             return None
 
     def plot_trades_plotly(
@@ -835,7 +835,7 @@ class DataVisualizer:
             return html
 
         except Exception as e:
-            logger.error("Error plotting trades with Plotly: {str(e)}" %)
+            logger.error(f"Error plotting trades with Plotly: {str(e)}" )
             return None
 
     def plot_drawdown(
@@ -857,7 +857,7 @@ class DataVisualizer:
         """
         try:
             # Преобразуем список словарей в DataFrame
-            if isinstance(equity_curve, list) и len(equity_curve) > 0:
+            if isinstance(equity_curve, list) and len(equity_curve) > 0:
                 df = pd.DataFrame(equity_curve)
 
                 # Преобразуем временные метки
@@ -938,7 +938,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error("Error plotting drawdown: {str(e)}" %)
+            logger.error(f"Error plotting drawdown: {str(e)}" )
             return None
 
     def plot_monthly_returns(
@@ -1041,7 +1041,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error("Error plotting monthly returns: {str(e)}" %)
+            logger.error(f"Error plotting monthly returns: {str(e)}" )
             return None
 
     def plot_win_loss_distribution(
@@ -1115,20 +1115,30 @@ class DataVisualizer:
                 ax1.text(
                     0.05,
                     0.95,
-                    f"Count: {len(win_trades)}\nMean: {win_trades.mean():.2f}\nMax: {win_trades.max():.2f}",
+                    f"Count: {
+                        len(win_trades)}\nMean: {
+                        win_trades.mean():.2f}\nMax: {
+                        win_trades.max():.2f}",
                     transform=ax1.transAxes,
                     verticalalignment="top",
-                    bbox=dict(boxstyle="round", alpha=0.1),
+                    bbox=dict(
+                        boxstyle="round",
+                        alpha=0.1),
                 )
 
             if len(loss_trades) > 0:
                 ax2.text(
                     0.05,
                     0.95,
-                    f"Count: {len(loss_trades)}\nMean: {loss_trades.mean():.2f}\nMin: {loss_trades.min():.2f}",
+                    f"Count: {
+                        len(loss_trades)}\nMean: {
+                        loss_trades.mean():.2f}\nMin: {
+                        loss_trades.min():.2f}",
                     transform=ax2.transAxes,
                     verticalalignment="top",
-                    bbox=dict(boxstyle="round", alpha=0.1),
+                    bbox=dict(
+                        boxstyle="round",
+                        alpha=0.1),
                 )
 
             # Устанавливаем общий заголовок
@@ -1160,7 +1170,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error("Error plotting win/loss distribution: {str(e)}" %)
+            logger.error(f"Error plotting win/loss distribution: {str(e)}" )
             return None
 
     def plot_trade_durations(
@@ -1260,7 +1270,10 @@ class DataVisualizer:
             ax.set_ylabel("Frequency")
 
             # Добавляем статистику
-            stats_text = f"Mean: {df['duration_hours'].mean():.2f} hours\nMedian: {df['duration_hours'].median():.2f} hours\nMax: {df['duration_hours'].max():.2f} hours"
+            stats_text = f"Mean: {
+                df['duration_hours'].mean():.2f} hours\nMedian: {
+                df['duration_hours'].median():.2f} hours\nMax: {
+                df['duration_hours'].max():.2f} hours"
             ax.text(
                 0.05,
                 0.95,
@@ -1293,7 +1306,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error("Error plotting trade durations: {str(e)}" %)
+            logger.error(f"Error plotting trade durations: {str(e)}" )
             return None
 
     def plot_correlation_matrix(
@@ -1389,7 +1402,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error("Error plotting correlation matrix: {str(e)}" %)
+            logger.error(f"Error plotting correlation matrix: {str(e)}" )
             return None
 
     def plot_optimization_results(
@@ -1415,7 +1428,7 @@ class DataVisualizer:
         """
         try:
             # Проверяем входные данные
-            if not results или "all_results" not in results:
+            if not results or "all_results" not in results:
                 logger.error("Invalid optimization results")
                 return None
 
@@ -1512,7 +1525,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error("Error plotting optimization results: {str(e)}" %)
+            logger.error(f"Error plotting optimization results: {str(e)}" )
             return None
 
     def plot_optimization_3d(
@@ -1538,7 +1551,7 @@ class DataVisualizer:
         """
         try:
             # Проверяем входные данные
-            if not results или "all_results" not in results:
+            if not results or "all_results" not in results:
                 logger.error("Invalid optimization results")
                 return None
 
@@ -1575,7 +1588,7 @@ class DataVisualizer:
             x_unique = sorted(df[param1].unique())
             y_unique = sorted(df[param2].unique())
 
-            if len(x_unique) > 1 и len(y_unique) > 1:
+            if len(x_unique) > 1 and len(y_unique) > 1:
                 # Создаем сетку значений
                 X, Y = np.meshgrid(x_unique, y_unique)
 
@@ -1653,7 +1666,10 @@ class DataVisualizer:
                     best_result[param1],
                     best_result[param2],
                     best_result["fitness"],
-                    f"Best: {best_result['fitness']:.2f}\n{param1}={best_result[param1]}, {param2}={best_result[param2]}",
+                    f"Best: {
+                        best_result['fitness']:.2f}\n{param1}={
+                        best_result[param1]}, {param2}={
+                        best_result[param2]}",
                     color="black",
                 )
 
@@ -1686,7 +1702,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error("Error plotting 3D optimization results: {str(e)}" %)
+            logger.error(f"Error plotting 3D optimization results: {str(e)}" )
             return None
 
     def plot_signals(
@@ -1740,7 +1756,7 @@ class DataVisualizer:
                 price = signal.get("price")
 
                 # Если цена не указана, используем цену закрытия для соответствующей даты
-                if price is None и timestamp in data.index:
+                if price is None and timestamp in data.index:
                     price = data.loc[timestamp, "close"]
                 elif price is None:
                     # Находим ближайшую дату
@@ -1813,7 +1829,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error("Error plotting signals: {str(e)}" %)
+            logger.error(f"Error plotting signals: {str(e)}" )
             return None
 
     def plot_market_dashboard(
@@ -1858,9 +1874,9 @@ class DataVisualizer:
             # Перебираем инструменты и создаем графики
             for i, (symbol, df) in enumerate(data.items()):
                 # Получаем соответствующую ось
-                if nrows > 1 и ncols > 1:
+                if nrows > 1 and ncols > 1:
                     ax = axes[i // ncols, i % ncols]
-                elif nrows > 1 или ncols > 1:
+                elif nrows > 1 or ncols > 1:
                     ax = axes[i]
                 else:
                     ax = axes
@@ -1928,9 +1944,9 @@ class DataVisualizer:
 
             # Скрываем пустые графики
             for i in range(num_instruments, nrows * ncols):
-                if nrows > 1 и ncols > 1:
+                if nrows > 1 and ncols > 1:
                     axes[i // ncols, i % ncols].axis("off")
-                elif nrows > 1 или ncols > 1:
+                elif nrows > 1 or ncols > 1:
                     axes[i].axis("off")
 
             # Устанавливаем общий заголовок
@@ -1958,7 +1974,7 @@ class DataVisualizer:
             return img_str
 
         except Exception as e:
-            logger.error("Error plotting market dashboard: {str(e)}" %)
+            logger.error(f"Error plotting market dashboard: {str(e)}" )
             return None
 
     def save_figure(self, fig: Figure, filename: str, dpi: int = 100) -> bool:
@@ -1983,17 +1999,17 @@ class DataVisualizer:
             # Закрываем фигуру, чтобы избежать утечки памяти
             plt.close(fig)
 
-            logger.info("Figure saved to {filename}" %)
+            logger.info(f"Figure saved to {filename}" )
             return True
 
         except Exception as e:
-            logger.error("Error saving figure: {str(e)}" %)
+            logger.error(f"Error saving figure: {str(e)}" )
             return False
 
     def get_connection_params(self) -> Tuple[str, dict]:
         """
         Возвращает параметры подключения для визуализатора.
-        
+
         Returns:
             Tuple с URL и параметрами подключения.
         """
