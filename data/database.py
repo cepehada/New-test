@@ -318,10 +318,70 @@ class Database:
                 raise
 
     async def save_order(self, order_data: Dict[str, Any]) -> bool:
-        """Сохраняет информацию о ордере в базу данных"""
+        """
+        Сохраняет информацию о ордере в базу данных
+
+        Args:
+            order_data: Данные ордера для сохранения
+
+        Returns:
+            bool: True если успешно, иначе False
+        """
         try:
-            # Логика сохранения ордера
+            # Проверяем, что соединение установлено
+            if not self._connection:
+                await self.connect()
+            
+            # Экранируем JSON параметры
+            params_json = "{}"
+            if "params" in order_data:
+                params_json = json.dumps(order_data["params"])
+            
+            # Создаем заготовку SQL-запроса
+            async with self._lock:
+                await self._connection.execute(
+                    """
+                    INSERT INTO orders (
+                        order_id, symbol, exchange, timestamp, type, side,
+                        price, amount, filled, remaining, cost, average,
+                        status, fee_cost, fee_currency, params, is_closed, client_order_id, strategy_id
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(order_id, exchange) DO UPDATE SET
+                        status = excluded.status,
+                        filled = excluded.filled,
+                        remaining = excluded.remaining,
+                        average = excluded.average,
+                        cost = excluded.cost,
+                        fee_cost = excluded.fee_cost,
+                        is_closed = excluded.is_closed
+                    """,
+                    (
+                        order_data.get("order_id", ""),
+                        order_data.get("symbol", ""),
+                        order_data.get("exchange", ""),
+                        order_data.get("timestamp", int(time.time() * 1000)),
+                        order_data.get("type", ""),
+                        order_data.get("side", ""),
+                        order_data.get("price", 0.0),
+                        order_data.get("amount", 0.0),
+                        order_data.get("filled", 0.0),
+                        order_data.get("remaining", 0.0),
+                        order_data.get("cost", 0.0),
+                        order_data.get("average", 0.0),
+                        order_data.get("status", "open"),
+                        order_data.get("fee_cost", 0.0),
+                        order_data.get("fee_currency", ""),
+                        params_json,
+                        order_data.get("is_closed", False),
+                        order_data.get("client_order_id", ""),
+                        order_data.get("strategy_id", "")
+                    )
+                )
+                await self._connection.commit()
+            
+            logger.debug(f"Ордер сохранен/обновлен: {order_data.get('order_id')}")
             return True
+            
         except Exception as e:
-            print(f"Ошибка при сохранении ордера: {str(e)}")
+            logger.error(f"Ошибка при сохранении ордера: {str(e)}")
             return False

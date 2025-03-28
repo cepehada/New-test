@@ -18,11 +18,170 @@ except ImportError:
 
 # Local imports
 from project.technical_analysis.indicators import Indicators
-from project.technical_analysis.patterns import detect_patterns
 from project.utils.error_handler import handle_error
 from project.utils.logging_utils import setup_logger
 
 logger = setup_logger(__name__)
+
+
+class Patterns:
+    """
+    Класс для обнаружения свечных паттернов.
+    """
+    
+    @staticmethod
+    def engulfing(data: pd.DataFrame, bullish: bool = True) -> pd.Series:
+        """
+        Обнаруживает паттерн поглощения (Engulfing).
+        
+        Args:
+            data: DataFrame с данными OHLCV
+            bullish: True для бычьего паттерна, False для медвежьего
+            
+        Returns:
+            Series с булевыми значениями для каждой свечи
+        """
+        if len(data) < 2:
+            return pd.Series(False, index=data.index)
+            
+        # Определяем направления свечей (True для роста, False для падения)
+        candle_direction = data['close'] > data['open']
+        
+        if bullish:
+            # Бычий паттерн: предыдущая свеча падающая, текущая растущая и поглощающая
+            engulfing = (
+                (~candle_direction.shift(1)) &  # Предыдущая свеча падающая
+                candle_direction &  # Текущая свеча растущая
+                (data['open'] < data['close'].shift(1)) &  # Открытие ниже закрытия предыдущей
+                (data['close'] > data['open'].shift(1))  # Закрытие выше открытия предыдущей
+            )
+        else:
+            # Медвежий паттерн: предыдущая свеча растущая, текущая падающая и поглощающая
+            engulfing = (
+                candle_direction.shift(1) &  # Предыдущая свеча растущая
+                (~candle_direction) &  # Текущая свеча падающая
+                (data['open'] > data['close'].shift(1)) &  # Открытие выше закрытия предыдущей
+                (data['close'] < data['open'].shift(1))  # Закрытие ниже открытия предыдущей
+            )
+            
+        return engulfing.fillna(False)
+    
+    @staticmethod
+    def hammer(data: pd.DataFrame) -> pd.Series:
+        """
+        Обнаруживает паттерн молота (Hammer).
+        
+        Args:
+            data: DataFrame с данными OHLCV
+            
+        Returns:
+            Series с булевыми значениями для каждой свечи
+        """
+        if len(data) < 1:
+            return pd.Series(False, index=data.index)
+            
+        # Вычисляем тело свечи и тени
+        body = abs(data['close'] - data['open'])
+        upper_shadow = data['high'] - data[['open', 'close']].max(axis=1)
+        lower_shadow = data[['open', 'close']].min(axis=1) - data['low']
+        
+        # Определяем паттерн молота
+        hammer = (
+            (lower_shadow > 2 * body) &  # Нижняя тень в 2+ раза длиннее тела
+            (upper_shadow < 0.2 * body) &  # Верхняя тень короткая
+            (body > 0)  # Свеча должна иметь тело
+        )
+        
+        return hammer.fillna(False)
+    
+    @staticmethod
+    def shooting_star(data: pd.DataFrame) -> pd.Series:
+        """
+        Обнаруживает паттерн падающей звезды (Shooting Star).
+        
+        Args:
+            data: DataFrame с данными OHLCV
+            
+        Returns:
+            Series с булевыми значениями для каждой свечи
+        """
+        if len(data) < 1:
+            return pd.Series(False, index=data.index)
+            
+        # Вычисляем тело свечи и тени
+        body = abs(data['close'] - data['open'])
+        upper_shadow = data['high'] - data[['open', 'close']].max(axis=1)
+        lower_shadow = data[['open', 'close']].min(axis=1) - data['low']
+        
+        # Определяем паттерн падающей звезды
+        shooting_star = (
+            (upper_shadow > 2 * body) &  # Верхняя тень в 2+ раза длиннее тела
+            (lower_shadow < 0.2 * body) &  # Нижняя тень короткая
+            (body > 0) &  # Свеча должна иметь тело
+            (data['close'] < data['open'])  # Закрытие ниже открытия (падающая свеча)
+        )
+        
+        return shooting_star.fillna(False)
+    
+    @staticmethod
+    def morning_star(data: pd.DataFrame) -> pd.Series:
+        """
+        Обнаруживает паттерн утренней звезды (Morning Star).
+        
+        Args:
+            data: DataFrame с данными OHLCV
+            
+        Returns:
+            Series с булевыми значениями для каждой свечи
+        """
+        if len(data) < 3:
+            return pd.Series(False, index=data.index)
+            
+        # Определяем направления свечей
+        candle_direction = data['close'] > data['open']
+        
+        # Размеры тел свечей
+        body_size = abs(data['close'] - data['open'])
+        
+        # Определяем паттерн утренней звезды
+        morning_star = (
+            (~candle_direction.shift(2)) &  # Первая свеча падающая
+            (body_size.shift(1) < 0.5 * body_size.shift(2)) &  # Вторая свеча с маленьким телом
+            candle_direction &  # Третья свеча растущая
+            (data['close'] > (data['open'].shift(2) + data['close'].shift(2)) / 2)  # Закрытие выше середины первой свечи
+        )
+        
+        return morning_star.fillna(False)
+    
+    @staticmethod
+    def evening_star(data: pd.DataFrame) -> pd.Series:
+        """
+        Обнаруживает паттерн вечерней звезды (Evening Star).
+        
+        Args:
+            data: DataFrame с данными OHLCV
+            
+        Returns:
+            Series с булевыми значениями для каждой свечи
+        """
+        if len(data) < 3:
+            return pd.Series(False, index=data.index)
+            
+        # Определяем направления свечей
+        candle_direction = data['close'] > data['open']
+        
+        # Размеры тел свечей
+        body_size = abs(data['close'] - data['open'])
+        
+        # Определяем паттерн вечерней звезды
+        evening_star = (
+            (candle_direction.shift(2)) &  # Первая свеча растущая
+            (body_size.shift(1) < 0.5 * body_size.shift(2)) &  # Вторая свеча с маленьким телом
+            (~candle_direction) &  # Третья свеча падающая
+            (data['close'] < (data['open'].shift(2) + data['close'].shift(2)) / 2)  # Закрытие ниже середины первой свечи
+        )
+        
+        return evening_star.fillna(False)
 
 
 class SignalGenerator:
