@@ -1,18 +1,14 @@
 """
-Основной пакет алгоритмического торгового бота.
-Включает в себя модули для управления стратегиями, исполнения ордеров,
-управления рисками, технического анализа и интеграций с внешними API.
+Trading Bot System
+A modular cryptocurrency trading platform with strategy backtesting and live trading.
 """
 
-__version__ = "1.0.0"
-__author__ = "cepehada"
-__email__ = "your.email@example.com"
+__version__ = '0.1.0'
+__author__ = 'Trading Bot Team'
 
-# Инициализация логгера на самом верхнем уровне
-import logging
+# Main package exports
+from project.config.configuration import get_config
+from project.utils.logging_utils import setup_logger
 
-from project.utils.logging_utils import setup_logging
-
-setup_logging()
-logger = logging.getLogger(__name__)
-logger.info("Initializing trading bot v{__version__}")
+# Initialize logger
+logger = setup_logger(__name__)
