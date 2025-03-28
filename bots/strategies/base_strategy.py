@@ -1096,3 +1096,525 @@ class BaseStrategy(ABC):
         if position_type == "short":
             return (entry_price - current_price) * position_size
         return 0
+
+
+"""
+Базовая стратегия для торговых ботов, использующая традиционные индикаторы
+вместо машинного обучения для экономии ресурсов.
+"""
+
+import numpy as np
+import pandas as pd
+from typing import Dict, List, Optional, Union, Any
+
+from project.utils.logging_utils import setup_logger
+from project.technical_analysis.indicators import (
+    calculate_ema, calculate_sma, calculate_rsi, 
+    calculate_macd, calculate_bollinger_bands
+)
+
+logger = setup_logger("base_strategy")
+
+
+class BaseStrategy:
+    """Базовый класс для торговых стратегий"""
+    
+    def __init__(
+        self,
+        symbol: str = "",
+        timeframe: str = "1h",
+        parameters: Dict = None,
+        **kwargs
+    ):
+        """
+        Инициализирует базовую стратегию
+        
+        Args:
+            symbol: Торговый символ
+            timeframe: Таймфрейм
+            parameters: Параметры стратегии
+            **kwargs: Дополнительные параметры
+        """
+        self.symbol = symbol
+        self.timeframe = timeframe
+        
+        # Устанавливаем параметры по умолчанию и из аргументов
+        self.parameters = {
+            # Общие параметры
+            'risk_per_trade': 0.01,  # 1% риска на сделку
+            'max_positions': 1,      # Максимум 1 позиция
+            
+            # Параметры индикаторов
+            'fast_ema': 12,          # Период быстрой EMA для MACD
+            'slow_ema': 26,          # Период медленной EMA для MACD
+            'signal_ema': 9,         # Период сигнальной линии MACD
+            'rsi_period': 14,        # Период RSI
+            'rsi_overbought': 70,    # Уровень перекупленности RSI
+            'rsi_oversold': 30,      # Уровень перепроданности RSI
+            'bb_period': 20,         # Период для полос Боллинджера
+            'bb_std': 2.0            # Стандартное отклонение для полос Боллинджера
+        }
+        
+        # Обновляем параметры из аргументов
+        if parameters:
+            self.parameters.update(parameters)
+            
+        # Данные
+        self.data: Optional[pd.DataFrame] = None
+        
+        # Состояние
+        self.position = {
+            'is_open': False,
+            'direction': None,     # 'long' или 'short'
+            'size': 0.0,           # размер позиции
+            'entry_price': 0.0,    # цена входа
+            'entry_time': None,    # время входа
+            'stop_loss': None,     # уровень стоп-лосса
+            'take_profit': None    # уровень тейк-профита
+        }
+        
+        # Результаты
+        self.results = {
+            'trades': [],
+            'equity_curve': [],
+            'stats': {}
+        }
+        
+        logger.info(f"Base strategy initialized for {symbol} on {timeframe}")
+    
+    def prepare_data(self, data: pd.DataFrame) -> pd.DataFrame:
+        """
+        Подготавливает данные для стратегии, рассчитывая необходимые индикаторы
+        
+        Args:
+            data: DataFrame с данными OHLCV
+            
+        Returns:
+            pd.DataFrame: Обработанные данные с индикаторами
+        """
+        # Копируем данные
+        df = data.copy()
+        
+        # Проверяем необходимые столбцы
+        required_columns = ['open', 'high', 'low', 'close', 'volume']
+        for col in required_columns:
+            if col not in df.columns:
+                raise ValueError(f"Required column '{col}' not found in data")
+        
+        # Рассчитываем индикаторы
+        
+        # Простые скользящие средние
+        df['sma_50'] = calculate_sma(df['close'], 50)
+        df['sma_200'] = calculate_sma(df['close'], 200)
+        
+        # Экспоненциальные скользящие средние
+        df['ema_20'] = calculate_ema(df['close'], 20)
+        
+        # MACD
+        macd_result = calculate_macd(
+            df['close'], 
+            self.parameters['fast_ema'], 
+            self.parameters['slow_ema'],
+            self.parameters['signal_ema']
+        )
+        df['macd'] = macd_result['macd']
+        df['macd_signal'] = macd_result['signal']
+        df['macd_histogram'] = macd_result['histogram']
+        
+        # RSI
+        df['rsi'] = calculate_rsi(df['close'], self.parameters['rsi_period'])
+        
+        # Bollinger Bands
+        bb_result = calculate_bollinger_bands(
+            df['close'], 
+            self.parameters['bb_period'], 
+            self.parameters['bb_std']
+        )
+        df['bb_upper'] = bb_result['upper']
+        df['bb_middle'] = bb_result['middle']
+        df['bb_lower'] = bb_result['lower']
+        
+        # Удаляем NaN значения
+        df.dropna(inplace=True)
+        
+        return df
+    
+    def update_data(self, data: pd.DataFrame) -> None:
+        """
+        Обновляет данные стратегии
+        
+        Args:
+            data: DataFrame с новыми данными OHLCV
+        """
+        # Подготавливаем данные и сохраняем
+        self.data = self.prepare_data(data)
+    
+    def generate_signals(self) -> pd.DataFrame:
+        """
+        Генерирует торговые сигналы на основе данных
+        
+        Returns:
+            pd.DataFrame: DataFrame с сигналами
+        """
+        if self.data is None:
+            logger.warning("No data available to generate signals")
+            return pd.DataFrame()
+        
+        # Копируем данные
+        df = self.data.copy()
+        
+        # Инициализируем столбцы для сигналов
+        df['signal'] = 0    # 1 для сигнала покупки, -1 для сигнала продажи
+        df['entry'] = False # True для точек входа в позицию
+        df['exit'] = False  # True для точек выхода из позиции
+        
+        # Здесь реализуется логика генерации сигналов на основе индикаторов
+        # Эта базовая реализация должна быть переопределена в подклассах
+        
+        # Пример простой стратегии пересечения MACD:
+        # Сигнал покупки: MACD пересекает сигнальную линию снизу вверх
+        # Сигнал продажи: MACD пересекает сигнальную линию сверху вниз
+        for i in range(1, len(df)):
+            # Проверяем пересечение MACD
+            if (df['macd'].iloc[i-1] < df['macd_signal'].iloc[i-1] and 
+                df['macd'].iloc[i] > df['macd_signal'].iloc[i]):
+                df.loc[df.index[i], 'signal'] = 1
+                df.loc[df.index[i], 'entry'] = True
+            elif (df['macd'].iloc[i-1] > df['macd_signal'].iloc[i-1] and 
+                  df['macd'].iloc[i] < df['macd_signal'].iloc[i]):
+                df.loc[df.index[i], 'signal'] = -1
+                df.loc[df.index[i], 'exit'] = True
+        
+        return df
+    
+    def backtest(self, data: pd.DataFrame) -> Dict:
+        """
+        Выполняет бэктестирование стратегии на исторических данных
+        
+        Args:
+            data: DataFrame с историческими данными OHLCV
+            
+        Returns:
+            Dict: Результаты бэктестирования
+        """
+        # Обновляем данные
+        self.update_data(data)
+        
+        # Генерируем сигналы
+        signals = self.generate_signals()
+        
+        # Начальные значения
+        initial_balance = 10000.0  # Начальный капитал
+        balance = initial_balance
+        equity = initial_balance
+        max_equity = initial_balance
+        drawdown = 0.0
+        max_drawdown = 0.0
+        trades = []
+        equity_curve = []
+        
+        # Состояние позиции
+        position = self.position.copy()
+        
+        # Проходим по сигналам
+        for i, row in signals.iterrows():
+            # Расчет equity для текущего бара
+            if position['is_open']:
+                # Если позиция открыта, рассчитываем нереализованную P&L
+                price = row['close']
+                if position['direction'] == 'long':
+                    unrealized_pnl = position['size'] * (price - position['entry_price'])
+                else:  # short
+                    unrealized_pnl = position['size'] * (position['entry_price'] - price)
+                
+                equity = balance + unrealized_pnl
+            else:
+                equity = balance
+            
+            # Обновляем максимум equity и drawdown
+            max_equity = max(max_equity, equity)
+            drawdown = (max_equity - equity) / max_equity if max_equity > 0 else 0.0
+            max_drawdown = max(max_drawdown, drawdown)
+            
+            # Записываем в equity curve
+            equity_curve.append({
+                'timestamp': i,
+                'balance': balance,
+                'equity': equity,
+                'drawdown': drawdown
+            })
+            
+            # Проверяем сигналы на вход/выход
+            if not position['is_open']:
+                # Если нет открытой позиции, проверяем сигнал на вход
+                if row['entry'] and row['signal'] != 0:
+                    # Открываем позицию
+                    direction = 'long' if row['signal'] > 0 else 'short'
+                    position_size = (balance * self.parameters['risk_per_trade'])
+                    entry_price = row['close']
+                    
+                    position = {
+                        'is_open': True,
+                        'direction': direction,
+                        'size': position_size,
+                        'entry_price': entry_price,
+                        'entry_time': i,
+                        'stop_loss': None,
+                        'take_profit': None
+                    }
+                    
+                    logger.debug(f"Opened {direction} position at {entry_price}")
+            else:
+                # Если есть открытая позиция, проверяем сигнал на выход
+                if (row['exit'] or 
+                   (position['direction'] == 'long' and row['signal'] < 0) or
+                   (position['direction'] == 'short' and row['signal'] > 0)):
+                    # Закрываем позицию
+                    exit_price = row['close']
+                    
+                    if position['direction'] == 'long':
+                        pnl = position['size'] * (exit_price - position['entry_price']) / position['entry_price']
+                    else:  # short
+                        pnl = position['size'] * (position['entry_price'] - exit_price) / position['entry_price']
+                    
+                    # Обновляем баланс
+                    balance += pnl
+                    equity = balance
+                    
+                    # Записываем сделку
+                    trade = {
+                        'direction': position['direction'],
+                        'entry_time': position['entry_time'],
+                        'entry_price': position['entry_price'],
+                        'exit_time': i,
+                        'exit_price': exit_price,
+                        'size': position['size'],
+                        'pnl': pnl,
+                        'pnl_percent': (pnl / position['size']) * 100
+                    }
+                    trades.append(trade)
+                    
+                    # Сбрасываем позицию
+                    position = {
+                        'is_open': False,
+                        'direction': None,
+                        'size': 0.0,
+                        'entry_price': 0.0,
+                        'entry_time': None,
+                        'stop_loss': None,
+                        'take_profit': None
+                    }
+                    
+                    logger.debug(f"Closed position at {exit_price}, PnL: {pnl:.2f}")
+        
+        # Рассчитываем статистику
+        total_trades = len(trades)
+        winning_trades = sum(1 for trade in trades if trade['pnl'] > 0)
+        losing_trades = sum(1 for trade in trades if trade['pnl'] < 0)
+        
+        # Статистика доходности
+        total_pnl = balance - initial_balance
+        win_rate = winning_trades / total_trades if total_trades > 0 else 0
+        
+        # Средний выигрыш/проигрыш
+        avg_win = sum(trade['pnl'] for trade in trades if trade['pnl'] > 0) / winning_trades if winning_trades > 0 else 0
+        avg_loss = sum(trade['pnl'] for trade in trades if trade['pnl'] < 0) / losing_trades if losing_trades > 0 else 0
+        
+        # Profit Factor
+        gross_profit = sum(trade['pnl'] for trade in trades if trade['pnl'] > 0)
+        gross_loss = abs(sum(trade['pnl'] for trade in trades if trade['pnl'] < 0))
+        profit_factor = gross_profit / gross_loss if gross_loss > 0 else float('inf')
+        
+        # Ожидаемая прибыль
+        expectancy = (win_rate * avg_win - (1 - win_rate) * abs(avg_loss)) if total_trades > 0 else 0
+        
+        # Коэффициент Шарпа (при годовой безрисковой ставке 0%)
+        if len(equity_curve) > 1:
+            returns = [e['equity'] / equity_curve[i-1]['equity'] - 1 for i, e in enumerate(equity_curve) if i > 0]
+            sharpe_ratio = np.mean(returns) / np.std(returns) * np.sqrt(252) if np.std(returns) > 0 else 0
+        else:
+            sharpe_ratio = 0
+        
+        # Собираем статистику в словарь
+        stats = {
+            'initial_balance': initial_balance,
+            'final_balance': balance,
+            'net_profit': total_pnl,
+            'net_profit_percent': (total_pnl / initial_balance) * 100 if initial_balance > 0 else 0,
+            'max_drawdown': max_drawdown,
+            'max_drawdown_pct': max_drawdown * 100,
+            'total_trades': total_trades,
+            'winning_trades': winning_trades,
+            'losing_trades': losing_trades,
+            'win_rate': win_rate,
+            'avg_win': avg_win,
+            'avg_loss': avg_loss,
+            'profit_factor': profit_factor,
+            'expectancy': expectancy,
+            'sharpe_ratio': sharpe_ratio
+        }
+        
+        # Сохраняем результаты
+        self.results = {
+            'trades': trades,
+            'equity_curve': equity_curve,
+            'stats': stats
+        }
+        
+        logger.info(f"Backtest completed for {self.symbol} on {self.timeframe}")
+        logger.info(f"Total trades: {total_trades}, Win rate: {win_rate:.2%}, Profit factor: {profit_factor:.2f}")
+        
+        return self.results
+    
+    def get_results(self) -> Dict:
+        """
+        Возвращает результаты бэктестирования
+        
+        Returns:
+            Dict: Результаты бэктестирования
+        """
+        return self.results
+    
+    def plot_results(self, filename: str = None):
+        """
+        Строит график результатов бэктестирования
+        
+        Args:
+            filename: Если указан, сохраняет график в файл
+        """
+        # Здесь может быть реализовано построение графиков
+        # Для экономии ресурсов, эта функция может быть опциональной
+        pass
+    
+    def optimize(self, data: pd.DataFrame, param_ranges: Dict, metric: str = 'sharpe_ratio') -> Dict:
+        """
+        Оптимизирует параметры стратегии
+        
+        Args:
+            data: DataFrame с историческими данными OHLCV
+            param_ranges: Словарь с диапазонами параметров для оптимизации
+            metric: Метрика для оптимизации
+            
+        Returns:
+            Dict: Результаты оптимизации
+        """
+        # Здесь может быть реализована оптимизация стратегии
+        # Для экономии ресурсов, можно использовать простой Grid Search
+        pass
+    
+    def save(self, filename: str) -> bool:
+        """
+        Сохраняет стратегию в файл
+        
+        Args:
+            filename: Имя файла
+            
+        Returns:
+            bool: True, если сохранение успешно
+        """
+        try:
+            import pickle
+            with open(filename, 'wb') as f:
+                pickle.dump({
+                    'symbol': self.symbol,
+                    'timeframe': self.timeframe,
+                    'parameters': self.parameters,
+                    'results': self.results
+                }, f)
+            logger.info(f"Strategy saved to {filename}")
+            return True
+        except Exception as e:
+            logger.error(f"Error saving strategy to {filename}: {str(e)}")
+            return False
+    
+    @classmethod
+    def load(cls, filename: str):
+        """
+        Загружает стратегию из файла
+        
+        Args:
+            filename: Имя файла
+            
+        Returns:
+            BaseStrategy: Экземпляр стратегии
+        """
+        try:
+            import pickle
+            with open(filename, 'rb') as f:
+                data = pickle.load(f)
+            
+            strategy = cls(
+                symbol=data['symbol'],
+                timeframe=data['timeframe'],
+                parameters=data['parameters']
+            )
+            strategy.results = data['results']
+            
+            logger.info(f"Strategy loaded from {filename}")
+            return strategy
+        except Exception as e:
+            logger.error(f"Error loading strategy from {filename}: {str(e)}")
+            return None
+
+
+# Реестр стратегий для динамического создания экземпляров
+class StrategyRegistry:
+    """Реестр стратегий для динамического создания экземпляров"""
+    
+    _strategies = {}
+    
+    @classmethod
+    def register(cls, strategy_id: str, strategy_class):
+        """
+        Регистрирует стратегию в реестре
+        
+        Args:
+            strategy_id: ID стратегии
+            strategy_class: Класс стратегии
+        """
+        cls._strategies[strategy_id] = strategy_class
+        
+    @classmethod
+    def get_strategy_class(cls, strategy_id: str):
+        """
+        Возвращает класс стратегии по ID
+        
+        Args:
+            strategy_id: ID стратегии
+            
+        Returns:
+            class: Класс стратегии
+        """
+        if strategy_id not in cls._strategies:
+            raise ValueError(f"Strategy {strategy_id} not found in registry")
+        
+        return cls._strategies[strategy_id]
+    
+    @classmethod
+    def create_strategy(cls, strategy_id: str, **kwargs):
+        """
+        Создает экземпляр стратегии по ID
+        
+        Args:
+            strategy_id: ID стратегии
+            **kwargs: Параметры для конструктора стратегии
+            
+        Returns:
+            BaseStrategy: Экземпляр стратегии
+        """
+        strategy_class = cls.get_strategy_class(strategy_id)
+        return strategy_class(**kwargs)
+    
+    @classmethod
+    def list_strategies(cls) -> List[str]:
+        """
+        Возвращает список доступных стратегий
+        
+        Returns:
+            List[str]: Список ID стратегий
+        """
+        return list(cls._strategies.keys())
+
+
+# Регистрируем базовую стратегию
+StrategyRegistry.register("base", BaseStrategy)
