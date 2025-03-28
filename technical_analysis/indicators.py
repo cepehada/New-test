@@ -13,6 +13,7 @@ try:
 except ImportError:
     import subprocess
     import sys
+
     subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy", "pandas"])
     import numpy as np
     import pandas as pd
@@ -32,7 +33,9 @@ class Indicators:
 
     @staticmethod
     @handle_error
-    def moving_average(data: pd.DataFrame, period: int, column: str = 'close') -> pd.Series:
+    def moving_average(
+        data: pd.DataFrame, period: int, column: str = "close"
+    ) -> pd.Series:
         """
         Рассчитывает простое скользящее среднее (SMA).
 
@@ -52,7 +55,9 @@ class Indicators:
 
     @staticmethod
     @handle_error
-    def exponential_moving_average(data: pd.DataFrame, period: int, column: str = 'close') -> pd.Series:
+    def exponential_moving_average(
+        data: pd.DataFrame, period: int, column: str = "close"
+    ) -> pd.Series:
         """
         Рассчитывает экспоненциальное скользящее среднее (EMA).
 
@@ -67,12 +72,14 @@ class Indicators:
         if len(data) < period:
             logger.warning("Недостаточно данных для расчета EMA с периодом %d", period)
             return pd.Series(index=data.index)
-            
+
         return data[column].ewm(span=period, adjust=False).mean()
 
     @staticmethod
     @handle_error
-    def relative_strength_index(data: pd.DataFrame, period: int = 14, column: str = 'close') -> pd.Series:
+    def relative_strength_index(
+        data: pd.DataFrame, period: int = 14, column: str = "close"
+    ) -> pd.Series:
         """
         Рассчитывает индекс относительной силы (RSI).
 
@@ -87,27 +94,32 @@ class Indicators:
         if len(data) < period + 1:
             logger.warning("Недостаточно данных для расчета RSI с периодом %d", period)
             return pd.Series(index=data.index)
-            
+
         delta = data[column].diff()
-        
+
         # Получаем положительные и отрицательные изменения
         gain = delta.where(delta > 0, 0)
         loss = -delta.where(delta < 0, 0)
-        
+
         # Рассчитываем среднее значение за период
         avg_gain = gain.rolling(window=period).mean()
         avg_loss = loss.rolling(window=period).mean()
-        
+
         # Рассчитываем RSI
         rs = avg_gain / avg_loss.where(avg_loss != 0, 1)  # Избегаем деления на ноль
         rsi = 100 - (100 / (1 + rs))
-        
+
         return rsi
 
     @staticmethod
     @handle_error
-    def macd(data: pd.DataFrame, fast_period: int = 12, slow_period: int = 26, 
-            signal_period: int = 9, column: str = 'close') -> Dict[str, pd.Series]:
+    def macd(
+        data: pd.DataFrame,
+        fast_period: int = 12,
+        slow_period: int = 26,
+        signal_period: int = 9,
+        column: str = "close",
+    ) -> Dict[str, pd.Series]:
         """
         Рассчитывает индикатор MACD (Moving Average Convergence Divergence).
 
@@ -124,30 +136,40 @@ class Indicators:
         if len(data) < slow_period + signal_period:
             logger.warning(
                 "Недостаточно данных для расчета MACD с периодами %d, %d, %d",
-                fast_period, slow_period, signal_period
+                fast_period,
+                slow_period,
+                signal_period,
             )
             empty_series = pd.Series(index=data.index)
-            return {"macd": empty_series, "signal": empty_series, "histogram": empty_series}
-            
+            return {
+                "macd": empty_series,
+                "signal": empty_series,
+                "histogram": empty_series,
+            }
+
         # Рассчитываем быструю и медленную EMA
         fast_ema = Indicators.exponential_moving_average(data, fast_period, column)
         slow_ema = Indicators.exponential_moving_average(data, slow_period, column)
-        
+
         # Рассчитываем линию MACD
         macd_line = fast_ema - slow_ema
-        
+
         # Рассчитываем сигнальную линию
         signal_line = macd_line.ewm(span=signal_period, adjust=False).mean()
-        
+
         # Рассчитываем гистограмму
         histogram = macd_line - signal_line
-        
+
         return {"macd": macd_line, "signal": signal_line, "histogram": histogram}
 
     @staticmethod
     @handle_error
-    def bollinger_bands(data: pd.DataFrame, period: int = 20, std_dev: float = 2.0, 
-                       column: str = 'close') -> Dict[str, pd.Series]:
+    def bollinger_bands(
+        data: pd.DataFrame,
+        period: int = 20,
+        std_dev: float = 2.0,
+        column: str = "close",
+    ) -> Dict[str, pd.Series]:
         """
         Рассчитывает полосы Боллинджера.
 
@@ -163,23 +185,29 @@ class Indicators:
         if len(data) < period:
             logger.warning("Недостаточно данных для расчета BB с периодом %d", period)
             empty_series = pd.Series(index=data.index)
-            return {"upper": empty_series, "middle": empty_series, "lower": empty_series}
-        
+            return {
+                "upper": empty_series,
+                "middle": empty_series,
+                "lower": empty_series,
+            }
+
         # Рассчитываем среднюю линию (SMA)
         middle = Indicators.moving_average(data, period, column)
-        
+
         # Рассчитываем стандартное отклонение
         rolling_std = data[column].rolling(window=period).std()
-        
+
         # Рассчитываем верхнюю и нижнюю полосы
         upper = middle + (rolling_std * std_dev)
         lower = middle - (rolling_std * std_dev)
-        
+
         return {"upper": upper, "middle": middle, "lower": lower}
 
     @staticmethod
     @handle_error
-    def stochastic_oscillator(data: pd.DataFrame, k_period: int = 14, d_period: int = 3) -> Dict[str, pd.Series]:
+    def stochastic_oscillator(
+        data: pd.DataFrame, k_period: int = 14, d_period: int = 3
+    ) -> Dict[str, pd.Series]:
         """
         Рассчитывает стохастический осциллятор.
 
@@ -194,26 +222,29 @@ class Indicators:
         if len(data) < k_period + d_period:
             logger.warning(
                 "Недостаточно данных для расчета стохастика с периодами %d, %d",
-                k_period, d_period
+                k_period,
+                d_period,
             )
             empty_series = pd.Series(index=data.index)
             return {"k": empty_series, "d": empty_series}
-        
+
         # Находим минимум и максимум за период k_period
-        low_min = data['low'].rolling(window=k_period).min()
-        high_max = data['high'].rolling(window=k_period).max()
-        
+        low_min = data["low"].rolling(window=k_period).min()
+        high_max = data["high"].rolling(window=k_period).max()
+
         # Рассчитываем %K
-        k = 100 * ((data['close'] - low_min) / (high_max - low_min))
-        
+        k = 100 * ((data["close"] - low_min) / (high_max - low_min))
+
         # Рассчитываем %D (SMA от %K)
         d = k.rolling(window=d_period).mean()
-        
+
         return {"k": k, "d": d}
 
     @staticmethod
     @handle_error
-    def average_directional_index(data: pd.DataFrame, period: int = 14) -> Dict[str, pd.Series]:
+    def average_directional_index(
+        data: pd.DataFrame, period: int = 14
+    ) -> Dict[str, pd.Series]:
         """
         Рассчитывает индекс среднего направления движения (ADX).
 
@@ -227,43 +258,52 @@ class Indicators:
         if len(data) < period * 2:
             logger.warning("Недостаточно данных для расчета ADX с периодом %d", period)
             empty_series = pd.Series(index=data.index)
-            return {"adx": empty_series, "di_plus": empty_series, "di_minus": empty_series}
-        
+            return {
+                "adx": empty_series,
+                "di_plus": empty_series,
+                "di_minus": empty_series,
+            }
+
         # Рассчитываем True Range
-        high_low = data['high'] - data['low']
-        high_close = abs(data['high'] - data['close'].shift(1))
-        low_close = abs(data['low'] - data['close'].shift(1))
-        
+        high_low = data["high"] - data["low"]
+        high_close = abs(data["high"] - data["close"].shift(1))
+        low_close = abs(data["low"] - data["close"].shift(1))
+
         ranges = pd.concat([high_low, high_close, low_close], axis=1)
         true_range = ranges.max(axis=1)
-        
+
         # Рассчитываем Directional Movement
-        plus_dm = data['high'].diff()
-        minus_dm = -data['low'].diff()
-        
+        plus_dm = data["high"].diff()
+        minus_dm = -data["low"].diff()
+
         # Оставляем только положительные значения
         plus_dm = plus_dm.where((plus_dm > 0) & (plus_dm > minus_dm), 0)
         minus_dm = minus_dm.where((minus_dm > 0) & (minus_dm > plus_dm), 0)
-        
+
         # Сглаживаем DirectionalMovement и TrueRange
         smoothed_plus_dm = plus_dm.ewm(span=period, adjust=False).mean()
         smoothed_minus_dm = minus_dm.ewm(span=period, adjust=False).mean()
         smoothed_tr = true_range.ewm(span=period, adjust=False).mean()
-        
+
         # Рассчитываем индексы направления
         di_plus = 100 * (smoothed_plus_dm / smoothed_tr)
         di_minus = 100 * (smoothed_minus_dm / smoothed_tr)
-        
+
         # Рассчитываем DX и ADX
         dx = 100 * abs(di_plus - di_minus) / (di_plus + di_minus)
         adx = dx.ewm(span=period, adjust=False).mean()
-        
+
         return {"adx": adx, "di_plus": di_plus, "di_minus": di_minus}
 
     @staticmethod
     @handle_error
-    def ichimoku_cloud(data: pd.DataFrame, conversion_period: int = 9, base_period: int = 26,
-                    lagging_span2_period: int = 52, displacement: int = 26) -> Dict[str, pd.Series]:
+    def ichimoku_cloud(
+        data: pd.DataFrame,
+        conversion_period: int = 9,
+        base_period: int = 26,
+        lagging_span2_period: int = 52,
+        displacement: int = 26,
+    ) -> Dict[str, pd.Series]:
         """
         Рассчитывает облако Ишимоку.
 
@@ -277,7 +317,10 @@ class Indicators:
         Returns:
             Dict[str, pd.Series]: Словарь с компонентами облака Ишимоку
         """
-        if len(data) < max(conversion_period, base_period, lagging_span2_period) + displacement:
+        if (
+            len(data)
+            < max(conversion_period, base_period, lagging_span2_period) + displacement
+        ):
             logger.warning("Недостаточно данных для расчета Ichimoku")
             empty_series = pd.Series(index=data.index)
             return {
@@ -285,41 +328,43 @@ class Indicators:
                 "kijun_sen": empty_series,
                 "senkou_span_a": empty_series,
                 "senkou_span_b": empty_series,
-                "chikou_span": empty_series
+                "chikou_span": empty_series,
             }
-        
+
         # Рассчитываем Tenkan-sen (Conversion Line)
-        period_high = data['high'].rolling(window=conversion_period).max()
-        period_low = data['low'].rolling(window=conversion_period).min()
+        period_high = data["high"].rolling(window=conversion_period).max()
+        period_low = data["low"].rolling(window=conversion_period).min()
         tenkan_sen = (period_high + period_low) / 2
-        
+
         # Рассчитываем Kijun-sen (Base Line)
-        period_high = data['high'].rolling(window=base_period).max()
-        period_low = data['low'].rolling(window=base_period).min()
+        period_high = data["high"].rolling(window=base_period).max()
+        period_low = data["low"].rolling(window=base_period).min()
         kijun_sen = (period_high + period_low) / 2
-        
+
         # Рассчитываем Senkou Span A (Leading Span A)
         senkou_span_a = ((tenkan_sen + kijun_sen) / 2).shift(displacement)
-        
+
         # Рассчитываем Senkou Span B (Leading Span B)
-        period_high = data['high'].rolling(window=lagging_span2_period).max()
-        period_low = data['low'].rolling(window=lagging_span2_period).min()
+        period_high = data["high"].rolling(window=lagging_span2_period).max()
+        period_low = data["low"].rolling(window=lagging_span2_period).min()
         senkou_span_b = ((period_high + period_low) / 2).shift(displacement)
-        
+
         # Рассчитываем Chikou Span (Lagging Span)
-        chikou_span = data['close'].shift(-displacement)
-        
+        chikou_span = data["close"].shift(-displacement)
+
         return {
             "tenkan_sen": tenkan_sen,
             "kijun_sen": kijun_sen,
             "senkou_span_a": senkou_span_a,
             "senkou_span_b": senkou_span_b,
-            "chikou_span": chikou_span
+            "chikou_span": chikou_span,
         }
-    
+
     @staticmethod
     @handle_error
-    def fibonacci_retracement(data: pd.DataFrame, high_period: int = 20, low_period: int = 20) -> Dict[str, float]:
+    def fibonacci_retracement(
+        data: pd.DataFrame, high_period: int = 20, low_period: int = 20
+    ) -> Dict[str, float]:
         """
         Рассчитывает уровни коррекции Фибоначчи.
 
@@ -334,19 +379,21 @@ class Indicators:
         if len(data) < max(high_period, low_period):
             logger.warning("Недостаточно данных для расчета уровней Фибоначчи")
             return {}
-        
+
         # Находим максимум и минимум за период
-        high = data['high'].rolling(window=high_period).max().iloc[-1]
-        low = data['low'].rolling(window=low_period).min().iloc[-1]
-        
+        high = data["high"].rolling(window=high_period).max().iloc[-1]
+        low = data["low"].rolling(window=low_period).min().iloc[-1]
+
         # Проверяем, что максимум и минимум найдены
         if pd.isna(high) or pd.isna(low) or high == low:
-            logger.warning("Не удалось определить максимум и минимум для уровней Фибоначчи")
+            logger.warning(
+                "Не удалось определить максимум и минимум для уровней Фибоначчи"
+            )
             return {}
-            
+
         # Рассчитываем уровни коррекции
         diff = high - low
-        
+
         # Стандартные уровни коррекции Фибоначчи
         levels = {
             "0.0": low,
@@ -361,5 +408,5 @@ class Indicators:
             "1.618": high + diff * 0.618,
             "2.0": high + diff,
         }
-        
+
         return levels

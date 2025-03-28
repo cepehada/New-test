@@ -292,7 +292,12 @@ class Position:
         """
         status = "OPEN" if self.is_open() else "CLOSED"
         pnl = self.unrealized_pnl if self.is_open() else self.realized_pnl
-        return f"Position({self.symbol}, {self.direction}, {self.amount}, {self.entry_price}, {status}, PnL: {pnl:.2f})"
+        return f"Position({
+            self.symbol}, {
+            self.direction}, {
+            self.amount}, {
+                self.entry_price}, {status}, PnL: {
+                    pnl:.2f})"
 
 
 class Strategy(ABC):

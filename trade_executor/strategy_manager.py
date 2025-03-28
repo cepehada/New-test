@@ -1,5 +1,6 @@
 from typing import Dict, Any, List
 
+
 class StrategyManager:
     """Модуль для выбора и управления стратегиями"""
 
@@ -9,7 +10,9 @@ class StrategyManager:
 
     def _load_strategies(self) -> List[str]:
         """Загружает доступные стратегии из конфигурации"""
-        return self.config.get("strategies", ["scalping", "trend_following", "arbitrage"])
+        return self.config.get(
+            "strategies", ["scalping", "trend_following", "arbitrage"]
+        )
 
     def select_best_strategy(self, market_data: Dict[str, Any]) -> str:
         """

@@ -96,7 +96,9 @@ class MessageBroker:
             message_json = json.dumps(message)
 
             # В реальной реализации здесь будет код для публикации в RabbitMQ/Kafka
-            await self.channel.basic_publish(exchange='', routing_key=topic, body=message_json)  # Assuming this is the correct fix
+            await self.channel.basic_publish(
+                exchange="", routing_key=topic, body=message_json
+            )  # Assuming this is the correct fix
             logger.debug(
                 f"Публикация сообщения в тему {topic}: {message_json[:100]}..."
             )

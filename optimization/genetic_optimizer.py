@@ -393,9 +393,9 @@ class GeneticOptimizer:
 
             # Формируем результаты
             results = {
-                'best_individual': best_individual.to_dict(),
-                'best_fitness': best_individual.fitness,
-                'history': [ind.to_dict() for ind in population]
+                "best_individual": best_individual.to_dict(),
+                "best_fitness": best_individual.fitness,
+                "history": [ind.to_dict() for ind in population],
             }
 
             # Сохраняем результаты в базу данных
@@ -609,7 +609,7 @@ class GeneticOptimizer:
         # Выполняем оценку с ограничением на количество одновременных задач
         batch_size = self.max_workers
         for i in range(0, len(tasks), batch_size):
-            batch = tasks[i: i + batch_size]
+            batch = tasks[i : i + batch_size]
             await asyncio.gather(*batch)
 
     async def _evaluate_individual(

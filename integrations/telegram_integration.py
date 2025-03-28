@@ -288,7 +288,11 @@ class TelegramIntegration:
             logger.debug("Фото отправлено в чат {chat_id}".format(chat_id=chat_id))
             return True
         except Exception as e:
-            logger.error("Ошибка при отправке фото в чат {chat_id}: {error}".format(chat_id=chat_id, error=str(e)))
+            logger.error(
+                "Ошибка при отправке фото в чат {chat_id}: {error}".format(
+                    chat_id=chat_id, error=str(e)
+                )
+            )
             return False
 
     @async_handle_error
@@ -333,7 +337,11 @@ class TelegramIntegration:
             logger.debug("Документ отправлен в чат {chat_id}".format(chat_id=chat_id))
             return True
         except Exception as e:
-            logger.error("Ошибка при отправке документа в чат {chat_id}: {error}".format(chat_id=chat_id, error=str(e)))
+            logger.error(
+                "Ошибка при отправке документа в чат {chat_id}: {error}".format(
+                    chat_id=chat_id, error=str(e)
+                )
+            )
             return False
 
     async def close(self) -> None:

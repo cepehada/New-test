@@ -80,7 +80,7 @@ class CoindeskParser:
                     published_at = datetime.strptime(
                         published, "%a, %d %b %Y %H:%M:%S %z"
                     )
-                except:
+                except BaseException:
                     published_at = datetime.now()
 
                 # Определяем автора
@@ -109,11 +109,11 @@ class CoindeskParser:
             # Обновляем время последнего запроса
             self.last_fetch_time = current_time
 
-            logger.debug("Получено {len(articles)} статей из CoinDesk" %)
+            logger.debug(f"Получено {len(articles)} статей из CoinDesk" )
             return articles
 
         except Exception as e:
-            logger.error("Ошибка при получении новостей из CoinDesk: {str(e)}" %)
+            logger.error(f"Ошибка при получении новостей из CoinDesk: {str(e)}" )
             return []
 
     @async_handle_error
@@ -133,8 +133,8 @@ class CoindeskParser:
                 async with session.get(url) as response:
                     if response.status != 200:
                         logger.warning(
-                            f"Не удалось получить содержимое статьи {url}. Статус: {response.status}"
-                        )
+                            f"Не удалось получить содержимое статьи {url}. Статус: {
+                                response.status}")
                         return
 
                     html_content = await response.text()
@@ -153,10 +153,10 @@ class CoindeskParser:
                 # Обновляем кэшированную статью
                 if url in self.articles_cache:
                     self.articles_cache[url]["content"] = content
-                    logger.debug("Обновлено содержимое статьи: {url}" %)
+                    logger.debug(f"Обновлено содержимое статьи: {url}" )
 
         except Exception as e:
-            logger.error("Ошибка при получении содержимого статьи {url}: {str(e)}" %)
+            logger.error(f"Ошибка при получении содержимого статьи {url}: {str(e)}" )
 
     @async_handle_error
     async def search_news(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
@@ -234,5 +234,5 @@ class CoindeskParser:
             return articles
 
         except Exception as e:
-            logger.error("Ошибка при поиске новостей на CoinDesk: {str(e)}" %)
+            logger.error(f"Ошибка при поиске новостей на CoinDesk: {str(e)}" )
             return []

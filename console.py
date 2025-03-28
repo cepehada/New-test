@@ -139,11 +139,11 @@ class TradingBotConsole(cmd.Cmd):
                 if "bids" in result and "asks" in result:
                     print("Bids:")
                     for i, bid in enumerate(result["bids"][:5]):
-                        print(f"  {i+1}. Price: {bid[0]}, Amount: {bid[1]}")
+                        print(f"  {i + 1}. Price: {bid[0]}, Amount: {bid[1]}")
 
                     print("Asks:")
                     for i, ask in enumerate(result["asks"][:5]):
-                        print(f"  {i+1}. Price: {ask[0]}, Amount: {ask[1]}")
+                        print(f"  {i + 1}. Price: {ask[0]}, Amount: {ask[1]}")
                 else:
                     print(json.dumps(result, indent=2))
             else:
@@ -494,8 +494,9 @@ class TradingBotConsole(cmd.Cmd):
             )
 
             print(
-                f"Scanning arbitrage opportunities for {', '.join(symbols)} on {', '.join(exchanges)}..."
-            )
+                f"Scanning arbitrage opportunities for {
+                    ', '.join(symbols)} on {
+                    ', '.join(exchanges)}...")
 
             # Сканируем возможности
             opportunities = self.loop.run_until_complete(
@@ -505,7 +506,7 @@ class TradingBotConsole(cmd.Cmd):
             if opportunities:
                 print(f"Found {len(opportunities)} arbitrage opportunities:")
                 for i, opp in enumerate(opportunities):
-                    print(f"  {i+1}. {opp.symbol}:")
+                    print(f"  {i + 1}. {opp.symbol}:")
                     print(f"     Buy on: {opp.buy_exchange} at {opp.buy_price:.8f}")
                     print(f"     Sell on: {opp.sell_exchange} at {opp.sell_price:.8f}")
                     print(f"     Price diff: {opp.price_diff_pct:.2%}")
@@ -585,7 +586,7 @@ class TradingBotConsole(cmd.Cmd):
             if stats["current_opportunities"]:
                 print("\nCurrent opportunities:")
                 for i, opp in enumerate(stats["current_opportunities"]):
-                    print(f"  {i+1}. {opp['symbol']}:")
+                    print(f"  {i + 1}. {opp['symbol']}:")
                     print(
                         f"     Buy on: {opp['buy_exchange']} at {opp['buy_price']:.8f}"
                     )

@@ -83,7 +83,7 @@ class Application:
                 await asyncio.sleep(1)
 
         except Exception as e:
-            logger.error("Ошибка в основном цикле приложения: {str(e)}" %, exc_info=True)
+            logger.error(f"Ошибка в основном цикле приложения: {str(e)}", exc_info=True)
             await self.shutdown("ERROR")
 
     async def start_trading(self):
@@ -102,7 +102,7 @@ class Application:
             interval="1h",
         )
 
-        logger.info("Стратегия main_strategy запущена с ID: {strategy_id}" %)
+        logger.info(f"Стратегия main_strategy запущена с ID: {strategy_id}")
 
         if self.components.get("telegram"):
             await self.components["telegram"].broadcast_message(
@@ -124,7 +124,7 @@ class Application:
     async def shutdown(self, signal_name=None):
         """Корректное завершение работы приложения"""
         if signal_name:
-            logger.info("Получен сигнал {signal_name}, завершаем работу..." %)
+            logger.info(f"Получен сигнал {signal_name}, завершаем работу...")
 
         self.is_running = False
 
@@ -136,7 +136,7 @@ class Application:
                     await strategy_manager.stop_strategy(strategy_id)
                 logger.info("Все стратегии остановлены")
             except Exception as e:
-                logger.error("Ошибка при остановке стратегий: {str(e)}" %)
+                logger.error(f"Ошибка при остановке стратегий: {str(e)}")
 
         # Закрытие соединений с брокером сообщений
         if "message_broker" in self.components:
@@ -144,7 +144,7 @@ class Application:
                 await self.components["message_broker"].close()
                 logger.info("Соединения с брокером сообщений закрыты")
             except Exception as e:
-                logger.error("Ошибка при закрытии брокера сообщений: {str(e)}" %)
+                logger.error(f"Ошибка при закрытии брокера сообщений: {str(e)}")
 
         # Закрытие соединений с базой данных
         if "database" in self.components:
@@ -152,7 +152,7 @@ class Application:
                 await self.components["database"].close()
                 logger.info("Соединения с базой данных закрыты")
             except Exception as e:
-                logger.error("Ошибка при закрытии соединений с БД: {str(e)}" %)
+                logger.error(f"Ошибка при закрытии соединений с БД: {str(e)}")
 
         # Отправка уведомления о завершении работы
         if "telegram" in self.components:
@@ -163,7 +163,7 @@ class Application:
                 await self.components["telegram"].close()
                 logger.info("Telegram-бот остановлен")
             except Exception as e:
-                logger.error("Ошибка при остановке Telegram-бота: {str(e)}" %)
+                logger.error(f"Ошибка при остановке Telegram-бота: {str(e)}")
 
         # Завершение всех оставшихся задач
         tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
@@ -190,7 +190,7 @@ def main():
     except KeyboardInterrupt:
         logger.info("Получен сигнал прерывания, завершаем работу...")
     except Exception as e:
-        logger.critical("Критическая ошибка: {str(e)}" %, exc_info=True)
+        logger.critical(f"Критическая ошибка: {str(e)}", exc_info=True)
         sys.exit(1)
 
 

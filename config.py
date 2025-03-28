@@ -48,7 +48,7 @@ class TelegramSettings(BaseModel):
     def parse_allowed_users(cls, v: Any) -> Set[str]:
         """Преобразует строку с пользователями в множество"""
         if isinstance(v, str):
-            return set(u.strip() for u in v.split(',') if u.strip())
+            return set(u.strip() for u in v.split(",") if u.strip())
         return v
 
 

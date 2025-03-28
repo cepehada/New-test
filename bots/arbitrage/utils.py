@@ -259,7 +259,7 @@ def format_arbitrage_path(path_info: Dict[str, Any]) -> str:
         base, quote = pair.split("/")
         trades.append(f"Обмен {base} на {quote}")
 
-    trades_str = "\n".join([f"{i+1}. {trade}" for i, trade in enumerate(trades)])
+    trades_str = "\n".join([f"{i + 1}. {trade}" for i, trade in enumerate(trades)])
 
     return f"Путь: {path_str}\nПрибыль: {profit_str}\n\nСделки:\n{trades_str}"
 

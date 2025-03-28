@@ -26,10 +26,11 @@ try:
                     "id": i,
                     "name": device.name.decode("utf-8"),
                     "total_memory": device.total_memory,
-                    "compute_capability": f"{device.compute_capability[0]}.{device.compute_capability[1]}",
-                }
-            )
-        logger.info("Available CUDA devices: {devices}" %)
+                    "compute_capability": f"{
+                        device.compute_capability[0]}.{
+                        device.compute_capability[1]}",
+                })
+        logger.info(f"Available CUDA devices: {devices}" )
     else:
         logger.warning("CUDA is not available. Using CPU fallback.")
 except ImportError:
@@ -77,9 +78,10 @@ def get_gpu_info() -> Dict:
                     "total_memory": device.total_memory,
                     "free_memory": memory_info[0],
                     "used_memory": memory_info[1],
-                    "compute_capability": f"{device.compute_capability[0]}.{device.compute_capability[1]}",
-                }
-            )
+                    "compute_capability": f"{
+                        device.compute_capability[0]}.{
+                        device.compute_capability[1]}",
+                })
 
         return {
             "available": True,
@@ -87,7 +89,7 @@ def get_gpu_info() -> Dict:
             "current_device": cuda.get_current_device().id,
         }
     except Exception as e:
-        logger.error("Error getting GPU info: {str(e)}" %)
+        logger.error(f"Error getting GPU info: {str(e)}" )
         return {"available": False, "devices": [], "error": str(e)}
 
 
@@ -108,15 +110,15 @@ def set_gpu_device(device_id: int) -> bool:
     try:
         # Проверяем, существует ли устройство
         if device_id >= cuda.gpus.lst:
-            logger.error("Device ID {device_id} is out of range." %)
+            logger.error(f"Device ID {device_id} is out of range." )
             return False
 
         # Устанавливаем текущее устройство
         cuda.select_device(device_id)
-        logger.info("Selected GPU device: {device_id}" %)
+        logger.info(f"Selected GPU device: {device_id}" )
         return True
     except Exception as e:
-        logger.error("Error setting GPU device: {str(e)}" %)
+        logger.error(f"Error setting GPU device: {str(e)}" )
         return False
 
 
@@ -149,7 +151,7 @@ def to_gpu(
             )
             return data
     except Exception as e:
-        logger.error("Error transferring data to GPU: {str(e)}" %)
+        logger.error(f"Error transferring data to GPU: {str(e)}" )
         return data
 
 
@@ -181,7 +183,7 @@ def to_cpu(
             )
             return data
     except Exception as e:
-        logger.error("Error transferring data to CPU: {str(e)}" %)
+        logger.error(f"Error transferring data to CPU: {str(e)}" )
         return data
 
 
@@ -251,12 +253,14 @@ def benchmark_gpu(
             results["speedup"] = avg_cpu_time / avg_gpu_time
 
         logger.info(
-            f"Benchmark results: CPU: {avg_cpu_time:.4f}s, GPU: {avg_gpu_time:.4f}s, Speedup: {results['speedup']:.2f}x"
-        )
+            f"Benchmark results: CPU: {
+                avg_cpu_time:.4f}s, GPU: {
+                avg_gpu_time:.4f}s, Speedup: {
+                results['speedup']:.2f}x")
 
         return results
     except Exception as e:
-        logger.error("Error during benchmark: {str(e)}" %)
+        logger.error(f"Error during benchmark: {str(e)}" )
         return results
 
 
@@ -320,7 +324,7 @@ def moving_average_gpu(data: np.ndarray, window: int) -> np.ndarray:
         # Возвращаем результат на CPU
         return gpu_result.get()
     except Exception as e:
-        logger.error("Error calculating moving average on GPU: {str(e)}" %)
+        logger.error(f"Error calculating moving average on GPU: {str(e)}" )
         return np.array(pd.Series(data).rolling(window=window, min_periods=1).mean())
 
 
@@ -388,7 +392,7 @@ def crossover_gpu(data1: np.ndarray, data2: np.ndarray) -> np.ndarray:
         # Возвращаем результат на CPU
         return gpu_result.get()
     except Exception as e:
-        logger.error("Error calculating crossover on GPU: {str(e)}" %)
+        logger.error(f"Error calculating crossover on GPU: {str(e)}" )
         result = np.zeros(data1.shape[0])
         for i in range(1, data1.shape[0]):
             if data1[i - 1] < data2[i - 1] and data1[i] >= data2[i]:
@@ -487,7 +491,7 @@ def rsi_gpu(data: np.ndarray, period: int = 14) -> np.ndarray:
         # Возвращаем результат на CPU
         return gpu_result.get()
     except Exception as e:
-        logger.error("Error calculating RSI on GPU: {str(e)}" %)
+        logger.error(f"Error calculating RSI on GPU: {str(e)}" )
         delta = np.diff(data)
         gains = np.copy(delta)
         losses = np.copy(delta)
@@ -544,7 +548,7 @@ def parallel_apply_gpu(df: pd.DataFrame, func: Callable, column: str) -> pd.Data
         # Возвращаем результат на CPU
         return gpu_df.to_pandas()
     except Exception as e:
-        logger.error("Error applying function on GPU: {str(e)}" %)
+        logger.error(f"Error applying function on GPU: {str(e)}" )
         return df.assign(result=df[column].apply(func))
 
 
@@ -560,7 +564,7 @@ def cleanup_gpu_memory():
 
         logger.info("GPU memory cleaned up")
     except Exception as e:
-        logger.error("Error cleaning up GPU memory: {str(e)}" %)
+        logger.error(f"Error cleaning up GPU memory: {str(e)}" )
 
 
 def is_gpu_available() -> bool:
@@ -599,4 +603,4 @@ def get_gpu_accelerator():
 
 
 # Инициализация при импорте модуля
-logger.info("GPU acceleration: {'Available' if CUDA_AVAILABLE else 'Not available'}" %)
+logger.info(f"GPU acceleration: {'Available' if CUDA_AVAILABLE else 'Not available'}" )

@@ -25,8 +25,8 @@ class CrossStrategy(BaseStrategy):
     """
 
     def __init__(self, name: str = "CrossStrategy", exchange_id: str = "binance",
-                symbols: List[str] = None, timeframes: List[str] = None,
-                config: Dict[str, Any] = None):
+                 symbols: List[str] = None, timeframes: List[str] = None,
+                 config: Dict[str, Any] = None):
         """
         Инициализирует стратегию кросс-торговли.
 
@@ -71,7 +71,7 @@ class CrossStrategy(BaseStrategy):
         self.arbitrage_opportunities: List[Dict[str, Any]] = []  # список возможностей для арбитража
         self.last_check_time = 0  # время последней проверки
 
-        logger.debug("Создана стратегия кросс-торговли {self.name}" %)
+        logger.debug(f"Создана стратегия кросс-торговли {self.name}")
 
     def _update_config(self, config: Dict[str, Any]) -> None:
         """
@@ -115,7 +115,6 @@ class CrossStrategy(BaseStrategy):
             self.exchange_prices[exchange] = {}
             self.exchange_volumes[exchange] = {}
 
-
         # Устанавливаем интервал обновления
         self.update_interval = self.strategy_config["check_interval"]
 
@@ -127,74 +126,74 @@ class CrossStrategy(BaseStrategy):
         Выполняет дополнительную очистку ресурсов стратегии.
         """
         # Нет специфических ресурсов для очистки
-    
+
     @async_handle_error
     async def _update_cross_market_data(self) -> None:
         """
         Обновляет данные по ценам и объемам на разных биржах.
         """
         exchanges = [self.exchange_id] + self.strategy_config["secondary_exchanges"]
-        
+
         for exchange in exchanges:
             for symbol in self.symbols:
                 try:
                     # Получаем тикер
                     ticker = await self.market_data.get_ticker(exchange, symbol)
-                    
+
                     if ticker:
                         # Сохраняем цену и объем
                         price = ticker.get("last", 0)
                         volume = ticker.get("quoteVolume", 0) or ticker.get("volume", 0)
-                        
+
                         if price > 0:
                             self.exchange_prices[exchange][symbol] = price
-                        
+
                         if volume > 0:
                             self.exchange_volumes[exchange][symbol] = volume
-                
+
                 except Exception as e:
-                    logger.warning("Ошибка при получении данных для {symbol} на {exchange}: {str(e)}" %)
-        
+                    logger.warning(f"Ошибка при получении данных для {symbol} на {exchange}: {str(e)}")
+
         self.last_check_time = time.time()
-    
+
     @async_handle_error
     async def _find_arbitrage_opportunities(self) -> None:
         """
         Ищет возможности для арбитража между биржами.
         """
         self.arbitrage_opportunities = []
-        
+
         # Получаем списки бирж и символов
         exchanges = [self.exchange_id] + self.strategy_config["secondary_exchanges"]
-        
+
         for symbol in self.symbols:
             # Собираем цены по всем биржам
             symbol_prices = {}
             symbol_volumes = {}
-            
+
             for exchange in exchanges:
                 price = self.exchange_prices.get(exchange, {}).get(symbol, 0)
                 volume = self.exchange_volumes.get(exchange, {}).get(symbol, 0)
-                
-                if price > 0 и volume >= self.strategy_config["min_volume"]:
+
+                if price > 0 and volume >= self.strategy_config["min_volume"]:
                     symbol_prices[exchange] = price
                     symbol_volumes[exchange] = volume
-            
+
             # Если цены есть как минимум на двух биржах
             if len(symbol_prices) >= 2:
                 # Находим биржу с минимальной и максимальной ценой
                 min_exchange = min(symbol_prices, key=symbol_prices.get)
                 max_exchange = max(symbol_prices, key=symbol_prices.get)
-                
+
                 min_price = symbol_prices[min_exchange]
                 max_price = symbol_prices[max_exchange]
-                
+
                 # Рассчитываем разницу в процентах
                 price_diff_pct = (max_price / min_price - 1)
-                
+
                 # Учитываем комиссии
                 net_profit_pct = price_diff_pct - self.strategy_config["fee_margin"]
-                
+
                 # Если разница больше минимального порога
                 if net_profit_pct > self.strategy_config["min_price_difference"]:
                     # Добавляем возможность арбитража
@@ -210,17 +209,17 @@ class CrossStrategy(BaseStrategy):
                         "sell_volume": symbol_volumes[max_exchange],
                         "timestamp": time.time()
                     }
-                    
+
                     self.arbitrage_opportunities.append(opportunity)
-                    
-                    logger.debug("Найдена возможность арбитража для {symbol}: " %
-                                f"купить на {min_exchange} по {min_price:.8f}, "
-                                f"продать на {max_exchange} по {max_price:.8f}, "
-                                f"прибыль: {net_profit_pct:.2%}")
-        
+
+                    logger.debug(f"Найдена возможность арбитража для {symbol}: "
+                                 f"купить на {min_exchange} по {min_price:.8f}, "
+                                 f"продать на {max_exchange} по {max_price:.8f}, "
+                                 f"прибыль: {net_profit_pct:.2%}")
+
         # Сортируем возможности по прибыли
         self.arbitrage_opportunities.sort(key=lambda x: x["net_profit_pct"], reverse=True)
-    
+
     @async_handle_error
     async def _find_triangular_arbitrage(self) -> None:
         """
@@ -228,25 +227,25 @@ class CrossStrategy(BaseStrategy):
         """
         if not self.strategy_config["use_triangular_arbitrage"]:
             return
-        
+
         for exchange in [self.exchange_id] + self.strategy_config["secondary_exchanges"]:
             try:
                 # Получаем все цены для этой биржи
                 prices = self.exchange_prices.get(exchange, {})
-                
+
                 if not prices:
                     continue
-                
+
                 # Проходим по всем базовым валютам
                 for base in self.strategy_config["base_currencies"]:
                     # Ищем все пары с этой базовой валютой
                     base_pairs = {}
-                    
+
                     for symbol, price in prices.items():
                         if symbol.endswith(f"/{base}"):
                             coin = symbol.split('/')[0]
                             base_pairs[coin] = price
-                    
+
                     # Если найдено как минимум 2 пары
                     if len(base_pairs) >= 2:
                         # Ищем все возможные треугольники
@@ -254,24 +253,25 @@ class CrossStrategy(BaseStrategy):
                             for coin_b, price_b in base_pairs.items():
                                 if coin_a == coin_b:
                                     continue
-                                
+
                                 # Проверяем, есть ли прямая пара между монетами
                                 direct_pair = f"{coin_a}/{coin_b}"
                                 reverse_pair = f"{coin_b}/{coin_a}"
-                                
+
                                 direct_price = prices.get(direct_pair, 0)
                                 reverse_price = prices.get(reverse_pair, 0)
-                                
+
                                 if direct_price > 0:
                                     # Треугольник: base -> coin_a -> coin_b -> base
                                     # 1. Купить coin_a за base: 1/price_a coin_a
                                     # 2. Купить coin_b за coin_a: 1/price_a * direct_price coin_b
-                                    # 3. Продать coin_b за base: 1/price_a * direct_price * price_b base
-                                    
+                                    # 3. Продать coin_b за base: 1/price_a * direct_price * price_b
+                                    # base
+
                                     # Рассчитываем чистый результат
                                     result = (1 / price_a) * direct_price * price_b
                                     profit_pct = result - 1 - self.strategy_config["fee_margin"]
-                                    
+
                                     if profit_pct > self.strategy_config["arbitrage_threshold"]:
                                         opportunity = {
                                             "type": "triangular",
@@ -283,23 +283,25 @@ class CrossStrategy(BaseStrategy):
                                             "profit_pct": profit_pct,
                                             "timestamp": time.time()
                                         }
-                                        
+
                                         self.arbitrage_opportunities.append(opportunity)
-                                        
-                                        logger.debug("Найдена возможность треугольного арбитража на {exchange}: " %
-                                                    f"{base} -> {coin_a} -> {coin_b} -> {base}, "
-                                                    f"прибыль: {profit_pct:.2%}")
-                                
+
+                                        logger.debug(
+                                            f"Найдена возможность треугольного арбитража на {exchange}: "
+                                            f"{base} -> {coin_a} -> {coin_b} -> {base}, " f"прибыль: {
+                                                profit_pct:.2%}")
+
                                 elif reverse_price > 0:
                                     # Треугольник: base -> coin_a -> coin_b -> base
                                     # 1. Купить coin_a за base: 1/price_a coin_a
                                     # 2. Продать coin_a за coin_b: 1/price_a * 1/reverse_price coin_b
-                                    # 3. Продать coin_b за base: 1/price_a * 1/reverse_price * price_b base
-                                    
+                                    # 3. Продать coin_b за base: 1/price_a * 1/reverse_price *
+                                    # price_b base
+
                                     # Рассчитываем чистый результат
                                     result = (1 / price_a) * (1 / reverse_price) * price_b
                                     profit_pct = result - 1 - self.strategy_config["fee_margin"]
-                                    
+
                                     if profit_pct > self.strategy_config["arbitrage_threshold"]:
                                         opportunity = {
                                             "type": "triangular",
@@ -311,124 +313,131 @@ class CrossStrategy(BaseStrategy):
                                             "profit_pct": profit_pct,
                                             "timestamp": time.time()
                                         }
-                                        
+
                                         self.arbitrage_opportunities.append(opportunity)
-                                        
-                                        logger.debug("Найдена возможность треугольного арбитража на {exchange}: " %
-                                                    f"{base} -> {coin_a} -> {coin_b} -> {base}, "
-                                                    f"прибыль: {profit_pct:.2%}")
-            
+
+                                        logger.debug(
+                                            f"Найдена возможность треугольного арбитража на {exchange}: "
+                                            f"{base} -> {coin_a} -> {coin_b} -> {base}, " f"прибыль: {
+                                                profit_pct:.2%}")
+
             except Exception as e:
-                logger.error("Ошибка при поиске треугольного арбитража на {exchange}: {str(e)}" %)
-    
+                logger.error(f"Ошибка при поиске треугольного арбитража на {exchange}: {str(e)}")
+
     @async_handle_error
     async def _check_balances(self, opportunity: Dict[str, Any]) -> bool:
         """
         Проверяет наличие достаточного баланса для выполнения арбитража.
-        
+
         Args:
             opportunity: Словарь с данными о возможности арбитража
-            
+
         Returns:
             True, если баланс достаточен, иначе False
         """
-        if "type" in opportunity и opportunity["type"] == "triangular":
+        if "type" in opportunity and opportunity["type"] == "triangular":
             # Треугольный арбитраж
             exchange = opportunity["exchange"]
             base = opportunity["base"]
-            
+
             try:
                 # Получаем баланс
                 balance = await self.market_data.get_balance(exchange)
                 if not balance:
                     return False
-                
+
                 # Проверяем наличие достаточного баланса базовой валюты
                 available = balance.get("free", {}).get(base, 0)
-                
+
                 # Рассчитываем требуемый объем
-                required = self.strategy_config["max_position_size_pct"] * self.strategy_config.get("account_balance", 10000)
+                required = self.strategy_config["max_position_size_pct"] * \
+                    self.strategy_config.get("account_balance", 10000)
                 minimum = required * self.strategy_config["balance_threshold"]
-                
+
                 return available >= minimum
-                
+
             except Exception as e:
-                logger.error("Ошибка при проверке баланса для треугольного арбитража: {str(e)}" %)
+                logger.error(f"Ошибка при проверке баланса для треугольного арбитража: {str(e)}")
                 return False
-        
+
         else:
             # Обычный арбитраж между биржами
             buy_exchange = opportunity["buy_exchange"]
             sell_exchange = opportunity["sell_exchange"]
             symbol = opportunity["symbol"]
-            
+
             try:
                 # Получаем базовую и котируемую валюты
                 base, quote = symbol.split('/')
-                
+
                 # Получаем балансы на обеих биржах
                 buy_balance = await self.market_data.get_balance(buy_exchange)
                 sell_balance = await self.market_data.get_balance(sell_exchange)
-                
+
                 if not buy_balance or not sell_balance:
                     return False
-                
+
                 # Проверяем наличие достаточного баланса котируемой валюты на бирже для покупки
                 buy_available = buy_balance.get("free", {}).get(quote, 0)
-                
+
                 # Проверяем наличие достаточного баланса базовой валюты на бирже для продажи
                 sell_available = sell_balance.get("free", {}).get(base, 0)
-                
+
                 # Рассчитываем требуемый объем
-                required_quote = self.strategy_config["max_position_size_pct"] * self.strategy_config.get("account_balance", 10000)
+                required_quote = self.strategy_config["max_position_size_pct"] * \
+                    self.strategy_config.get("account_balance", 10000)
                 required_base = required_quote / opportunity["buy_price"]
-                
+
                 # Устанавливаем минимальные пороги
                 min_quote = required_quote * self.strategy_config["balance_threshold"]
                 min_base = required_base * self.strategy_config["balance_threshold"]
-                
+
                 # Проверяем достаточность балансов
-                return buy_available >= min_quote и sell_available >= min_base
-                
+                return buy_available >= min_quote and sell_available >= min_base
+
             except Exception as e:
-                logger.error("Ошибка при проверке балансов для арбитража: {str(e)}" %)
+                logger.error(f"Ошибка при проверке балансов для арбитража: {str(e)}")
                 return False
-    
+
     @async_handle_error
     async def _execute_arbitrage(self, opportunity: Dict[str, Any]) -> bool:
         """
         Выполняет арбитражную операцию.
-        
+
         Args:
             opportunity: Словарь с данными о возможности арбитража
-            
+
         Returns:
             True, если операция выполнена успешно, иначе False
         """
         # В реальном проекте здесь должен быть код для выполнения арбитражной операции
         # Поскольку это требует интеграции с биржами и управления реальными средствами,
         # мы просто имитируем выполнение и возвращаем успех
-        
-        if "type" в opportunity и opportunity["type"] == "triangular":
+
+        if "type" in opportunity and opportunity["type"] == "triangular":
             # Треугольный арбитраж
-            logger.info("Выполняем треугольный арбитраж на {opportunity['exchange']}: " %
-                       f"{opportunity['step1']}, {opportunity['step2']}, {opportunity['step3']}, "
-                       f"ожидаемая прибыль: {opportunity['profit_pct']:.2%}")
+            logger.info(f"Выполняем треугольный арбитраж на {opportunity['exchange']}: "
+                        f"{opportunity['step1']}, {opportunity['step2']}, {opportunity['step3']}, "
+                        f"ожидаемая прибыль: {opportunity['profit_pct']:.2%}")
         else:
             # Обычный арбитраж между биржами
-            logger.info("Выполняем арбитраж для {opportunity['symbol']}: " %
-                       f"покупка на {opportunity['buy_exchange']} по {opportunity['buy_price']:.8f}, "
-                       f"продажа на {opportunity['sell_exchange']} по {opportunity['sell_price']:.8f}, "
-                       f"ожидаемая прибыль: {opportunity['net_profit_pct']:.2%}")
-        
+            logger.info(
+                f"Выполняем арбитраж для {opportunity['symbol']}: "
+                f"покупка на {
+                    opportunity['buy_exchange']} по {
+                    opportunity['buy_price']:.8f}, " f"продажа на {
+                    opportunity['sell_exchange']} по {
+                    opportunity['sell_price']:.8f}, " f"ожидаемая прибыль: {
+                        opportunity['net_profit_pct']:.2%}")
+
         # Имитируем успешное выполнение
         return True
-    
+
     @async_handle_error
     async def _generate_trading_signals(self) -> Dict[str, Dict[str, Any]]:
         """
         Генерирует торговые сигналы на основе арбитражных возможностей.
-        
+
         Returns:
             Словарь с сигналами для каждого символа
         """
@@ -436,47 +445,47 @@ class CrossStrategy(BaseStrategy):
         current_time = time.time()
         if current_time - self.last_check_time < self.strategy_config["check_interval"]:
             return {}
-        
+
         # Обновляем данные по ценам и объемам
         await self._update_cross_market_data()
-        
+
         # Ищем возможности для арбитража
         await self._find_arbitrage_opportunities()
-        
+
         # Если включен треугольный арбитраж, ищем такие возможности
         if self.strategy_config["use_triangular_arbitrage"]:
             await self._find_triangular_arbitrage()
-        
+
         # Если нет возможностей, возвращаем пустой словарь
         if not self.arbitrage_opportunities:
             return {}
-        
+
         signals = {}
-        
+
         # Проверяем каждую возможность
-        for opportunity в self.arbitrage_opportunities:
+        for opportunity in self.arbitrage_opportunities:
             # Проверяем, не превышено ли максимальное количество открытых позиций
             if len(self.open_positions) >= self.strategy_config["max_open_positions"]:
                 break
-            
+
             # Проверяем балансы
             has_balance = await self._check_balances(opportunity)
             if not has_balance:
                 continue
-            
+
             # Выполняем арбитраж
             success = await self._execute_arbitrage(opportunity)
-            
+
             if success:
                 # Формируем сигнал на основе успешной операции
-                if "type" в opportunity и opportunity["type"] == "triangular":
+                if "type" in opportunity and opportunity["type"] == "triangular":
                     # Треугольный арбитраж не создает позицию в обычном смысле
                     continue
-                
+
                 else:
                     # Создаем сигнал для обычного арбитража
                     symbol = opportunity["symbol"]
-                    
+
                     signals[symbol] = {
                         "symbol": symbol,
                         "action": "arbitrage",
@@ -487,21 +496,21 @@ class CrossStrategy(BaseStrategy):
                         "price_diff_pct": opportunity["price_diff_pct"],
                         "timestamp": time.time()
                     }
-                    
+
                     # В реальной стратегии здесь должен быть код для отслеживания арбитражной позиции
                     # Например, создание записи в self.open_positions
-        
+
         return signals
 
     def calculate_signals(self, data):
         """Рассчитывает торговые сигналы на основе пересечения индикаторов"""
         # ...existing code...
-        
+
         # Исправление отступа на строке 123
         for i in range(len(data)):
             # Логика расчета сигналов
             pass
-            
+
         # ...existing code...
 
     def _get_signal(self, fast_line, slow_line, previous_fast, previous_slow):
@@ -517,6 +526,6 @@ class CrossStrategy(BaseStrategy):
         # Make sure this is properly indented
         if self.data is None or len(self.data) < self.fast_ma_period + 10:
             return "neutral"
-        
+
         # Rest of the method with proper indentation
         # ...

@@ -76,7 +76,7 @@ class ScalpingStrategy(BaseStrategy):
         self.momentum_data: Dict[str, float] = {}  # symbol -> импульс
         self.trade_start_times: Dict[str, float] = {}  # symbol -> время начала сделки
 
-        logger.debug("Создана стратегия скальпинга {self.name}" %)
+        logger.debug(f"Создана стратегия скальпинга {self.name}")
 
     def _update_config(self, config: Dict[str, Any]) -> None:
         """
@@ -225,7 +225,7 @@ class ScalpingStrategy(BaseStrategy):
                     await self._check_position_duration(symbol)
 
             except Exception as e:
-                logger.error("Ошибка при генерации сигналов для {symbol}: {str(e)}" %)
+                logger.error(f"Ошибка при генерации сигналов для {symbol}: {str(e)}")
 
         return signals
 
@@ -420,7 +420,7 @@ class ScalpingStrategy(BaseStrategy):
             return None
 
         except Exception as e:
-            logger.error("Ошибка при расчете импульса для {symbol}: {str(e)}" %)
+            logger.error(f"Ошибка при расчете импульса для {symbol}: {str(e)}")
             return None
 
     def _combine_signals(

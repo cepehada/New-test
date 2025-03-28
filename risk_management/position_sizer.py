@@ -138,7 +138,7 @@ class PositionSizer:
         position_size = position_value / price if price > 0 else 0
 
         logger.debug(
-            f"Calculated position size: {position_size} ({position_size_pct*100:.2f}% of balance)"
+            f"Calculated position size: {position_size} ({position_size_pct * 100:.2f}% of balance)"
         )
 
         return position_size, position_size_pct
@@ -184,8 +184,9 @@ class PositionSizer:
             )
 
         logger.info(
-            f"Position multiplier updated: {self.current_position_multiplier:.2f}, Martingale level: {self.current_martingale_level}"
-        )
+            f"Position multiplier updated: {
+                self.current_position_multiplier:.2f}, Martingale level: {
+                self.current_martingale_level}")
 
     def update_equity(self, equity: float, timestamp: datetime = None):
         """
@@ -222,7 +223,7 @@ class PositionSizer:
         # Ограничиваем историю
         if len(self.volatility_history) > self.volatility_lookback:
             self.volatility_history = self.volatility_history[
-                -self.volatility_lookback :
+                -self.volatility_lookback:
             ]
 
         # Рассчитываем среднюю волатильность
@@ -273,15 +274,19 @@ class PositionSizer:
         # Рассчитываем отношение выигрыша к проигрышу
         win_loss_ratio = avg_win / avg_loss if avg_loss > 0 else 1.0
 
-        # Формула Келли: f* = p - (1-p)/r, где p - вероятность выигрыша, r - отношение выигрыша к проигрышу
+        # Формула Келли: f* = p - (1-p)/r, где p - вероятность выигрыша, r -
+        # отношение выигрыша к проигрышу
         kelly_pct = win_probability - (1 - win_probability) / win_loss_ratio
 
         # Ограничиваем размер позиции
         kelly_pct = max(min(kelly_pct, self.max_position_size), self.min_position_size)
 
         logger.debug(
-            f"Calculated Kelly criterion: {kelly_pct*100:.2f}% (Win prob: {win_probability:.2f}, Win/Loss ratio: {win_loss_ratio:.2f})"
-        )
+            f"Calculated Kelly criterion: {
+                kelly_pct *
+                100:.2f}% (Win prob: {
+                win_probability:.2f}, Win/Loss ratio: {
+                win_loss_ratio:.2f})")
 
         return kelly_pct
 
@@ -315,8 +320,11 @@ class PositionSizer:
         optimal_f = max(min(optimal_f, self.max_position_size), self.min_position_size)
 
         logger.debug(
-            f"Calculated optimal f: {optimal_f*100:.2f}% (Worst loss: {worst_loss_pct*100:.2f}%)"
-        )
+            f"Calculated optimal f: {
+                optimal_f *
+                100:.2f}% (Worst loss: {
+                worst_loss_pct *
+                100:.2f}%)")
 
         return optimal_f
 

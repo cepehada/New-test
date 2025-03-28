@@ -39,25 +39,25 @@ class WebSocketServer:
         self.config = get_config()
         self.host = host or self.config.WS_HOST
         self.port = port or self.config.WS_PORT
-        
+
         # Набор активных подключений
         self.connections: Set[WebSocketServerProtocol] = set()
-        
+
         # Словарь для отслеживания подписок на темы
         self.subscriptions: Dict[str, Set[WebSocketServerProtocol]] = {}
-        
+
         # Обработчики событий
         self.event_handlers: Dict[str, WSEventHandler] = {}
-        
+
         # Брокер сообщений для интеграции с остальной системой
         self.message_broker = MessageBroker.get_instance()
-        
+
         # Серверная задача
         self.server_task = None
-        
+
         # Флаг, указывающий, запущен ли сервер
         self.is_running = False
-        
+
         logger.debug(f"WebSocket server initialized at {self.host}:{self.port}")
 
     async def start(self) -> None:
@@ -70,20 +70,22 @@ class WebSocketServer:
 
         # Инициализируем брокер сообщений
         await self.message_broker.initialize()
-        
+
         # Создаем сервер
         try:
-            server = await websockets.serve(self._handle_connection, self.host, self.port)
+            server = await websockets.serve(
+                self._handle_connection, self.host, self.port
+            )
             self.is_running = True
-            
+
             # Сохраняем серверную задачу
             self.server_task = asyncio.create_task(self._keep_alive())
-            
+
             logger.info(f"WebSocket server started at {self.host}:{self.port}")
-            
+
             # Подключаемся к брокеру сообщений для получения обновлений
             await self._subscribe_to_message_broker()
-            
+
             # Ожидаем завершения сервера (не завершается сам по себе)
             await server.wait_closed()
         except Exception as e:
@@ -112,19 +114,21 @@ class WebSocketServer:
         close_tasks = []
         for ws in list(self.connections):
             close_tasks.append(self._close_connection(ws))
-        
+
         if close_tasks:
             await asyncio.gather(*close_tasks)
-        
+
         # Очищаем структуры данных
         self.connections.clear()
         self.subscriptions.clear()
-        
+
         self.is_running = False
         logger.info("WebSocket server stopped")
 
     @async_handle_error
-    async def _handle_connection(self, websocket: WebSocketServerProtocol, path: str) -> None:
+    async def _handle_connection(
+        self, websocket: WebSocketServerProtocol, path: str
+    ) -> None:
         """
         Обрабатывает новое WebSocket-соединение.
 
@@ -134,50 +138,66 @@ class WebSocketServer:
         """
         # Добавляем соединение в набор
         self.connections.add(websocket)
-        
+
         # Инициализируем клиентский ID
         client_id = str(uuid.uuid4())
-        
-        logger.info(f"New WebSocket connection: {client_id} ({websocket.remote_address})")
-        
+
+        logger.info(
+            f"New WebSocket connection: {client_id} ({websocket.remote_address})"
+        )
+
         try:
             # Отправляем приветственное сообщение
-            await websocket.send(json.dumps({
-                "type": "welcome",
-                "client_id": client_id,
-                "timestamp": int(time.time()),
-                "message": "Connected to Trading Bot WebSocket Server"
-            }))
-            
+            await websocket.send(
+                json.dumps(
+                    {
+                        "type": "welcome",
+                        "client_id": client_id,
+                        "timestamp": int(time.time()),
+                        "message": "Connected to Trading Bot WebSocket Server",
+                    }
+                )
+            )
+
             # Обрабатываем сообщения от клиента
             async for message in websocket:
                 try:
                     # Парсим JSON
                     data = json.loads(message)
-                    
+
                     # Обрабатываем запрос
                     await self._process_client_message(websocket, data)
                 except json.JSONDecodeError:
-                    await websocket.send(json.dumps({
-                        "type": "error",
-                        "error": "Invalid JSON",
-                        "timestamp": int(time.time())
-                    }))
+                    await websocket.send(
+                        json.dumps(
+                            {
+                                "type": "error",
+                                "error": "Invalid JSON",
+                                "timestamp": int(time.time()),
+                            }
+                        )
+                    )
                 except Exception as e:
                     logger.error(f"Error processing WebSocket message: {str(e)}")
-                    await websocket.send(json.dumps({
-                        "type": "error",
-                        "error": "Internal server error",
-                        "message": str(e),
-                        "timestamp": int(time.time())
-                    }))
+                    await websocket.send(
+                        json.dumps(
+                            {
+                                "type": "error",
+                                "error": "Internal server error",
+                                "message": str(e),
+                                "timestamp": int(time.time()),
+                            }
+                        )
+                    )
         except websockets.exceptions.ConnectionClosed:
             logger.info(f"WebSocket connection closed: {client_id}")
         finally:
             # Удаляем соединение из всех структур данных
             await self._close_connection(websocket)
 
-    async def _process_client_message(self, websocket: WebSocketServerProtocol, data: Dict[str, Any]) -> None:
+    async def _process_client_message(
+        self, websocket: WebSocketServerProtocol, data: Dict[str, Any]
+    ) -> None:
         """
         Обрабатывает сообщение от клиента.
 
@@ -186,7 +206,7 @@ class WebSocketServer:
             data: Данные сообщения
         """
         message_type = data.get("type")
-        
+
         if message_type == "subscribe":
             # Обрабатываем подписку на тему
             await self._handle_subscribe(websocket, data)
@@ -195,22 +215,27 @@ class WebSocketServer:
             await self._handle_unsubscribe(websocket, data)
         elif message_type == "ping":
             # Отвечаем на пинг
-            await websocket.send(json.dumps({
-                "type": "pong",
-                "timestamp": int(time.time())
-            }))
+            await websocket.send(
+                json.dumps({"type": "pong", "timestamp": int(time.time())})
+            )
         elif message_type == "event":
             # Обрабатываем пользовательское событие
             await self._handle_event(websocket, data)
         else:
             # Неизвестный тип сообщения
-            await websocket.send(json.dumps({
-                "type": "error",
-                "error": "Unknown message type",
-                "timestamp": int(time.time())
-            }))
+            await websocket.send(
+                json.dumps(
+                    {
+                        "type": "error",
+                        "error": "Unknown message type",
+                        "timestamp": int(time.time()),
+                    }
+                )
+            )
 
-    async def _handle_subscribe(self, websocket: WebSocketServerProtocol, data: Dict[str, Any]) -> None:
+    async def _handle_subscribe(
+        self, websocket: WebSocketServerProtocol, data: Dict[str, Any]
+    ) -> None:
         """
         Обрабатывает запрос на подписку.
 
@@ -219,31 +244,37 @@ class WebSocketServer:
             data: Данные запроса
         """
         topic = data.get("topic")
-        
+
         if not topic:
-            await websocket.send(json.dumps({
-                "type": "error",
-                "error": "Topic not specified",
-                "timestamp": int(time.time())
-            }))
+            await websocket.send(
+                json.dumps(
+                    {
+                        "type": "error",
+                        "error": "Topic not specified",
+                        "timestamp": int(time.time()),
+                    }
+                )
+            )
             return
-        
+
         # Добавляем соединение в список подписчиков темы
         if topic not in self.subscriptions:
             self.subscriptions[topic] = set()
-        
+
         self.subscriptions[topic].add(websocket)
-        
+
         # Отправляем подтверждение
-        await websocket.send(json.dumps({
-            "type": "subscribed",
-            "topic": topic,
-            "timestamp": int(time.time())
-        }))
-        
+        await websocket.send(
+            json.dumps(
+                {"type": "subscribed", "topic": topic, "timestamp": int(time.time())}
+            )
+        )
+
         logger.debug(f"Client subscribed to {topic}")
 
-    async def _handle_unsubscribe(self, websocket: WebSocketServerProtocol, data: Dict[str, Any]) -> None:
+    async def _handle_unsubscribe(
+        self, websocket: WebSocketServerProtocol, data: Dict[str, Any]
+    ) -> None:
         """
         Обрабатывает запрос на отписку.
 
@@ -252,33 +283,39 @@ class WebSocketServer:
             data: Данные запроса
         """
         topic = data.get("topic")
-        
+
         if not topic:
-            await websocket.send(json.dumps({
-                "type": "error",
-                "error": "Topic not specified",
-                "timestamp": int(time.time())
-            }))
+            await websocket.send(
+                json.dumps(
+                    {
+                        "type": "error",
+                        "error": "Topic not specified",
+                        "timestamp": int(time.time()),
+                    }
+                )
+            )
             return
-        
+
         # Удаляем соединение из списка подписчиков темы
         if topic in self.subscriptions and websocket in self.subscriptions[topic]:
             self.subscriptions[topic].remove(websocket)
-            
+
             # Если больше нет подписчиков, удаляем тему
             if not self.subscriptions[topic]:
                 del self.subscriptions[topic]
-        
+
         # Отправляем подтверждение
-        await websocket.send(json.dumps({
-            "type": "unsubscribed",
-            "topic": topic,
-            "timestamp": int(time.time())
-        }))
-        
+        await websocket.send(
+            json.dumps(
+                {"type": "unsubscribed", "topic": topic, "timestamp": int(time.time())}
+            )
+        )
+
         logger.debug(f"Client unsubscribed from {topic}")
 
-    async def _handle_event(self, websocket: WebSocketServerProtocol, data: Dict[str, Any]) -> None:
+    async def _handle_event(
+        self, websocket: WebSocketServerProtocol, data: Dict[str, Any]
+    ) -> None:
         """
         Обрабатывает пользовательское событие.
 
@@ -287,15 +324,19 @@ class WebSocketServer:
             data: Данные события
         """
         event = data.get("event")
-        
+
         if not event:
-            await websocket.send(json.dumps({
-                "type": "error",
-                "error": "Event not specified",
-                "timestamp": int(time.time())
-            }))
+            await websocket.send(
+                json.dumps(
+                    {
+                        "type": "error",
+                        "error": "Event not specified",
+                        "timestamp": int(time.time()),
+                    }
+                )
+            )
             return
-        
+
         # Проверяем наличие обработчика для события
         if event in self.event_handlers:
             try:
@@ -303,19 +344,27 @@ class WebSocketServer:
                 await self.event_handlers[event](data, websocket)
             except Exception as e:
                 logger.error(f"Error in event handler for '{event}': {str(e)}")
-                await websocket.send(json.dumps({
-                    "type": "error",
-                    "error": f"Error processing event '{event}'",
-                    "message": str(e),
-                    "timestamp": int(time.time())
-                }))
+                await websocket.send(
+                    json.dumps(
+                        {
+                            "type": "error",
+                            "error": f"Error processing event '{event}'",
+                            "message": str(e),
+                            "timestamp": int(time.time()),
+                        }
+                    )
+                )
         else:
             # Неизвестное событие
-            await websocket.send(json.dumps({
-                "type": "error",
-                "error": f"Unknown event '{event}'",
-                "timestamp": int(time.time())
-            }))
+            await websocket.send(
+                json.dumps(
+                    {
+                        "type": "error",
+                        "error": f"Unknown event '{event}'",
+                        "timestamp": int(time.time()),
+                    }
+                )
+            )
 
     async def _close_connection(self, websocket: WebSocketServerProtocol) -> None:
         """
@@ -327,16 +376,16 @@ class WebSocketServer:
         # Удаляем из набора соединений
         if websocket in self.connections:
             self.connections.remove(websocket)
-        
+
         # Удаляем из всех подписок
         for topic in list(self.subscriptions.keys()):
             if websocket in self.subscriptions[topic]:
                 self.subscriptions[topic].remove(websocket)
-                
+
                 # Если больше нет подписчиков, удаляем тему
                 if not self.subscriptions[topic]:
                     del self.subscriptions[topic]
-        
+
         # Закрываем соединение, если оно еще открыто
         try:
             await websocket.close()
@@ -351,13 +400,12 @@ class WebSocketServer:
             try:
                 # Ожидаем 30 секунд
                 await asyncio.sleep(30)
-                
+
                 # Отправляем пинг всем соединениям
-                ping_message = json.dumps({
-                    "type": "ping",
-                    "timestamp": int(time.time())
-                })
-                
+                ping_message = json.dumps(
+                    {"type": "ping", "timestamp": int(time.time())}
+                )
+
                 for ws in list(self.connections):
                     try:
                         await ws.send(ping_message)
@@ -376,7 +424,7 @@ class WebSocketServer:
         """
         # Получаем список всех тем
         topics = self.message_broker.get_all_topics()
-        
+
         # Подписываемся на каждую тему
         for topic in topics:
             await self.message_broker.subscribe(topic, self._on_message_broker_message)
@@ -390,27 +438,27 @@ class WebSocketServer:
         """
         # Получаем тему сообщения
         topic = message.get("topic")
-        
+
         if not topic:
             logger.warning("Received message without topic from message broker")
             return
-        
+
         # Проверяем наличие подписчиков
         if topic not in self.subscriptions:
             # Нет подписчиков, пропускаем
             return
-        
+
         # Создаем сообщение для отправки
         ws_message = {
             "type": "message",
             "topic": topic,
             "data": message.get("data", {}),
-            "timestamp": message.get("timestamp", int(time.time()))
+            "timestamp": message.get("timestamp", int(time.time())),
         }
-        
+
         # Сериализуем сообщение
         ws_message_json = json.dumps(ws_message)
-        
+
         # Отправляем сообщение всем подписчикам
         for ws in list(self.subscriptions[topic]):
             try:
@@ -456,26 +504,26 @@ class WebSocketServer:
         if not self.is_running:
             logger.warning("WebSocket server is not running, cannot broadcast")
             return 0
-        
+
         # Проверяем наличие подписчиков
         if topic not in self.subscriptions:
             # Нет подписчиков
             return 0
-        
+
         # Создаем сообщение
         message = {
             "type": "message",
             "topic": topic,
             "data": data,
-            "timestamp": int(time.time())
+            "timestamp": int(time.time()),
         }
-        
+
         # Сериализуем сообщение
         message_json = json.dumps(message)
-        
+
         # Счетчик отправленных сообщений
         sent_count = 0
-        
+
         # Отправляем сообщение всем подписчикам
         for ws in list(self.subscriptions[topic]):
             try:
@@ -484,11 +532,13 @@ class WebSocketServer:
             except:
                 # Соединение, вероятно, закрыто, удаляем его
                 await self._close_connection(ws)
-        
+
         return sent_count
 
     @async_handle_error
-    async def send_to(self, websocket: WebSocketServerProtocol, data: Dict[str, Any]) -> bool:
+    async def send_to(
+        self, websocket: WebSocketServerProtocol, data: Dict[str, Any]
+    ) -> bool:
         """
         Отправляет сообщение конкретному WebSocket-соединению.
 
@@ -502,11 +552,11 @@ class WebSocketServer:
         if not self.is_running:
             logger.warning("WebSocket server is not running, cannot send message")
             return False
-        
+
         # Проверяем, активно ли соединение
         if websocket not in self.connections:
             return False
-        
+
         try:
             # Отправляем сообщение
             await websocket.send(json.dumps(data))
@@ -530,9 +580,9 @@ def get_websocket_server() -> WebSocketServer:
         WebSocketServer: Экземпляр WebSocket-сервера
     """
     global _ws_server
-    
+
     if _ws_server is None:
         config = get_config()
         _ws_server = WebSocketServer(config.WS_HOST, config.WS_PORT)
-    
+
     return _ws_server

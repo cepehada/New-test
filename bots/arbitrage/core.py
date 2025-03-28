@@ -4,6 +4,11 @@
 """
 
 # Стандартные импорты
+from project.utils.notify import send_trading_signal
+import numpy as np
+import logging
+import pandas as pd
+from typing import Dict, List, Optional, Any, Set
 import time
 import dataclasses
 from dataclasses import dataclass
@@ -647,20 +652,10 @@ class ArbitrageCore:
 """
 
 # Стандартные импорты
-import time
-import dataclasses
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Any, Set
 
 # Сторонние импорты
-import pandas as pd
 
 # Внутренние импорты
-from project.config import get_config
-from project.utils.error_handler import async_handle_error
-from project.utils.logging_utils import get_logger
-from project.utils.ccxt_exchanges import fetch_ticker, fetch_order_book, fetch_balance
-from project.data.market_data import MarketData
 
 
 logger = get_logger(__name__)
@@ -1262,25 +1257,13 @@ class ArbitrageCore:
 """
 
 # Стандартные импорты
-import time
-import logging
-import dataclasses
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Any, Set
 
 # Сторонние импорты
-import pandas as pd
-import numpy as np
 
 # Настройка логгера
 logger = logging.getLogger(__name__)
 
 # Внутренние импорты
-from project.config import get_config
-from project.utils.error_handler import async_handle_error
-from project.utils.notify import send_trading_signal
-from project.utils.ccxt_exchanges import fetch_ticker, fetch_order_book, fetch_balance
-from project.data.market_data import MarketData
 
 
 @dataclass

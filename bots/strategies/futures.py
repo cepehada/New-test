@@ -92,7 +92,7 @@ class FuturesStrategy(BaseStrategy):
         )  # символы, для которых уже установлено плечо
         self.liquidation_prices: Dict[str, float] = {}  # symbol -> цена ликвидации
 
-        logger.debug("Создана стратегия для фьючерсов {self.name}" %)
+        logger.debug(f"Создана стратегия для фьючерсов {self.name}")
 
     def _update_config(self, config: Dict[str, Any]) -> None:
         """
@@ -182,7 +182,7 @@ class FuturesStrategy(BaseStrategy):
             return True
 
         except Exception as e:
-            logger.error("Ошибка при установке плеча для {symbol}: {str(e)}" %)
+            logger.error(f"Ошибка при установке плеча для {symbol}: {str(e)}")
             return False
 
     @async_handle_error
@@ -203,7 +203,7 @@ class FuturesStrategy(BaseStrategy):
                     await self._update_order_book(symbol)
 
             except Exception as e:
-                logger.error("Ошибка при загрузке данных для {symbol}: {str(e)}" %)
+                logger.error(f"Ошибка при загрузке данных для {symbol}: {str(e)}")
 
     @async_handle_error
     async def _get_funding_rate(self, symbol: str) -> Optional[float]:
@@ -224,7 +224,7 @@ class FuturesStrategy(BaseStrategy):
             # (случайное значение в диапазоне [-0.001, 0.001])
             funding_rate = (np.random.random() * 0.002) - 0.001
 
-            logger.debug("Ставка финансирования для {symbol}: {funding_rate:.6f}" %)
+            logger.debug(f"Ставка финансирования для {symbol}: {funding_rate:.6f}")
             return funding_rate
 
         except Exception as e:
@@ -249,10 +249,10 @@ class FuturesStrategy(BaseStrategy):
 
             if order_book and "bids" in order_book and "asks" in order_book:
                 self.order_book_data[symbol] = order_book
-                logger.debug("Обновлен ордербук для {symbol}" %)
+                logger.debug(f"Обновлен ордербук для {symbol}")
 
         except Exception as e:
-            logger.error("Ошибка при обновлении ордербука для {symbol}: {str(e)}" %)
+            logger.error(f"Ошибка при обновлении ордербука для {symbol}: {str(e)}")
 
     @async_handle_error
     async def _calculate_liquidation_price(
@@ -594,7 +594,7 @@ class FuturesStrategy(BaseStrategy):
                     }
 
             except Exception as e:
-                logger.error("Ошибка при генерации сигналов для {symbol}: {str(e)}" %)
+                logger.error(f"Ошибка при генерации сигналов для {symbol}: {str(e)}")
 
         return signals
 

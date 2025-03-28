@@ -66,7 +66,7 @@ def fix_logging():
 
     # Паттерны для замены f-строк в логах
     patterns = [
-        # Логи с аргументами: logger.info("text {var}" %)
+        # Логи с аргументами: logger.info(f"text {var}")
         (
             re.compile(
                 r'(log(?:ger)?\.(?:debug|info|warning|error|critical))\(f(["\'])(.*?)(?:\2)'

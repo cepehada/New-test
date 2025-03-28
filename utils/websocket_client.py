@@ -1,8 +1,11 @@
 # Standard imports
+import asyncio
 import hashlib
 import hmac
 import inspect
+import json
 import ssl
+import time
 import zlib
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from urllib.parse import urlparse
@@ -96,7 +99,7 @@ class WebSocketClient:
         self.message_id = 0
         self.buffer = bytearray()
 
-        logger.debug("WebSocket client initialized for {self.url}" %)
+        logger.debug(f"WebSocket client initialized for {self.url}")
 
     async def connect(self) -> bool:
         """
@@ -113,7 +116,7 @@ class WebSocketClient:
         self._user_disconnect = False
 
         try:
-            logger.info("Connecting to WebSocket server: {self.url}" %)
+            logger.info(f"Connecting to WebSocket server: {self.url}")
 
             # Выполняем авторизацию, если настроена
             if self._auth_provider and self._auth_params:
@@ -155,7 +158,7 @@ class WebSocketClient:
                 else:
                     self.on_connect()
 
-            logger.info("Connected to WebSocket server: {self.url}" %)
+            logger.info(f"Connected to WebSocket server: {self.url}")
             return True
 
         except (
@@ -207,7 +210,7 @@ class WebSocketClient:
             logger.debug("Not connected to WebSocket server")
             return
 
-        logger.info("Disconnecting from WebSocket server: {self.url}" %)
+        logger.info(f"Disconnecting from WebSocket server: {self.url}")
 
         # Останавливаем задачи
         await self._stop_tasks()
@@ -216,7 +219,7 @@ class WebSocketClient:
             # Закрываем соединение
             await self.ws.close(code=code, reason=reason)
         except Exception as e:
-            logger.error("Error closing WebSocket connection: {str(e)}" %)
+            logger.error(f"Error closing WebSocket connection: {str(e)}")
 
         # Сбрасываем флаги
         self.connected = False
@@ -229,7 +232,7 @@ class WebSocketClient:
             else:
                 self.on_disconnect()
 
-        logger.info("Disconnected from WebSocket server: {self.url}" %)
+        logger.info(f"Disconnected from WebSocket server: {self.url}")
 
     async def _start_tasks(self):
         """Запускает фоновые задачи"""
@@ -278,7 +281,7 @@ class WebSocketClient:
                     await self._handle_message(decoded_message)
 
                 except Exception as e:
-                    logger.error("Error processing WebSocket message: {str(e)}" %)
+                    logger.error(f"Error processing WebSocket message: {str(e)}")
 
         except (
             websockets.exceptions.ConnectionClosed,
@@ -289,7 +292,7 @@ class WebSocketClient:
                 self.connected = False
 
                 # Выводим сообщение с кодом ошибки
-                logger.warning("WebSocket connection closed: {str(e)}" %)
+                logger.warning(f"WebSocket connection closed: {str(e)}")
 
                 # Вызываем коллбэк отключения
                 if self.on_disconnect:
@@ -343,8 +346,10 @@ class WebSocketClient:
         delay = min(delay, 60.0)  # Максимальная задержка 60 секунд
 
         logger.info(
-            f"Reconnecting to WebSocket server (attempt {self.reconnect_attempts}/{self.max_reconnect_attempts}) after {delay:.1f} seconds"
-        )
+            f"Reconnecting to WebSocket server (attempt {
+                self.reconnect_attempts}/{
+                self.max_reconnect_attempts}) after {
+                delay:.1f} seconds")
 
         # Ждем указанное время
         await asyncio.sleep(delay)
@@ -395,7 +400,7 @@ class WebSocketClient:
                 break
 
             except Exception as e:
-                logger.error("Error in ping-pong loop: {str(e)}" %)
+                logger.error(f"Error in ping-pong loop: {str(e)}")
                 await asyncio.sleep(1.0)
 
     async def _handle_message(self, message: Any):
@@ -429,7 +434,7 @@ class WebSocketClient:
                 else:
                     self.on_message(message)
             except Exception as e:
-                logger.error("Error in general message handler: {str(e)}" %)
+                logger.error(f"Error in general message handler: {str(e)}")
 
     def _get_message_type(self, message: Any) -> Optional[str]:
         """
@@ -482,7 +487,7 @@ class WebSocketClient:
                     decompressed = zlib.decompress(message)
                     return self._decode_message(decompressed.decode("utf-8"))
                 except Exception as e:
-                    logger.error("Error decompressing message: {str(e)}" %)
+                    logger.error(f"Error decompressing message: {str(e)}")
                     return message
             else:
                 # Пробуем декодировать байты как UTF-8 строку
@@ -519,7 +524,7 @@ class WebSocketClient:
             return True
 
         except (websockets.exceptions.WebSocketException, ConnectionError) as e:
-            logger.error("Error sending message: {str(e)}" %)
+            logger.error(f"Error sending message: {str(e)}")
 
             # Если соединение закрыто, пробуем переподключиться
             if self.auto_reconnect and self.connected:
@@ -548,7 +553,7 @@ class WebSocketClient:
             return True
 
         except (websockets.exceptions.WebSocketException, ConnectionError) as e:
-            logger.error("Error sending raw message: {str(e)}" %)
+            logger.error(f"Error sending raw message: {str(e)}")
 
             # Если соединение закрыто, пробуем переподключиться
             if self.auto_reconnect and self.connected:
@@ -709,7 +714,7 @@ class WebSocketPool:
                 break
 
             except Exception as e:
-                logger.error("Error in WebSocket pool cleanup loop: {str(e)}" %)
+                logger.error(f"Error in WebSocket pool cleanup loop: {str(e)}")
                 await asyncio.sleep(10.0)
 
     async def create_connection(
@@ -744,7 +749,7 @@ class WebSocketPool:
         # Добавляем в словарь соединений
         self.connections[conn_id] = client
 
-        logger.info("Created WebSocket connection: {conn_id}" %)
+        logger.info(f"Created WebSocket connection: {conn_id}")
 
         return conn_id, client
 
@@ -759,7 +764,7 @@ class WebSocketPool:
             bool: True, если соединение установлено, иначе False
         """
         if conn_id not in self.connections:
-            logger.warning("Connection not found: {conn_id}" %)
+            logger.warning(f"Connection not found: {conn_id}")
             return False
 
         return await self.connections[conn_id].connect()
@@ -775,7 +780,7 @@ class WebSocketPool:
             bool: True, если соединение закрыто, иначе False
         """
         if conn_id not in self.connections:
-            logger.warning("Connection not found: {conn_id}" %)
+            logger.warning(f"Connection not found: {conn_id}")
             return False
 
         await self.connections[conn_id].disconnect()
@@ -793,7 +798,7 @@ class WebSocketPool:
             bool: True, если сообщение успешно отправлено, иначе False
         """
         if conn_id not in self.connections:
-            logger.warning("Connection not found: {conn_id}" %)
+            logger.warning(f"Connection not found: {conn_id}")
             return False
 
         return await self.connections[conn_id].send(message)
@@ -812,7 +817,7 @@ class WebSocketPool:
             bool: True, если подписка добавлена, иначе False
         """
         if conn_id not in self.connections:
-            logger.warning("Connection not found: {conn_id}" %)
+            logger.warning(f"Connection not found: {conn_id}")
             return False
 
         self.connections[conn_id].add_subscription(subscription_message)
@@ -832,7 +837,7 @@ class WebSocketPool:
             bool: True, если подписка удалена, иначе False
         """
         if conn_id not in self.connections:
-            logger.warning("Connection not found: {conn_id}" %)
+            logger.warning(f"Connection not found: {conn_id}")
             return False
 
         self.connections[conn_id].remove_subscription(subscription_message)
@@ -853,7 +858,7 @@ class WebSocketPool:
             bool: True, если обработчик добавлен, иначе False
         """
         if conn_id not in self.connections:
-            logger.warning("Connection not found: {conn_id}" %)
+            logger.warning(f"Connection not found: {conn_id}")
             return False
 
         self.connections[conn_id].add_message_handler(message_type, handler)
@@ -871,7 +876,7 @@ class WebSocketPool:
             bool: True, если обработчик удален, иначе False
         """
         if conn_id not in self.connections:
-            logger.warning("Connection not found: {conn_id}" %)
+            logger.warning(f"Connection not found: {conn_id}")
             return False
 
         self.connections[conn_id].remove_message_handler(message_type)
@@ -1029,7 +1034,7 @@ class WebSocketMessageProcessor:
         if message_type not in self.message_queues:
             self.message_queues[message_type] = asyncio.Queue(maxsize=self.buffer_size)
 
-        logger.debug("Registered handler for message type: {message_type}" %)
+        logger.debug(f"Registered handler for message type: {message_type}")
 
     def unregister_handler(self, message_type: str):
         """
@@ -1041,7 +1046,7 @@ class WebSocketMessageProcessor:
         if message_type in self.message_handlers:
             del self.message_handlers[message_type]
 
-        logger.debug("Unregistered handler for message type: {message_type}" %)
+        logger.debug(f"Unregistered handler for message type: {message_type}")
 
     async def process_message(self, message: Any, message_type: str = None):
         """
@@ -1070,7 +1075,7 @@ class WebSocketMessageProcessor:
                 else:
                     await queue.put(message)
         except Exception as e:
-            logger.error("Error adding message to queue: {str(e)}" %)
+            logger.error(f"Error adding message to queue: {str(e)}")
 
     def _get_message_type(self, message: Any) -> Optional[str]:
         """
@@ -1149,7 +1154,7 @@ class WebSocketMessageProcessor:
                 break
 
             except Exception as e:
-                logger.error("Error in message processing loop: {str(e)}" %)
+                logger.error(f"Error in message processing loop: {str(e)}")
                 await asyncio.sleep(1.0)
 
     async def _collect_stats(self):
@@ -1179,7 +1184,7 @@ class WebSocketMessageProcessor:
                 break
 
             except Exception as e:
-                logger.error("Error in stats collection loop: {str(e)}" %)
+                logger.error(f"Error in stats collection loop: {str(e)}")
                 await asyncio.sleep(10.0)
 
     def get_stats(self) -> Dict:

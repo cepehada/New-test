@@ -14,6 +14,7 @@ MAX_RETRY_COUNT = 3
 DEFAULT_TIMEOUT = 30.0
 REQUEST_HEADERS = {"User-Agent": "Trading Bot/1.0", "Content-Type": "application/json"}
 
+
 # Константы для бирж
 # Исправление оператора 'не в' на 'not in'
 def is_order_active(order_id, active_orders):
@@ -21,6 +22,8 @@ def is_order_active(order_id, active_orders):
         logger.warning(f"Ордер {order_id} не найден в активных ордерах")
         return False
     return True
+
+
 API_VERSION = "v1"  # Assuming this is the correct fix
 EXCHANGE_TIMEOUT = 60.0
 EXCHANGE_RATE_LIMIT_MARGIN = 0.8

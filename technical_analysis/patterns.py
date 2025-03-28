@@ -14,6 +14,7 @@ try:
 except ImportError:
     import subprocess
     import sys
+
     subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy", "pandas"])
     import numpy as np
     import pandas as pd
@@ -545,7 +546,9 @@ class Patterns:
                 Series с булевыми значениями (True для свечей с паттерном)
             """
             if len(data) < 2:
-                logger.warning("Недостаточно данных для определения паттерна бычий харами")
+                logger.warning(
+                    "Недостаточно данных для определения паттерна бычий харами"
+                )
                 return pd.Series(False, index=data.index)
 
             # Создаем серию результатов
@@ -553,7 +556,9 @@ class Patterns:
 
             # Определяем бычий харами
             bullish_harami = (
-                (data["open"].shift(1) > data["close"].shift(1))  # Предыдущая свеча красная
+                (
+                    data["open"].shift(1) > data["close"].shift(1)
+                )  # Предыдущая свеча красная
                 & (data["open"] < data["close"])  # Текущая свеча зеленая
                 & (
                     data["open"] > data["close"].shift(1)
@@ -578,7 +583,9 @@ class Patterns:
                 Series с булевыми значениями (True для свечей с паттерном)
             """
             if len(data) < 2:
-                logger.warning("Недостаточно данных для определения паттерна медвежий харами")
+                logger.warning(
+                    "Недостаточно данных для определения паттерна медвежий харами"
+                )
                 return pd.Series(False, index=data.index)
 
             # Создаем серию результатов
@@ -586,7 +593,9 @@ class Patterns:
 
             # Определяем медвежий харами
             bearish_harami = (
-                (data["open"].shift(1) < data["close"].shift(1))  # Предыдущая свеча зеленая
+                (
+                    data["open"].shift(1) < data["close"].shift(1)
+                )  # Предыдущая свеча зеленая
                 & (data["open"] > data["close"])  # Текущая свеча красная
                 & (
                     data["open"] < data["close"].shift(1)
@@ -612,7 +621,9 @@ class Patterns:
                 Series с булевыми значениями (True для свечей с паттерном)
             """
             if len(data) < 2:
-                logger.warning("Недостаточно данных для определения паттерна шипцы вершины")
+                logger.warning(
+                    "Недостаточно данных для определения паттерна шипцы вершины"
+                )
                 return pd.Series(False, index=data.index)
 
             # Создаем серию результатов
@@ -621,12 +632,15 @@ class Patterns:
             # Определяем шипцы вершины
             for i in range(1, len(data)):
                 # Первая свеча зеленая, вторая красная
-                first_bullish = data["close"].iloc[i-1] > data["open"].iloc[i-1]
+                first_bullish = data["close"].iloc[i - 1] > data["open"].iloc[i - 1]
                 second_bearish = data["close"].iloc[i] < data["open"].iloc[i]
-                
+
                 # Максимумы почти совпадают
-                highs_close = abs(data["high"].iloc[i] - data["high"].iloc[i-1]) < tolerance * data["high"].iloc[i-1]
-                
+                highs_close = (
+                    abs(data["high"].iloc[i] - data["high"].iloc[i - 1])
+                    < tolerance * data["high"].iloc[i - 1]
+                )
+
                 if first_bullish and second_bearish and highs_close:
                     tweezer_tops.iloc[i] = True
 
@@ -646,7 +660,9 @@ class Patterns:
                 Series с булевыми значениями (True для свечей с паттерном)
             """
             if len(data) < 2:
-                logger.warning("Недостаточно данных для определения паттерна шипцы основания")
+                logger.warning(
+                    "Недостаточно данных для определения паттерна шипцы основания"
+                )
                 return pd.Series(False, index=data.index)
 
             # Создаем серию результатов
@@ -655,12 +671,15 @@ class Patterns:
             # Определяем шипцы основания
             for i in range(1, len(data)):
                 # Первая свеча красная, вторая зеленая
-                first_bearish = data["close"].iloc[i-1] < data["open"].iloc[i-1]
+                first_bearish = data["close"].iloc[i - 1] < data["open"].iloc[i - 1]
                 second_bullish = data["close"].iloc[i] > data["open"].iloc[i]
-                
+
                 # Минимумы почти совпадают
-                lows_close = abs(data["low"].iloc[i] - data["low"].iloc[i-1]) < tolerance * data["low"].iloc[i-1]
-                
+                lows_close = (
+                    abs(data["low"].iloc[i] - data["low"].iloc[i - 1])
+                    < tolerance * data["low"].iloc[i - 1]
+                )
+
                 if first_bearish and second_bullish and lows_close:
                     tweezer_bottoms.iloc[i] = True
 
@@ -717,7 +736,9 @@ class Patterns:
                 Series с булевыми значениями (True для свечей с паттерном)
             """
             if len(data) < 5:
-                logger.warning("Недостаточно данных для определения паттерна растущие три метода")
+                logger.warning(
+                    "Недостаточно данных для определения паттерна растущие три метода"
+                )
                 return pd.Series(False, index=data.index)
 
             # Создаем серию результатов
@@ -726,24 +747,33 @@ class Patterns:
             # Определяем растущие три метода
             for i in range(4, len(data)):
                 # Первая свеча - длинная бычья свеча
-                first_bullish = data["close"].iloc[i-4] > data["open"].iloc[i-4]
-                first_body_size = data["close"].iloc[i-4] - data["open"].iloc[i-4]
-                
+                first_bullish = data["close"].iloc[i - 4] > data["open"].iloc[i - 4]
+                first_body_size = data["close"].iloc[i - 4] - data["open"].iloc[i - 4]
+
                 # Последняя свеча - длинная бычья свеча, закрывается выше первой
                 last_bullish = data["close"].iloc[i] > data["open"].iloc[i]
-                last_closes_higher = data["close"].iloc[i] > data["close"].iloc[i-4]
-                
+                last_closes_higher = data["close"].iloc[i] > data["close"].iloc[i - 4]
+
                 # Три свечи между - короткие медвежьи свечи внутри первой
                 inside_first = True
                 all_bearish = True
-                
+
                 for j in range(1, 4):
-                    if data["high"].iloc[i-j] > data["high"].iloc[i-4] or data["low"].iloc[i-j] < data["low"].iloc[i-4]:
+                    if (
+                        data["high"].iloc[i - j] > data["high"].iloc[i - 4]
+                        or data["low"].iloc[i - j] < data["low"].iloc[i - 4]
+                    ):
                         inside_first = False
-                    if data["open"].iloc[i-j] < data["close"].iloc[i-j]:
+                    if data["open"].iloc[i - j] < data["close"].iloc[i - j]:
                         all_bearish = False
-                
-                if first_bullish and last_bullish and last_closes_higher and inside_first and all_bearish:
+
+                if (
+                    first_bullish
+                    and last_bullish
+                    and last_closes_higher
+                    and inside_first
+                    and all_bearish
+                ):
                     rising_three_methods.iloc[i] = True
 
             return rising_three_methods
@@ -761,7 +791,9 @@ class Patterns:
                 Series с булевыми значениями (True для свечей с паттерном)
             """
             if len(data) < 5:
-                logger.warning("Недостаточно данных для определения паттерна падающие три метода")
+                logger.warning(
+                    "Недостаточно данных для определения паттерна падающие три метода"
+                )
                 return pd.Series(False, index=data.index)
 
             # Создаем серию результатов
@@ -770,24 +802,33 @@ class Patterns:
             # Определяем падающие три метода
             for i in range(4, len(data)):
                 # Первая свеча - длинная медвежья свеча
-                first_bearish = data["close"].iloc[i-4] < data["open"].iloc[i-4]
-                first_body_size = data["open"].iloc[i-4] - data["close"].iloc[i-4]
-                
+                first_bearish = data["close"].iloc[i - 4] < data["open"].iloc[i - 4]
+                first_body_size = data["open"].iloc[i - 4] - data["close"].iloc[i - 4]
+
                 # Последняя свеча - длинная медвежья свеча, закрывается ниже первой
                 last_bearish = data["close"].iloc[i] < data["open"].iloc[i]
-                last_closes_lower = data["close"].iloc[i] < data["close"].iloc[i-4]
-                
+                last_closes_lower = data["close"].iloc[i] < data["close"].iloc[i - 4]
+
                 # Три свечи между - короткие бычьи свечи внутри первой
                 inside_first = True
                 all_bullish = True
-                
+
                 for j in range(1, 4):
-                    if data["high"].iloc[i-j] > data["high"].iloc[i-4] or data["low"].iloc[i-j] < data["low"].iloc[i-4]:
+                    if (
+                        data["high"].iloc[i - j] > data["high"].iloc[i - 4]
+                        or data["low"].iloc[i - j] < data["low"].iloc[i - 4]
+                    ):
                         inside_first = False
-                    if data["open"].iloc[i-j] > data["close"].iloc[i-j]:
+                    if data["open"].iloc[i - j] > data["close"].iloc[i - j]:
                         all_bullish = False
-                
-                if first_bearish and last_bearish and last_closes_lower and inside_first and all_bullish:
+
+                if (
+                    first_bearish
+                    and last_bearish
+                    and last_closes_lower
+                    and inside_first
+                    and all_bullish
+                ):
                     falling_three_methods.iloc[i] = True
 
             return falling_three_methods
@@ -830,6 +871,10 @@ class Patterns:
             has_lower_shadow = data["low"] < body_low
 
             # Определяем волчок
-            spinning_top = (body_to_candle_ratio <= body_ratio) & has_upper_shadow & has_lower_shadow
+            spinning_top = (
+                (body_to_candle_ratio <= body_ratio)
+                & has_upper_shadow
+                & has_lower_shadow
+            )
 
             return spinning_top

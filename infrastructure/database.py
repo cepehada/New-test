@@ -11,6 +11,7 @@ try:
 except ImportError:
     import subprocess
     import sys
+
     subprocess.check_call([sys.executable, "-m", "pip", "install", "asyncpg"])
     import asyncpg
 

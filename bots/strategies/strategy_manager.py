@@ -82,10 +82,10 @@ class StrategyManager:
                         f"Ошибка при загрузке пользовательской стратегии {name}: {str(e)}"
                     )
 
-            logger.info("Загружено {len(self.strategies)} стратегий" %)
+            logger.info(f"Загружено {len(self.strategies)} стратегий")
 
         except Exception as e:
-            logger.error("Ошибка при загрузке стратегий: {str(e)}" %)
+            logger.error(f"Ошибка при загрузке стратегий: {str(e)}")
 
     def register_strategy(self, name: str, strategy_class: Type[BaseStrategy]) -> None:
         """
@@ -104,7 +104,7 @@ class StrategyManager:
 
         # Регистрируем стратегию
         self.strategies[name] = strategy_class
-        logger.debug("Зарегистрирована стратегия: {name}" %)
+        logger.debug(f"Зарегистрирована стратегия: {name}")
 
     def set_strategy_config(self, name: str, config: Dict[str, Any]) -> None:
         """
@@ -115,7 +115,7 @@ class StrategyManager:
             config: Конфигурация стратегии
         """
         self.strategy_configs[name] = config
-        logger.debug("Установлена конфигурация для стратегии {name}" %)
+        logger.debug(f"Установлена конфигурация для стратегии {name}")
 
     def get_available_strategies(self) -> List[str]:
         """
@@ -190,7 +190,7 @@ class StrategyManager:
         strategy_id = strategy.strategy_id
         self.running_strategies[strategy_id] = strategy
 
-        logger.info("Запущена стратегия {strategy_name} с ID {strategy_id}" %)
+        logger.info(f"Запущена стратегия {strategy_name} с ID {strategy_id}")
         await send_trading_signal(f"Запущена стратегия {strategy.name}")
 
         return strategy_id
@@ -207,7 +207,7 @@ class StrategyManager:
             True в случае успеха, иначе False
         """
         if strategy_id not in self.running_strategies:
-            logger.warning("Стратегия с ID {strategy_id} не найдена" %)
+            logger.warning(f"Стратегия с ID {strategy_id} не найдена")
             return False
 
         # Получаем стратегию
@@ -216,13 +216,13 @@ class StrategyManager:
         # Останавливаем стратегию
         success = await strategy.stop()
         if not success:
-            logger.error("Не удалось остановить стратегию с ID {strategy_id}" %)
+            logger.error(f"Не удалось остановить стратегию с ID {strategy_id}")
             return False
 
         # Удаляем стратегию из списка запущенных
         del self.running_strategies[strategy_id]
 
-        logger.info("Остановлена стратегия {strategy.name} с ID {strategy_id}" %)
+        logger.info(f"Остановлена стратегия {strategy.name} с ID {strategy_id}")
         await send_trading_signal(f"Остановлена стратегия {strategy.name}")
 
         return True
@@ -239,7 +239,7 @@ class StrategyManager:
             True в случае успеха, иначе False
         """
         if strategy_id not in self.running_strategies:
-            logger.warning("Стратегия с ID {strategy_id} не найдена" %)
+            logger.warning(f"Стратегия с ID {strategy_id} не найдена")
             return False
 
         # Получаем стратегию
@@ -248,7 +248,7 @@ class StrategyManager:
         # Приостанавливаем стратегию
         success = await strategy.pause()
 
-        logger.info("Приостановлена стратегия {strategy.name} с ID {strategy_id}" %)
+        logger.info(f"Приостановлена стратегия {strategy.name} с ID {strategy_id}")
 
         return success
 
@@ -264,7 +264,7 @@ class StrategyManager:
             True в случае успеха, иначе False
         """
         if strategy_id not in self.running_strategies:
-            logger.warning("Стратегия с ID {strategy_id} не найдена" %)
+            logger.warning(f"Стратегия с ID {strategy_id} не найдена")
             return False
 
         # Получаем стратегию
@@ -273,7 +273,7 @@ class StrategyManager:
         # Возобновляем стратегию
         success = await strategy.resume()
 
-        logger.info("Возобновлена работа стратегии {strategy.name} с ID {strategy_id}" %)
+        logger.info(f"Возобновлена работа стратегии {strategy.name} с ID {strategy_id}")
 
         return success
 
@@ -292,7 +292,7 @@ class StrategyManager:
             True в случае успеха, иначе False
         """
         if strategy_id not in self.running_strategies:
-            logger.warning("Стратегия с ID {strategy_id} не найдена" %)
+            logger.warning(f"Стратегия с ID {strategy_id} не найдена")
             return False
 
         # Получаем стратегию
@@ -319,7 +319,7 @@ class StrategyManager:
             Словарь с состоянием стратегии
         """
         if strategy_id not in self.running_strategies:
-            logger.warning("Стратегия с ID {strategy_id} не найдена" %)
+            logger.warning(f"Стратегия с ID {strategy_id} не найдена")
             return {}
 
         # Получаем стратегию
@@ -370,7 +370,7 @@ class StrategyManager:
         for strategy_id, strategy in running_strategies:
             try:
                 await strategy.stop()
-                logger.info("Остановлена стратегия {strategy.name} с ID {strategy_id}" %)
+                logger.info(f"Остановлена стратегия {strategy.name} с ID {strategy_id}")
             except Exception as e:
                 logger.error(
                     f"Ошибка при остановке стратегии {strategy.name}: {str(e)}"

@@ -89,7 +89,7 @@ class HttpCache:
         self._cache_metadata = {}
         self._load_metadata()
 
-        logger.info("HTTP cache initialized in {self.cache_dir}" %)
+        logger.info(f"HTTP cache initialized in {self.cache_dir}")
 
     def _create_cache_dir(self):
         """Создает директорию для кеша, если она не существует"""
@@ -104,7 +104,7 @@ class HttpCache:
                 with open(metadata_path, "r") as f:
                     self._cache_metadata = json.load(f)
             except Exception as e:
-                logger.error("Error loading cache metadata: {str(e)}" %)
+                logger.error(f"Error loading cache metadata: {str(e)}")
                 self._cache_metadata = {}
 
     def _save_metadata(self):
@@ -114,7 +114,7 @@ class HttpCache:
             with open(metadata_path, "w") as f:
                 json.dump(self._cache_metadata, f)
         except Exception as e:
-            logger.error("Error saving cache metadata: {str(e)}" %)
+            logger.error(f"Error saving cache metadata: {str(e)}")
 
     def _get_cache_key(
         self, url: str, params: Dict = None, headers: Dict = None
@@ -186,8 +186,13 @@ class HttpCache:
         # Если размер превышен, удаляем старые файлы
         if total_size > self.max_size_bytes:
             logger.info(
-                f"Cache size ({total_size / 1024 / 1024:.2f} MB) exceeds maximum ({self.max_size_bytes / 1024 / 1024:.2f} MB). Cleaning up..."
-            )
+                f"Cache size ({
+                    total_size /
+                    1024 /
+                    1024:.2f} MB) exceeds maximum ({
+                    self.max_size_bytes /
+                    1024 /
+                    1024:.2f} MB). Cleaning up...")
 
             # Сортируем метаданные по времени истечения
             sorted_metadata = sorted(
@@ -242,7 +247,7 @@ class HttpCache:
                     cache_data = json.load(f)
                     return cache_data.get("response")
         except Exception as e:
-            logger.error("Error reading cache file: {str(e)}" %)
+            logger.error(f"Error reading cache file: {str(e)}")
 
         return None
 
@@ -297,7 +302,7 @@ class HttpCache:
             # Сохраняем обновленные метаданные
             self._save_metadata()
         except Exception as e:
-            logger.error("Error writing cache file: {str(e)}" %)
+            logger.error(f"Error writing cache file: {str(e)}")
 
     async def clear(self, url: str = None, older_than: int = None) -> None:
         """
@@ -460,7 +465,7 @@ class HttpClient:
         if self.cache_enabled and use_cache:
             cached_response = await self.cache.get(url, params, headers)
             if cached_response:
-                logger.debug("Cache hit for {url}" %)
+                logger.debug(f"Cache hit for {url}")
                 return cached_response
 
         # Добавляем заголовки по умолчанию
@@ -512,19 +517,19 @@ class HttpClient:
                     raise
 
                 logger.warning(
-                    f"HTTP error {e.response.status_code} for {url}, attempt {attempt+1}/{self.retry_attempts}"
+                    f"HTTP error {e.response.status_code} for {url}, attempt {attempt + 1}/{self.retry_attempts}"
                 )
 
             except (httpx.RequestError, httpx.TimeoutException) as e:
                 last_error = e
                 logger.warning(
-                    f"Request error for {url}, attempt {attempt+1}/{self.retry_attempts}: {str(e)}"
+                    f"Request error for {url}, attempt {attempt + 1}/{self.retry_attempts}: {str(e)}"
                 )
 
             except Exception as e:
                 last_error = e
                 logger.error(
-                    f"Unexpected error for {url}, attempt {attempt+1}/{self.retry_attempts}: {str(e)}"
+                    f"Unexpected error for {url}, attempt {attempt + 1}/{self.retry_attempts}: {str(e)}"
                 )
 
             # Увеличиваем счетчик попыток
@@ -616,19 +621,19 @@ class HttpClient:
                     raise
 
                 logger.warning(
-                    f"HTTP error {e.response.status_code} for {url}, attempt {attempt+1}/{self.retry_attempts}"
+                    f"HTTP error {e.response.status_code} for {url}, attempt {attempt + 1}/{self.retry_attempts}"
                 )
 
             except (httpx.RequestError, httpx.TimeoutException) as e:
                 last_error = e
                 logger.warning(
-                    f"Request error for {url}, attempt {attempt+1}/{self.retry_attempts}: {str(e)}"
+                    f"Request error for {url}, attempt {attempt + 1}/{self.retry_attempts}: {str(e)}"
                 )
 
             except Exception as e:
                 last_error = e
                 logger.error(
-                    f"Unexpected error for {url}, attempt {attempt+1}/{self.retry_attempts}: {str(e)}"
+                    f"Unexpected error for {url}, attempt {attempt + 1}/{self.retry_attempts}: {str(e)}"
                 )
 
             # Увеличиваем счетчик попыток

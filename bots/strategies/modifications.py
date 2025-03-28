@@ -65,7 +65,7 @@ class StrategyModifications:
             return min(initial_stop, trailing_stop)
 
         else:
-            logger.error("Неизвестная сторона позиции: {side}" %)
+            logger.error(f"Неизвестная сторона позиции: {side}")
             return entry_price
 
     @staticmethod
@@ -120,7 +120,7 @@ class StrategyModifications:
                 result.append((exit_price, pct))
 
         else:
-            logger.error("Неизвестная сторона позиции: {side}" %)
+            logger.error(f"Неизвестная сторона позиции: {side}")
 
         return result
 
@@ -254,7 +254,7 @@ class StrategyModifications:
             Оптимальное соотношение риск/прибыль
         """
         if win_rate <= 0 or win_rate >= 1:
-            logger.warning("Некорректный винрейт: {win_rate}" %)
+            logger.warning(f"Некорректный винрейт: {win_rate}")
             return risk_reward_ratio
 
         # Оптимальное соотношение риск/прибыль = (1 - win_rate) / win_rate
@@ -284,7 +284,7 @@ class StrategyModifications:
             Словарь с порогами для разных индикаторов
         """
         if data.empty:
-            logger.warning("Пустой DataFrame для {symbol}" %)
+            logger.warning(f"Пустой DataFrame для {symbol}")
             return {
                 "rsi_oversold": 30.0,
                 "rsi_overbought": 70.0,

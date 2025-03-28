@@ -147,7 +147,9 @@ class CacheService:
                     self.tags[tag] = set()
                 self.tags[tag].add(key)
 
-            await self.redis.set(key, value, expire=ttl)  # Assuming this is the correct fix
+            await self.redis.set(
+                key, value, expire=ttl
+            )  # Assuming this is the correct fix
 
             logger.debug(
                 f"Установлено значение в кэш для ключа {key}, TTL={ttl}с, теги={tags}"

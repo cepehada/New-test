@@ -23,7 +23,9 @@ class Database:
             config: Конфигурация базы данных
         """
         self.config = config
-        self.db_path = config.get("db_path", os.environ.get("DB_PATH", "data/trading.db"))
+        self.db_path = config.get(
+            "db_path", os.environ.get("DB_PATH", "data/trading.db")
+        )
         self._connection = None
         self._lock = asyncio.Lock()
 
@@ -331,12 +333,12 @@ class Database:
             # Проверяем, что соединение установлено
             if not self._connection:
                 await self.connect()
-            
+
             # Экранируем JSON параметры
             params_json = "{}"
             if "params" in order_data:
                 params_json = json.dumps(order_data["params"])
-            
+
             # Создаем заготовку SQL-запроса
             async with self._lock:
                 await self._connection.execute(
@@ -374,14 +376,14 @@ class Database:
                         params_json,
                         order_data.get("is_closed", False),
                         order_data.get("client_order_id", ""),
-                        order_data.get("strategy_id", "")
-                    )
+                        order_data.get("strategy_id", ""),
+                    ),
                 )
                 await self._connection.commit()
-            
+
             logger.debug(f"Ордер сохранен/обновлен: {order_data.get('order_id')}")
             return True
-            
+
         except Exception as e:
             logger.error(f"Ошибка при сохранении ордера: {str(e)}")
             return False

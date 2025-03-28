@@ -56,7 +56,7 @@ async def run_optimization():
 
     # Запуск оптимизации
     results = await genetic_optimizer.optimize(strategy_class, parameter_ranges, data)
-    logger.info("Результаты оптимизации: {results}" %)
+    logger.info(f"Результаты оптимизации: {results}")
 
 
 def run_visualization():
@@ -94,6 +94,6 @@ if __name__ == "__main__":
         # Запуск оптимизации в event loop
         asyncio.run(run_optimization())
     except Exception as e:
-        logger.error("Ошибка в оптимизации: {e}" %)
+        logger.error(f"Ошибка в оптимизации: {e}")
 
     run_visualization()

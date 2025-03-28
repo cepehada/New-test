@@ -178,7 +178,12 @@ class Position:
         """
         status = "OPEN" if self.is_open() else "CLOSED"
         pnl = self.unrealized_pnl if self.is_open() else self.realized_pnl
-        return f"Position({self.symbol}, {self.direction}, {self.amount}, {self.entry_price}, {status}, PnL: {pnl:.2f})"
+        return f"Position({
+            self.symbol}, {
+            self.direction}, {
+            self.amount}, {
+                self.entry_price}, {status}, PnL: {
+                    pnl:.2f})"
 
 
 class Trade:
@@ -286,7 +291,12 @@ class Trade:
         Returns:
             str: Строковое представление
         """
-        return f"Trade({self.symbol}, {self.direction}, {self.amount}, {self.price}, {self.timestamp})"
+        return f"Trade({
+            self.symbol}, {
+            self.direction}, {
+            self.amount}, {
+                self.price}, {
+                    self.timestamp})"
 
 
 class Order:
@@ -503,7 +513,7 @@ class Portfolio:
         # Хронология изменений капитала
         self.equity_history = []
 
-        logger.debug("Portfolio initialized with balance: {initial_balance}" %)
+        logger.debug(f"Portfolio initialized with balance: {initial_balance}")
 
     async def open_position(
         self,
@@ -551,8 +561,9 @@ class Portfolio:
         # Проверяем, достаточно ли баланса
         if self.balance < position_cost + fee:
             logger.warning(
-                f"Cannot open position: insufficient balance ({self.balance} < {position_cost + fee})"
-            )
+                f"Cannot open position: insufficient balance ({
+                    self.balance} < {
+                    position_cost + fee})")
             return None
 
         # Обновляем баланс
@@ -597,7 +608,7 @@ class Portfolio:
         # Обновляем хронологию капитала
         self._update_equity_history()
 
-        logger.debug("Opened position: {position}" %)
+        logger.debug(f"Opened position: {position}")
 
         return position
 
@@ -617,7 +628,7 @@ class Portfolio:
         """
         # Проверяем, существует ли позиция
         if position_id not in self.positions:
-            logger.warning("Cannot close position: position not found ({position_id})" %)
+            logger.warning(f"Cannot close position: position not found ({position_id})")
             return None
 
         # Получаем позицию
@@ -684,7 +695,7 @@ class Portfolio:
         # Обновляем хронологию капитала
         self._update_equity_history()
 
-        logger.debug("Closed position: {position}" %)
+        logger.debug(f"Closed position: {position}")
 
         return position
 

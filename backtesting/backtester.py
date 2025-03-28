@@ -572,8 +572,8 @@ class Backtester:
                     # Логируем сделку, если включено
                     if settings.log_trades:
                         logger.debug(
-                            f"Closed LONG position at {position.stop_loss} (STOP-LOSS) ({timestamp})"
-                        )
+                            f"Closed LONG position at {
+                                position.stop_loss} (STOP-LOSS) ({timestamp})")
 
                 # Проверяем, был ли достигнут тейк-профит
                 elif (
@@ -589,8 +589,8 @@ class Backtester:
                     # Логируем сделку, если включено
                     if settings.log_trades:
                         logger.debug(
-                            f"Closed LONG position at {position.take_profit} (TAKE-PROFIT) ({timestamp})"
-                        )
+                            f"Closed LONG position at {
+                                position.take_profit} (TAKE-PROFIT) ({timestamp})")
 
             # Проверяем стоп-лосс и тейк-профит для короткой позиции
             elif position.direction == "short":
@@ -608,8 +608,8 @@ class Backtester:
                     # Логируем сделку, если включено
                     if settings.log_trades:
                         logger.debug(
-                            f"Closed SHORT position at {position.stop_loss} (STOP-LOSS) ({timestamp})"
-                        )
+                            f"Closed SHORT position at {
+                                position.stop_loss} (STOP-LOSS) ({timestamp})")
 
                 # Проверяем, был ли достигнут тейк-профит
                 elif (
@@ -625,8 +625,8 @@ class Backtester:
                     # Логируем сделку, если включено
                     if settings.log_trades:
                         logger.debug(
-                            f"Closed SHORT position at {position.take_profit} (TAKE-PROFIT) ({timestamp})"
-                        )
+                            f"Closed SHORT position at {
+                                position.take_profit} (TAKE-PROFIT) ({timestamp})")
 
     async def _close_all_positions(
         self, portfolio: Portfolio, price: float, timestamp: datetime

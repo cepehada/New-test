@@ -80,7 +80,7 @@ class MainStrategy(BaseStrategy):
         )  # symbol -> timeframe -> timestamp
         self.trend_direction: Dict[str, str] = {}  # symbol -> trend
 
-        logger.debug("Создана основная стратегия {self.name}" %)
+        logger.debug(f"Создана основная стратегия {self.name}")
 
     def _update_config(self, config: Dict[str, Any]) -> None:
         """
@@ -385,7 +385,7 @@ class MainStrategy(BaseStrategy):
                     signals[symbol] = combined_signal
 
             except Exception as e:
-                logger.error("Ошибка при генерации сигналов для {symbol}: {str(e)}" %)
+                logger.error(f"Ошибка при генерации сигналов для {symbol}: {str(e)}")
 
         return signals
 
@@ -666,16 +666,16 @@ class MainStrategy(BaseStrategy):
             return combined_signal
 
         except Exception as e:
-            logger.error("Ошибка при комбинировании сигналов для {symbol}: {str(e)}" %)
+            logger.error(f"Ошибка при комбинировании сигналов для {symbol}: {str(e)}")
             return {}
 
     def analyze_market(self, data):
         """
         Analyzes market data to generate trading signals.
-        
+
         Args:
             data: Market data to analyze
-            
+
         Returns:
             Dictionary with analysis results
         """
@@ -683,15 +683,15 @@ class MainStrategy(BaseStrategy):
         volatility = self._calculate_volatility(data)
         signals = self._generate_signals(trend, volatility, data)
         return signals
-    
+
     def _determine_trend(self, data):
         """Determines market trend based on data"""
         # Fewer branches...
-    
+
     def _calculate_volatility(self, data):
         """Calculates market volatility"""
         # Fewer branches...
-    
+
     def _generate_signals(self, trend, volatility, data):
         """Generates signals based on trend and volatility"""
         # Fewer branches...
