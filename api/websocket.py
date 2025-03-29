@@ -22,6 +22,10 @@ logger = get_logger(__name__)
 # Тип для обработчиков событий WebSocket
 WSEventHandler = Callable[[Dict[str, Any], WebSocketServerProtocol], Awaitable[None]]
 
+# Глобальные переменные для подписок и активных клиентов
+active_subscriptions = {}
+active_clients = {"market": set()}
+
 
 class WebSocketServer:
     """
@@ -566,6 +570,36 @@ class WebSocketServer:
             # Соединение, вероятно, закрыто, удаляем его
             await self._close_connection(websocket)
             return False
+
+
+async def broadcast_updates(symbol, data_type, data):
+    """Рассылает обновления всем подписанным клиентам"""
+    
+    # Объявляем глобальную переменную active_subscriptions
+    global active_subscriptions
+    
+    # Проверяем, что active_subscriptions инициализирована
+    if not active_subscriptions:
+        active_subscriptions = {}
+    
+    # Используем .items() для перебора словаря
+    for client_id, subscriptions in active_subscriptions.items():
+        if symbol in subscriptions and data_type in subscriptions[symbol]:
+            try:
+                # Получаем клиента
+                client = next((ws for ws in active_clients.get("market", set()) 
+                              if hasattr(ws, 'id') and ws.id == client_id), None)
+                
+                if client:
+                    # Отправляем данные
+                    await client.send_json({
+                        "type": data_type,
+                        "symbol": symbol,
+                        "data": data,
+                        "timestamp": time.time()
+                    })
+            except Exception as e:
+                logger.error(f"Error broadcasting update to client {client_id}: {str(e)}")
 
 
 # Глобальный экземпляр WebSocket-сервера

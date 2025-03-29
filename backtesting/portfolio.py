@@ -982,3 +982,24 @@ class Portfolio:
         self.equity_history = []
 
         logger.debug("Portfolio reset to initial state")
+
+
+"""
+Модуль для управления портфелем во время бэктестинга.
+"""
+
+import numpy as np
+import pandas as pd
+from typing import Dict, List, Any, Optional, Tuple
+from datetime import datetime, timedelta
+
+from project.utils.logging_utils import setup_logger
+
+logger = setup_logger("backtest_portfolio")
+
+
+class BacktestPortfolio:
+    """Класс для отслеживания состояния портфеля во время бэктестинга"""
+    
+    def __init__(self, initial_balance: float = 10000, commission: float = 0.001):
+        pass

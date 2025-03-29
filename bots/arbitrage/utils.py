@@ -1,5 +1,28 @@
 """
 Утилиты для арбитражной торговли.
+"""
+
+import asyncio
+from typing import Dict, List, Any, Optional, Tuple
+import time
+from datetime import datetime, timedelta
+
+from project.utils.logging_utils import setup_logger
+from project.exchange.exchange_manager import ExchangeManager
+from project.data.market_data import MarketDataProvider
+
+logger = setup_logger("arbitrage_utils")
+
+
+class ArbitrageCalculator:
+    """Класс для расчета арбитражных возможностей"""
+    
+    def __init__(self):
+        pass
+
+
+"""
+Утилиты для арбитражной торговли.
 Предоставляет вспомогательные функции для работы с данными рынка и расчетов.
 """
 
